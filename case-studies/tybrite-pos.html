@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tybrite POS — Case Study · Ribyon Studios</title>
+  <meta name="description" content="Product design and frontend for Tybrite POS — a point of sale system built for high-volume East African retail environments.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../nav.js" defer></script>
+</head>
+<body>
+  <div class="scroll-progress"><div class="scroll-progress-bar"></div></div>
+
+  <nav class="navbar">
+    <div class="container">
+      <a class="logo" href="/"><img src="../images/RIBYON NEON LOGO.png" alt="Ribyon Studios"></a>
+      <button class="mobile-toggle" aria-label="Menu">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="../products.html">Services</a>
+          <a href="../about.html">About</a>
+          <a href="../pricing.html">Pricing</a>
+          <a href="../contact.html">Contact</a>
+          <a href="../blog.html">Read</a>
+        </div>
+        <button class="btn-nav" onclick="location.href='../contact.html'">Start a project</button>
+      </div>
+    </div>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="cs-hero">
+    <div class="cs-hero-bg">
+      <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=1920&q=85&fit=crop" alt="Tybrite POS">
+    </div>
+    <div class="cs-hero-body">
+      <div class="container">
+        <a href="../index.html#work" class="cs-back">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 8H3M7 4L3 8l4 4"/></svg>
+          All work
+        </a>
+        <div class="cs-hero-tags">
+          <span class="cs-hero-tag">Product</span>
+          <span class="cs-hero-tag">Retail</span>
+          <span class="cs-hero-tag">POS</span>
+        </div>
+        <h1 class="cs-hero-title">Tybrite POS</h1>
+        <p class="cs-hero-subtitle">A point of sale system for East African retail — designed to handle high transaction volumes in noisy, fast-moving environments where speed and clarity are non-negotiable.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <div class="cs-metrics">
+    <div class="container cs-metrics-inner">
+      <div class="cs-metric">
+        <span class="cs-metric-val">↑ 65%</span>
+        <span class="cs-metric-label">Transaction speed</span>
+      </div>
+      <div class="cs-metric">
+        <span class="cs-metric-val">East Africa</span>
+        <span class="cs-metric-label">Market</span>
+      </div>
+      <div class="cs-metric">
+        <span class="cs-metric-val">2024</span>
+        <span class="cs-metric-label">Year completed</span>
+      </div>
+      <div class="cs-metric">
+        <span class="cs-metric-val">Full</span>
+        <span class="cs-metric-label">Build delivered</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRIEF -->
+  <section class="section section-dark bg-black">
+    <div class="container">
+      <div class="cs-brief">
+        <div>
+          <span class="cs-brief-label">The brief</span>
+          <h2 class="cs-brief-heading">Speed and clarity. No compromises.</h2>
+        </div>
+        <div class="cs-brief-text">
+          <p>Tybrite POS needed a product design and frontend that could handle high transaction volumes in noisy, fast-moving retail environments. Speed and clarity were non-negotiable — the system had to perform at the counter, not just on a demo screen.</p>
+          <p>The challenge was density. A retail POS needs to surface a large amount of information — inventory, pricing, transaction history, customer data — without overwhelming the operator or slowing down the queue. Every design decision had to serve the person at the till.</p>
+          <p>The result is a UI that prioritises the most common actions, reduces taps to complete a transaction, and maintains legibility under fluorescent lighting, on low-resolution screens, and in high-pressure situations. New staff need almost no training. That's the real benchmark.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FULL IMAGE -->
+  <div class="cs-img-full reveal">
+    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=85&fit=crop" alt="Tybrite POS in use">
+  </div>
+
+  <!-- DELIVERABLES -->
+  <section class="section section-dark bg-black">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">What we built</span>
+        <h2>The full <span class="orange">system.</span></h2>
+      </div>
+      <div class="cs-deliverables">
+        <div class="cs-deliverable reveal">
+          <span class="cs-deliverable-icon">◎</span>
+          <h4>UI/UX Design</h4>
+          <p>Full interface design across all screens. Wireframes, prototypes, and final high-fidelity UI.</p>
+        </div>
+        <div class="cs-deliverable reveal reveal-d2">
+          <span class="cs-deliverable-icon">▣</span>
+          <h4>Design System</h4>
+          <p>Component library with states, variants, and usage rules. Built for consistency at scale.</p>
+        </div>
+        <div class="cs-deliverable reveal reveal-d3">
+          <span class="cs-deliverable-icon">Aa</span>
+          <h4>Frontend Development</h4>
+          <p>Responsive, performant frontend built to the design spec. Optimised for speed on hardware constraints.</p>
+        </div>
+        <div class="cs-deliverable reveal reveal-d4">
+          <span class="cs-deliverable-icon">≡</span>
+          <h4>User Flows</h4>
+          <p>End-to-end transaction flows mapped and tested. Reduced average checkout time by 65%.</p>
+        </div>
+        <div class="cs-deliverable reveal reveal-d5">
+          <span class="cs-deliverable-icon">✉</span>
+          <h4>Onboarding System</h4>
+          <p>Guided setup flow and in-app help system. New operators productive within minutes, not hours.</p>
+        </div>
+        <div class="cs-deliverable reveal reveal-d6">
+          <span class="cs-deliverable-icon">◐</span>
+          <h4>Source &amp; Handoff</h4>
+          <p>Full design source files, developer specs, and implementation documentation delivered on completion.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2-COL IMAGES -->
+  <section class="section section-dark bg-white" style="padding-top:0;">
+    <div class="container">
+      <div class="cs-img-2col reveal">
+        <div class="cs-img-frame">
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80&fit=crop" alt="Tybrite POS interface">
+        </div>
+        <div class="cs-img-frame">
+          <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=800&q=80&fit=crop" alt="Tybrite POS in retail context">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="section section-dark bg-grey" style="padding-top:0;">
+    <div class="container">
+      <div class="cs-quote reveal">
+        <blockquote>"Our checkout queues dropped by half. The interface is so clear that new staff need almost no training."</blockquote>
+        <cite>— Operations Lead, Tybrite</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section bg-black">
+    <div class="container">
+      <div class="cta-inner">
+        <span class="label">Work with us</span>
+        <h2>Ready to build a brand like this?</h2>
+        <p>Tell us where you are. We'll tell you what we'd do and what it costs.</p>
+        <a href="../contact.html" class="btn btn-orange">
+          Start a conversation
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREV / NEXT -->
+  <div class="cs-nav">
+    <a href="pixelplus.html" class="cs-nav-item">
+      <span class="cs-nav-dir">← Previous</span>
+      <span class="cs-nav-name">Pixelplus</span>
+      <span class="cs-nav-type">Identity · Videography</span>
+    </a>
+    <a href="pollant-travels.html" class="cs-nav-item">
+      <span class="cs-nav-dir">Next →</span>
+      <span class="cs-nav-name">Pollant Travels</span>
+      <span class="cs-nav-type">Brand Strategy</span>
+    </a>
+  </div>
+
+  <footer class="footer bg-black">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="../images/RIBYON NEON LOGO.png" alt="Ribyon Studios" class="footer-logo">
+          <p>Brand direction &amp; design. Built in Nairobi, for the world.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="../about.html">About</a></li>
+            <li><a href="../contact.html">Contact</a></li>
+            <li><a href="../blog.html">Read</a></li>
+            <li><a href="../pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="../products.html">Brand Identity</a></li>
+            <li><a href="../products.html">Web Design</a></li>
+            <li><a href="../products.html">Brand Strategy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ribyon Studios. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#">X</a><a href="#">LinkedIn</a><a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — Ribyon Studios</title>
+  <meta name="description" content="Transparent pricing for brand identity, web design, and brand strategy. Fixed price. Fixed scope. No surprises.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="nav.js" defer></script>
+</head>
+<body>
+  <div class="scroll-progress"><div class="scroll-progress-bar"></div></div>
+  <nav class="navbar">
+    <div class="container">
+      <a class="logo" href="/"><img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios"></a>
+      <button class="mobile-toggle" aria-label="Menu">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="products.html">Services</a>
+          <a href="about.html">About</a>
+          <a class="active" href="pricing.html">Pricing</a>
+          <a href="contact.html">Contact</a>
+          <a href="blog.html">Read</a>
+        </div>
+        <button class="btn-nav" onclick="location.href='contact.html'">Start a project</button>
+      </div>
+    </div>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+  </nav>
+
+  <section class="page-hero">
+    <div class="page-hero-img">
+      <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200&q=85&fit=crop&crop=right" alt="">
+    </div>
+    <div class="container page-hero-body">
+      <div class="page-hero-title-wrap">
+        <h1 class="page-hero-title">Fixed price.<br><span class="orange">Fixed scope.</span></h1>
+      </div>
+      <div class="page-hero-bottom">
+        <p class="page-hero-sub">You know what it costs<br>before we start. Always.</p>
+        <a href="contact.html" class="btn btn-orange">Get a quote</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing-section bg-white">
+
+    <!-- Horizontal wave ribbon on dark -->
+    <svg class="pricing-ribbon" viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <path d="M -80 460 C 200 460, 200 260, 480 260 C 760 260, 760 460, 1040 460 C 1320 460, 1320 260, 1600 260"
+        fill="none" stroke="var(--orange)" stroke-width="90" stroke-linecap="round"/>
+      <path d="M -80 220 C 240 220, 240 80, 520 80 C 800 80, 800 220, 1080 220 C 1360 220, 1360 80, 1600 80"
+        fill="none" stroke="var(--orange)" stroke-width="32" stroke-linecap="round"/>
+    </svg>
+
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="section-head">
+        <span class="label">Packages</span>
+        <h2>Choose your <span class="orange">path.</span></h2>
+        <p>Three tiers. Same quality of thinking. Different depth depending on where you are.</p>
+      </div>
+
+      <div class="prc-grid">
+
+        <!-- STARTUP -->
+        <div class="prc-card reveal">
+          <div class="prc-top">
+            <span class="prc-tier">Startup</span>
+            <h3 class="prc-name">Brand<br>Foundation</h3>
+            <p class="prc-for">For founders who need to look credible and start selling, fast.</p>
+          </div>
+          <div class="prc-spacer"></div>
+          <div class="prc-divider"></div>
+          <a href="tiers/brand-kit.html" class="prc-btn">
+            Get started
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+          <ul class="prc-features">
+            <li>Primary logo &amp; mark <span>(2 variations)</span></li>
+            <li>Colour palette + typography system</li>
+            <li>One-page brand guidelines</li>
+            <li>Social media template kit <span>(5–10 templates)</span></li>
+            <li>Single-page website <span>(landing page)</span></li>
+            <li>One-page positioning statement</li>
+          </ul>
+        </div>
+
+        <!-- SME — featured -->
+        <div class="prc-card prc-card--featured reveal reveal-d2">
+          <div class="prc-top">
+            <span class="prc-tier">SME</span>
+            <h3 class="prc-name">Brand Growth<br>System</h3>
+            <p class="prc-for">For teams whose brand needs to carry sales, hiring, and investor conversations.</p>
+          </div>
+          <div class="prc-spacer"></div>
+          <div class="prc-divider"></div>
+          <a href="tiers/brand-system.html" class="prc-btn">
+            Get started
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+          <ul class="prc-features">
+            <li>Full logo suite + colour system</li>
+            <li>Typography system</li>
+            <li>Website design &amp; development <span>(multi-page)</span></li>
+            <li>Social design system</li>
+            <li>Detailed brand guidelines</li>
+            <li>Messaging framework <span>(narrative, value props, tone)</span></li>
+            <li>Competitor &amp; market positioning snapshot</li>
+            <li>Quarterly brand check-in <span>(1 session post-delivery)</span></li>
+          </ul>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="prc-card reveal reveal-d3">
+          <div class="prc-top">
+            <span class="prc-tier">Enterprise</span>
+            <h3 class="prc-name">Brand<br>Platform</h3>
+            <p class="prc-for">For established organisations undertaking a full strategic repositioning.</p>
+          </div>
+          <div class="prc-spacer"></div>
+          <div class="prc-divider"></div>
+          <a href="tiers/brand-platform.html" class="prc-btn">
+            Let's talk
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+          <ul class="prc-features">
+            <li>Brand strategy &amp; positioning</li>
+            <li>Complete identity system <span>(logo, colour, type, voice, motion)</span></li>
+            <li>Advanced brand guidelines <span>(multi-department rollout)</span></li>
+            <li>Website + full marketing asset suite</li>
+            <li>Investor &amp; stakeholder readiness narrative</li>
+            <li>Internal rollout support <span>(training &amp; briefing materials)</span></li>
+            <li>Dedicated account structure <span>(named lead, defined review cadence)</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark bg-black">
+    <div class="container">
+      <div class="section-head" style="max-width:100%;text-align:center;margin-left:auto;margin-right:auto;">
+        <span class="label">FAQ</span>
+        <h2>Questions you <span class="orange">probably have.</span></h2>
+        <p>We'd rather answer them here than on a call.</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-q">
+            What if I need something outside a package?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>Every project is scoped before we start. If you need something custom, we'll give you a fixed price for it. No hourly billing.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d2">
+          <button class="faq-q">
+            How long does a typical project take?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>Brand Kits take 2-3 weeks. Brand Systems take 4-6 weeks. Brand Platforms are scoped individually. We'll give you a timeline before we start.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d3">
+          <button class="faq-q">
+            Do I own the files?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>Yes. Every file, every template, every guideline — it's yours on delivery. No licenses, no ongoing fees, no restrictions.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d4">
+          <button class="faq-q">
+            Do you work remotely?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>Yes. We're based in Nairobi but work across time zones. We use async communication and structured check-ins to keep things moving.</p></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q">
+            Do you offer revisions?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>Yes. Every package includes two rounds of revisions. After that, additional changes are scoped separately — but most clients are done in two rounds.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d2">
+          <button class="faq-q">
+            What if I'm not happy with the direction?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>We start with strategy for a reason. By the time we get to design, we've aligned on direction. If something's off, we fix it within scope.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d3">
+          <button class="faq-q">
+            Do you only work in USD/KSh?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>We price in KSh and USD. Mobile money, bank transfer, and international payment options are all available.</p></div>
+        </div>
+        <div class="faq-item reveal reveal-d4">
+          <button class="faq-q">
+            What do you need from me to start?
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+          <div class="faq-a"><p>A clear brief or conversation about your brand, your market, and what you're trying to achieve. We handle the rest.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section bg-white">
+    <div class="container">
+      <div class="cta-inner">
+        <span class="label">Still unsure?</span>
+        <h2>Let's figure it out together.</h2>
+        <p>Tell us where you are. We'll recommend the right package — or scope something custom. No pressure. Just honest advice.</p>
+        <a href="contact.html" class="btn btn-orange">
+          Start a conversation
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer bg-black">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios" class="footer-logo">
+          <p>Brand direction &amp; design. Nairobi — Global.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="blog.html">Read</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="products.html">Brand Identity</a></li>
+            <li><a href="products.html">Web Design</a></li>
+            <li><a href="products.html">Brand Strategy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ribyon Studios. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#">X</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ribyon Studios — Brand direction & design, Nairobi</title>
+  <meta name="description" content="We build brands that feel like they've always belonged out there. Brand direction, identity, and digital design from Nairobi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { font-family: 'Syne', sans-serif; }
+  </style>
+  <script src="nav.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-left">
+        <a class="logo" href="/"><img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios"></a>
+      </div>
+      <button class="mobile-toggle" aria-label="Menu">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a class="active" href="/">Home</a>
+          <a href="products.html">Services</a>
+          <a href="about.html">About</a>
+          <a href="pricing.html">Pricing</a>
+          <a href="contact.html">Contact</a>
+          <a href="blog.html">Read</a>
+        </div>
+        <button class="btn-nav" onclick="location.href='contact.html'">Start a project</button>
+      </div>
+    </div>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+  </nav>
+
+  <section class="hero-type">
+
+    <!-- Background ribbon -->
+    <svg class="hero-type-ribbon" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <path d="M -80 700 C 200 700, 200 400, 520 400 C 840 400, 840 700, 1120 700 C 1400 700, 1400 400, 1680 400"
+        fill="none" stroke="var(--orange)" stroke-width="90" stroke-linecap="round"/>
+      <path d="M -80 320 C 240 320, 240 100, 560 100 C 880 100, 880 320, 1160 320 C 1440 320, 1440 100, 1680 100"
+        fill="none" stroke="var(--orange)" stroke-width="32" stroke-linecap="round"/>
+    </svg>
+
+    <div class="container hero-type-inner">
+
+      <h1 class="ht-headline">
+        <span class="ht-line">Brands that</span>
+        <span class="ht-line ht-line--accent">refuse to blend in.</span>
+      </h1>
+
+      <div class="ht-bottom">
+        <div class="ht-bottom-left">
+          <p class="ht-sub">We build visual languages with conviction.<br>Strategy before design. Always.</p>
+          <div class="ht-actions">
+            <a href="contact.html" class="btn btn-orange">Start a conversation<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+            <a href="products.html" class="btn btn-ghost-white">See what we do</a>
+          </div>
+        </div>
+        <div class="ht-img-card">
+          <img src="images/hero-bg.jpg" alt="Ribyon Studios">
+          <div class="ht-img-stat">
+            <strong><span class="count-up" data-target="50" data-suffix="+">0</span></strong>
+            <span>brands built</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="manifesto bg-white">
+    <!-- Decorative ribbon — organic SVG wave, floats behind content -->
+    <svg class="manifesto-ribbon" viewBox="0 0 1440 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <path class="ribbon-path" d="M -80 420
+        C 80 380, 180 160, 360 200
+        C 540 240, 580 420, 760 380
+        C 940 340, 980 100, 1160 140
+        C 1340 180, 1420 360, 1560 300"
+        fill="none" stroke="var(--orange)" stroke-width="80" stroke-linecap="round"/>
+      <!-- Second thinner ribbon offset for depth -->
+      <path class="ribbon-path ribbon-path--thin" d="M -120 300
+        C 60 260, 200 60, 400 100
+        C 600 140, 620 340, 820 300
+        C 1020 260, 1040 60, 1240 80
+        C 1440 100, 1500 280, 1620 220"
+        fill="none" stroke="var(--orange)" stroke-width="36" stroke-linecap="round"/>
+    </svg>
+
+    <div class="container">
+      <div class="manifesto-grid">
+        <div class="manifesto-card reveal">
+          <span class="card-num">01</span>
+          <blockquote>Most agencies sell you a process. We sell you a <em>point of view</em>.</blockquote>
+          <p>Strategy without conviction is just decoration. We start with what you stand for, then build the visual system to prove it.</p>
+        </div>
+        <div class="manifesto-card reveal reveal-d2">
+          <span class="card-num">02</span>
+          <blockquote>If your brand looks like it was made in a template, <em>it was.</em></blockquote>
+          <p>We don't do cookie-cutter. Every mark, every colour, every word earns its place because it means something specific to you.</p>
+        </div>
+        <div class="manifesto-card reveal reveal-d4">
+          <span class="card-num">03</span>
+          <blockquote>Great branding isn't about being liked. <em>It's about being recognised.</em></blockquote>
+          <p>A brand that tries to please everyone ends up invisible. We build brands with the courage to stand for something real.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="svc-accordion-section bg-black">
+    <div class="svc-accordion-head container">
+      <span class="label">What we do</span>
+      <h2>Four services. <span class="orange">Same conviction.</span></h2>
+      <p>Same standard of thinking. Different depth for where you are right now.</p>
+    </div>
+
+    <div class="svc-accordion" id="svcAccordion">
+
+      <div class="sva-row" data-index="0">
+        <div class="sva-row-inner">
+          <span class="sva-num">01</span>
+          <div class="sva-title-wrap">
+            <h3 class="sva-title">Brand Identity</h3>
+            <div class="sva-tags">
+              <span>Positioning</span><span>Color &amp; Type</span><span>Guidelines</span><span>Launch</span>
+            </div>
+            <p class="sva-conviction">A visual language that knows what it stands for — before anyone asks.</p>
+          </div>
+          <a href="products.html" class="sva-cta">
+            See the work
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+        <div class="sva-toggle" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="sva-img" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop&crop=center" alt="">
+        </div>
+      </div>
+
+      <div class="sva-row" data-index="1">
+        <div class="sva-row-inner">
+          <span class="sva-num">02</span>
+          <div class="sva-title-wrap">
+            <h3 class="sva-title">Web &amp; Digital</h3>
+            <div class="sva-tags">
+              <span>UI/UX</span><span>Front-end</span><span>Performance</span><span>CMS</span>
+            </div>
+            <p class="sva-conviction">Websites that don't look like templates — because they aren't.</p>
+          </div>
+          <a href="products.html" class="sva-cta">
+            See the work
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+        <div class="sva-toggle" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="sva-img" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=900&q=80&fit=crop&crop=center" alt="">
+        </div>
+      </div>
+
+      <div class="sva-row" data-index="2">
+        <div class="sva-row-inner">
+          <span class="sva-num">03</span>
+          <div class="sva-title-wrap">
+            <h3 class="sva-title">Brand Strategy</h3>
+            <div class="sva-tags">
+              <span>Research</span><span>Positioning</span><span>Messaging</span><span>Architecture</span>
+            </div>
+            <p class="sva-conviction">Clarity that makes every decision obvious — and every dollar work harder.</p>
+          </div>
+          <a href="products.html" class="sva-cta">
+            See the work
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+        <div class="sva-toggle" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="sva-img" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&q=80&fit=crop&crop=center" alt="">
+        </div>
+      </div>
+
+      <div class="sva-row" data-index="3">
+        <div class="sva-row-inner">
+          <span class="sva-num">04</span>
+          <div class="sva-title-wrap">
+            <h3 class="sva-title">Content Systems</h3>
+            <div class="sva-tags">
+              <span>Templates</span><span>Guidelines</span><span>Tone</span><span>Scalability</span>
+            </div>
+            <p class="sva-conviction">A system for everything you publish. Consistent, not boring. Scalable, not rigid.</p>
+          </div>
+          <a href="products.html" class="sva-cta">
+            See the work
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+        <div class="sva-toggle" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="sva-img" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=900&q=80&fit=crop&crop=center" alt="">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section-dark" style="padding:4rem 0;">
+    <div class="container">
+      <div class="tb-head">
+        <span class="label">Trusted by</span>
+      </div>
+      <div class="tb-logos">
+        <div class="tb-logo"><img src="LOGO STRIP FILES/GC LONG WHITE.png" alt="Galactic Core"></div>
+        <div class="tb-logo"><img src="LOGO STRIP FILES/ICON WHITE+ORANGE (HORIZONTAL) TECHNOLOGIES.png" alt="Technologies"></div>
+        <div class="tb-logo"><img src="LOGO STRIP FILES/PIXEL PLUS LOGO.png" alt="Pixel Plus"></div>
+        <div class="tb-logo"><img src="LOGO STRIP FILES/POLLANT TRAVELS.png" alt="Pollant Travels"></div>
+        <div class="tb-logo"><img src="LOGO STRIP FILES/SAFARI YETU LOGO WHITE.png" alt="Safari Yetu"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-light bg-white tiers-section">
+
+    <!-- Decorative ribbon — consistent sine-wave running full width, two layers -->
+    <svg class="tiers-geo" viewBox="0 0 1440 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <!-- Primary wave: full-width, passes through mid-section -->
+      <path d="M -40 420 C 120 420, 120 200, 360 200 C 600 200, 600 420, 840 420 C 1080 420, 1080 200, 1320 200 C 1440 200, 1480 280, 1480 280"
+        fill="none" stroke="var(--orange)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Secondary wave: same rhythm, offset upward, thinner -->
+      <path d="M -40 320 C 120 320, 120 100, 360 100 C 600 100, 600 320, 840 320 C 1080 320, 1080 100, 1320 100 C 1440 100, 1480 180, 1480 180"
+        fill="none" stroke="var(--orange)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <div class="container">
+      <div class="section-head">
+        <span class="label">By stage</span>
+        <h2>Three tiers. <span class="orange">Built for where you are.</span></h2>
+        <p>Whether you're launching, scaling, or leading — same quality of thinking, different level of depth.</p>
+      </div>
+      <div class="tiers-row">
+        <div class="tiers-col reveal">
+          <span class="tiers-label">Starter</span>
+          <span class="tiers-name">Brand Kit</span>
+          <p class="tiers-desc">For founders who need to show up looking like they've already arrived.</p>
+          <a href="tiers/brand-kit.html" class="tiers-cta">
+            Explore Brand Kit
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+        </div>
+        <div class="tiers-col tiers-col--focus reveal reveal-d2">
+          <span class="tiers-label">Growth</span>
+          <span class="tiers-name">Brand System</span>
+          <p class="tiers-desc">For teams that outgrew their first logo and need something that scales.</p>
+          <a href="tiers/brand-system.html" class="tiers-cta">
+            Explore Brand System
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+        </div>
+        <div class="tiers-col reveal reveal-d3">
+          <span class="tiers-label">Premium</span>
+          <span class="tiers-name">Brand Platform</span>
+          <p class="tiers-desc">For organisations that compete on brand and need the full arsenal.</p>
+          <a href="tiers/brand-platform.html" class="tiers-cta">
+            Explore Brand Platform
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><polyline points="9 4 13 8 9 12"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="work-section bg-black">
+    <div class="container work-section-head">
+      <div>
+        <span class="label">Recent work</span>
+        <h2>What we've <span class="orange">built.</span></h2>
+      </div>
+      <a href="products.html" class="work-view-all">
+        All work
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </div>
+
+    <div class="container work-pile-wrap">
+
+      <!-- Left: stacked image pile + nav buttons -->
+      <div class="work-pile-left">
+        <div class="work-pile" id="workPile">
+          <div class="work-pile-card" data-idx="0">
+            <!-- Tronavo: overhead painted warehouse floor markings — bold geometry, industrial orange echoes brand -->
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=85&fit=crop&crop=center" alt="Tronavo">
+          </div>
+          <div class="work-pile-card" data-idx="1">
+            <!-- Galactic Core: dark room, multiple glowing screens, data-rich -->
+            <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=900&q=85&fit=crop&crop=center" alt="Galactic Core">
+          </div>
+          <div class="work-pile-card" data-idx="2">
+            <!-- Safari Yetu: elephant silhouette at golden dusk — cinematic, not postcard -->
+            <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=900&q=85&fit=crop&crop=center" alt="Safari Yetu">
+          </div>
+          <div class="work-pile-card" data-idx="3">
+            <!-- Pixelplus: camera lens close-up with dramatic light refraction -->
+            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&q=85&fit=crop&crop=center" alt="Pixelplus">
+          </div>
+          <div class="work-pile-card" data-idx="4">
+            <!-- Tybrite POS: Nairobi market stalls, vivid colour, East African street commerce -->
+            <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=900&q=85&fit=crop&crop=center" alt="Tybrite POS">
+          </div>
+          <div class="work-pile-card" data-idx="5">
+            <!-- Pollant Travels: aerial Kenyan landscape — abstract topography, brand direction -->
+            <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=900&q=85&fit=crop&crop=center" alt="Pollant Travels">
+          </div>
+        </div>
+
+        <!-- Prev / Next buttons — always visible below the pile -->
+        <div class="work-pile-controls">
+          <button class="wpc-btn" id="workPrev" aria-label="Previous project">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4L6 8l4 4"/></svg>
+            Prev
+          </button>
+          <span class="wpc-count" id="wpcCount">01 / 06</span>
+          <button class="wpc-btn wpc-btn--next" id="workNext" aria-label="Next project">
+            Next
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: project details -->
+      <div class="work-pile-info">
+
+        <div class="work-pile-detail active" data-idx="0">
+          <span class="wpd-num">01 / 06</span>
+          <h3 class="wpd-name">Tronavo</h3>
+          <p class="wpd-type">Rebrand · Brand System</p>
+          <p class="wpd-desc">Full rebrand for a logistics company. From zero to a complete identity system in six weeks.</p>
+          <span class="wpd-stat">↑ 40% inbound enquiries post-launch</span>
+          <a href="case-studies/tronavo.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="work-pile-detail" data-idx="1">
+          <span class="wpd-num">02 / 06</span>
+          <h3 class="wpd-name">Galactic Core</h3>
+          <p class="wpd-type">Web Design · Frontend</p>
+          <p class="wpd-desc">Data-rich platform for Tybrite Labs. Concept to live in six weeks. Clean, fast, built to scale.</p>
+          <span class="wpd-stat">6 weeks concept → live</span>
+          <a href="case-studies/galactic-core.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="work-pile-detail" data-idx="2">
+          <span class="wpd-num">03 / 06</span>
+          <h3 class="wpd-name">Safari Yetu</h3>
+          <p class="wpd-type">Social · Content System</p>
+          <p class="wpd-desc">Social content system for an East African safari operator. Consistent voice, scalable output.</p>
+          <span class="wpd-stat">↑ 62% profile reach</span>
+          <a href="case-studies/safari-yetu.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="work-pile-detail" data-idx="3">
+          <span class="wpd-num">04 / 06</span>
+          <h3 class="wpd-name">Pixelplus</h3>
+          <p class="wpd-type">Identity · Videography</p>
+          <p class="wpd-desc">Cinematic visual system for a videography studio. Built to compete at the highest level.</p>
+          <span class="wpd-stat">Launching 2026</span>
+          <a href="case-studies/pixelplus.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="work-pile-detail" data-idx="4">
+          <span class="wpd-num">05 / 06</span>
+          <h3 class="wpd-name">Tybrite POS</h3>
+          <p class="wpd-type">Product · Retail</p>
+          <p class="wpd-desc">Point of sale system for East African retail. Built for speed in high-volume environments.</p>
+          <span class="wpd-stat">↑ 65% transaction speed</span>
+          <a href="case-studies/tybrite-pos.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="work-pile-detail" data-idx="5">
+          <span class="wpd-num">06 / 06</span>
+          <h3 class="wpd-name">Pollant Travels</h3>
+          <p class="wpd-type">Brand Strategy</p>
+          <p class="wpd-desc">Brand direction for a travel company connecting East Africa to the world.</p>
+          <span class="wpd-stat">Direction complete</span>
+          <a href="case-studies/pollant-travels.html" class="wpd-cta">
+            View case study
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <!-- Dot nav -->
+        <div class="wpd-nav" id="wpdNav">
+          <button class="wpd-dot active" data-idx="0" aria-label="Tronavo"></button>
+          <button class="wpd-dot" data-idx="1" aria-label="Galactic Core"></button>
+          <button class="wpd-dot" data-idx="2" aria-label="Safari Yetu"></button>
+          <button class="wpd-dot" data-idx="3" aria-label="Pixelplus"></button>
+          <button class="wpd-dot" data-idx="4" aria-label="Tybrite POS"></button>
+          <button class="wpd-dot" data-idx="5" aria-label="Pollant Travels"></button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark bg-black">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">Why us</span>
+        <h2>Five things we <span class="orange">actually believe.</span></h2>
+        <p>Not values on a wall. Principles we use to decide what to take on — and what to turn down.</p>
+      </div>
+      <div class="tenets-list">
+        <div class="tenet-row reveal">
+          <span class="tenet-row-num">01</span>
+          <div class="tenet-row-body">
+            <h3 class="tenet-row-title">Strategy first, always.</h3>
+            <p class="tenet-row-desc">We don't open a design file until we understand your market, your audience, and why you exist.</p>
+          </div>
+          <span class="tenet-row-arrow">→</span>
+        </div>
+        <div class="tenet-row reveal reveal-d2">
+          <span class="tenet-row-num">02</span>
+          <div class="tenet-row-body">
+            <h3 class="tenet-row-title">You own the work.</h3>
+            <p class="tenet-row-desc">Every file, every template, every guideline. Yours on delivery. No licenses, no ongoing fees.</p>
+          </div>
+          <span class="tenet-row-arrow">→</span>
+        </div>
+        <div class="tenet-row reveal reveal-d3">
+          <span class="tenet-row-num">03</span>
+          <div class="tenet-row-body">
+            <h3 class="tenet-row-title">Fixed price. Fixed scope.</h3>
+            <p class="tenet-row-desc">You know what you're getting and what it costs before we start. No hourly billing.</p>
+          </div>
+          <span class="tenet-row-arrow">→</span>
+        </div>
+        <div class="tenet-row reveal reveal-d4">
+          <span class="tenet-row-num">04</span>
+          <div class="tenet-row-body">
+            <h3 class="tenet-row-title">Built for your stage.</h3>
+            <p class="tenet-row-desc">A founder needs speed. A growing team needs systems. An enterprise needs strategy.</p>
+          </div>
+          <span class="tenet-row-arrow">→</span>
+        </div>
+        <div class="tenet-row reveal reveal-d5">
+          <span class="tenet-row-num">05</span>
+          <div class="tenet-row-body">
+            <h3 class="tenet-row-title">Clients come back.</h3>
+            <p class="tenet-row-desc">Not because they're locked in. Because the work works. 98% return rate.</p>
+          </div>
+          <span class="tenet-row-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section bg-white cta-section--decorated">
+
+    <!-- Ribbon: bold curves, dramatic control points, not straight lines -->
+    <svg class="cta-ribbon" viewBox="0 0 1440 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <!-- Primary: wide S-curve sweeping top-right → bottom-left with big belly -->
+      <path d="M 1440 -40 C 1100 -40, 900 300, 720 260 C 540 220, 340 -20, 0 120"
+        fill="none" stroke="var(--orange)" stroke-width="90" stroke-linecap="round"/>
+      <!-- Secondary: flipped belly, offset down -->
+      <path d="M 1440 180 C 1200 400, 900 120, 720 360 C 540 600, 200 300, -40 440"
+        fill="none" stroke="var(--orange)" stroke-width="32" stroke-linecap="round"/>
+      <!-- Spiral coil, bottom-right — tight looping path -->
+      <path d="M 1360 560 C 1420 460, 1460 360, 1360 320 C 1260 280, 1180 360, 1220 460 C 1260 560, 1360 580, 1400 500 C 1440 420, 1420 360, 1360 340"
+        fill="none" stroke="var(--orange)" stroke-width="16" stroke-linecap="round"/>
+    </svg>
+
+    <div class="container">
+      <div class="cta-inner">
+        <span class="label">Let's talk</span>
+        <h2>Ready to build a brand that stands for something?</h2>
+        <p>Tell us where you are. We'll tell you what we'd do — and what it costs. No pitch decks. No pressure. Just honest conversation.</p>
+        <a href="contact.html" class="btn btn-orange">Start a conversation<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="pricing.html" class="btn btn-ghost-dark">See pricing</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer bg-black">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios" class="footer-logo">
+          <p>Brand direction &amp; design. Built in Nairobi, for the world.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="blog.html">Read</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="admin.html">Admin</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="products.html">Brand Identity</a></li>
+            <li><a href="products.html">Web Design</a></li>
+            <li><a href="products.html">Brand Strategy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ribyon Studios. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#">X</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="cms.js"></script>
+</body>
+</html>

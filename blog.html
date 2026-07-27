@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Ribyon Studios</title>
+  <meta name="description" content="Thoughts on brand strategy, identity design, and building brands that stand for something.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="nav.js" defer></script>
+</head>
+<body>
+  <div class="scroll-progress"><div class="scroll-progress-bar"></div></div>
+  <nav class="navbar">
+    <div class="container">
+      <a class="logo" href="/"><img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios"></a>
+      <button class="mobile-toggle" aria-label="Menu">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="products.html">Services</a>
+          <a href="about.html">About</a>
+          <a href="pricing.html">Pricing</a>
+          <a href="contact.html">Contact</a>
+          <a class="active" href="blog.html">Read</a>
+        </div>
+        <button class="btn-nav" onclick="location.href='contact.html'">Start a project</button>
+      </div>
+    </div>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+  </nav>
+
+  <section class="page-hero">
+    <div class="page-hero-img">
+      <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=85&fit=crop&crop=right" alt="">
+    </div>
+    <div class="container page-hero-body">
+      <div class="page-hero-title-wrap">
+        <h1 class="page-hero-title">Thoughts<br>on <span class="orange">brand.</span></h1>
+      </div>
+      <div class="page-hero-bottom">
+        <p class="page-hero-sub">Strategy, identity, and the<br>occasional hot take.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark bg-black">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">Latest</span>
+        <h2>Recent <span class="orange">articles.</span></h2>
+      </div>
+      <div class="work-grid">
+        <a href="blog/brand-pyramid.html" class="work-item reveal">
+          <div class="work-tags">
+            <span class="work-tag">Strategy</span>
+            <span class="work-tag">Positioning</span>
+          </div>
+          <h3>The Brand Pyramid: A Framework for Clarity</h3>
+          <p>A simple mental model for understanding the layers of a brand — from visual identity to core purpose — and why most brands skip the most important part.</p>
+          <div class="work-metric">
+            <strong>6 min read</strong>
+          </div>
+        </a>
+        <a href="blog/templates.html" class="work-item reveal reveal-d2">
+          <div class="work-tags">
+            <span class="work-tag">Design</span>
+            <span class="work-tag">Identity</span>
+          </div>
+          <h3>Why Templates Make You Look Like Everyone Else</h3>
+          <p>Templates are convenient. They're also the fastest way to make your brand indistinguishable from your competitors. Here's what to do instead.</p>
+          <div class="work-metric">
+            <strong>4 min read</strong>
+          </div>
+        </a>
+        <a href="blog/global-brand-nairobi.html" class="work-item reveal reveal-d3">
+          <div class="work-tags">
+            <span class="work-tag">Branding</span>
+            <span class="work-tag">Africa</span>
+          </div>
+          <h3>Building a Global Brand from Nairobi</h3>
+          <p>What it means to build a brand from East Africa — and why geography is an asset, not a limitation, when you have conviction and the internet.</p>
+          <div class="work-metric">
+            <strong>5 min read</strong>
+          </div>
+        </a>
+        <a href="blog/strategy-before-design.html" class="work-item reveal reveal-d4">
+          <div class="work-tags">
+            <span class="work-tag">Process</span>
+            <span class="work-tag">Design</span>
+          </div>
+          <h3>Strategy Before Design: A Case Study</h3>
+          <p>A behind-the-scenes look at how we approached a recent rebrand. What we learned in the strategy phase and how it shaped every design decision.</p>
+          <div class="work-metric">
+            <strong>7 min read</strong>
+          </div>
+        </a>
+        <a href="blog/fixed-price.html" class="work-item reveal reveal-d5">
+          <div class="work-tags">
+            <span class="work-tag">Pricing</span>
+            <span class="work-tag">Business</span>
+          </div>
+          <h3>Why Fixed Price Beats Hourly Billing</h3>
+          <p>Hourly billing rewards inefficiency. Fixed price rewards clarity. Here's why we choose the latter and how it changes the dynamic of a client relationship.</p>
+          <div class="work-metric">
+            <strong>4 min read</strong>
+          </div>
+        </a>
+        <a href="blog/consistency-content.html" class="work-item reveal reveal-d6">
+          <div class="work-tags">
+            <span class="work-tag">Social</span>
+            <span class="work-tag">Content</span>
+          </div>
+          <h3>Consistency Without Boredom: A Content Framework</h3>
+          <p>How to build a social media presence that's recognisable without being repetitive. A system for varied, on-brand content at scale.</p>
+          <div class="work-metric">
+            <strong>5 min read</strong>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section bg-black">
+    <div class="container">
+      <div class="cta-inner">
+        <span class="label">Stay in touch</span>
+        <h2>Want more like this?</h2>
+        <p>No newsletter. But if you reach out, we'll send you our best thinking — and maybe something we haven't published yet.</p>
+        <a href="contact.html" class="btn btn-orange">
+          Say hello
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer bg-black">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="images/RIBYON NEON LOGO.png" alt="Ribyon Studios" class="footer-logo">
+          <p>Brand direction &amp; design. Nairobi — Global.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="blog.html">Read</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="products.html">Brand Identity</a></li>
+            <li><a href="products.html">Web Design</a></li>
+            <li><a href="products.html">Brand Strategy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ribyon Studios. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#">X</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

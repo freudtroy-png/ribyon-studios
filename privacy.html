@@ -58,6 +58,9 @@
     </div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
   </nav>
+<div id="google_translate_element_wrapper" style="position:fixed;top:0.75rem;right:5.5rem;z-index:101;">
+  <div id="google_translate_element"></div>
+</div>
 
   <section class="post-hero bg-black">
     <svg class="post-hero-ribbon" viewBox="0 0 1440 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
@@ -83,6 +86,12 @@
     </svg>
     <div class="container">
       <div class="post-body-inner">
+
+        <div class="legal-nav">
+          <a href="privacy.html" class="active">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="cookies.html">Cookies</a>
+        </div>
 
         <h2>Who We Are</h2>
         <p>Ribyon Studios is a branding and website development studio based in Nairobi, Kenya. We specialise in brand identity, brand strategy, and web design for businesses that want to stand for something. When we refer to "we," "us," or "our" in this policy, we mean Ribyon Studios.</p>
@@ -249,5 +258,14 @@
   </div>
 </div>
 <script src="cookie-consent.js" defer></script>
+<button id="go-to-top" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'en,sw,fr,de,es,pt,ar,zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

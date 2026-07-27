@@ -58,6 +58,9 @@
     </div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
   </nav>
+<div id="google_translate_element_wrapper" style="position:fixed;top:0.75rem;right:5.5rem;z-index:101;">
+  <div id="google_translate_element"></div>
+</div>
 
   <section class="post-hero">
     <svg class="post-hero-ribbon" viewBox="0 0 1440 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
@@ -146,7 +149,19 @@
     </div>
   </div>
 
-  <footer class="footer bg-black">
+    <section class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-inner">
+        <h3>Stay in the loop</h3>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit" class="btn btn-orange">Subscribe</button>
+        </form>
+      </div>
+      <p class="newsletter-message"></p>
+    </div>
+  </section>
+<footer class="footer bg-black">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand"><img src="../images/RIBYON NEON LOGO.png" alt="Ribyon Studios" class="footer-logo"><p>Brand direction &amp; design. Nairobi � Global.</p></div>
@@ -171,6 +186,15 @@
   </div>
 </div>
 <script src="../cookie-consent.js" defer></script>
+<button id="go-to-top" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'en,sw,fr,de,es,pt,ar,zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
 

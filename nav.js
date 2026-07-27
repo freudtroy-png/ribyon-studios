@@ -1,16 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
-  /* Navbar scroll state */
+  /* Navbar scroll state — hide on scroll down, show on scroll up */
   const navbar = document.querySelector('.navbar');
   let lastScroll = 0;
+  let scrollTimer = null;
 
   window.addEventListener('scroll', function () {
     const currentScroll = window.pageYOffset;
+
     if (currentScroll > 40) {
       navbar.classList.add('scrolled');
     } else {
       navbar.classList.remove('scrolled');
     }
+
+    /* Hide navbar on scroll down, show on scroll up (only after threshold) */
+    if (currentScroll > 120) {
+      if (currentScroll > lastScroll && !navbar.classList.contains('hidden')) {
+        navbar.classList.add('hidden');
+      } else if (currentScroll < lastScroll && navbar.classList.contains('hidden')) {
+        navbar.classList.remove('hidden');
+      }
+    } else {
+      navbar.classList.remove('hidden');
+    }
+
     lastScroll = currentScroll;
+
+    /* Go-to-top button visibility */
+    var goTop = document.getElementById('go-to-top');
+    if (goTop) {
+      if (currentScroll > 400) {
+        goTop.classList.add('visible');
+      } else {
+        goTop.classList.remove('visible');
+      }
+    }
   });
 
   /* Mobile menu */
@@ -292,5 +316,70 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.setAttribute('aria-expanded', 'true');
       }
     });
+  });
+}());
+
+/* Go to Top button */
+(function () {
+  var btn = document.getElementById('go-to-top');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}());
+
+/* Newsletter subscribe */
+(function () {
+  var forms = document.querySelectorAll('.newsletter-form');
+  if (!forms.length) return;
+
+  forms.forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = form.querySelector('input[type="email"]');
+      var msg = form.parentNode.querySelector('.newsletter-message');
+      if (!input || !input.value.trim()) return;
+
+      /* Simple validation */
+      var email = input.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (msg) { msg.textContent = 'Please enter a valid email address.'; msg.className = 'newsletter-message error'; }
+        return;
+      }
+
+      /* Store in localStorage as mock subscription */
+      var subs = JSON.parse(localStorage.getItem('ribyon_subscribers') || '[]');
+      if (subs.indexOf(email) === -1) {
+        subs.push(email);
+        localStorage.setItem('ribyon_subscribers', JSON.stringify(subs));
+      }
+
+      if (msg) { msg.textContent = 'Thanks for subscribing! We\'ll be in touch.'; msg.className = 'newsletter-message success'; }
+      input.value = '';
+    });
+  });
+}());
+
+/* Draw ribbon paths on SVG elements for the wave animation */
+(function () {
+  var ribbons = document.querySelectorAll('.cta-ribbon, .contact-ribbon, .post-hero-ribbon, .tier-included-ribbon, .svc-detail-ribbon');
+  ribbons.forEach(function (svg) {
+    svg.querySelectorAll('path').forEach(function (path) {
+      if (!path.getAttribute('stroke')) path.setAttribute('stroke', 'var(--orange)');
+      if (!path.getAttribute('fill')) path.setAttribute('fill', 'none');
+      if (!path.getAttribute('stroke-linecap')) path.setAttribute('stroke-linecap', 'round');
+    });
+  });
+}());
+
+/* Scroll progress bar */
+(function () {
+  var bar = document.querySelector('.scroll-progress-bar');
+  if (!bar) return;
+  window.addEventListener('scroll', function () {
+    var winScroll = document.documentElement.scrollTop;
+    var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var scrolled = (winScroll / height) * 100;
+    bar.style.width = scrolled + '%';
   });
 }());

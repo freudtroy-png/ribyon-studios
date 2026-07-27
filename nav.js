@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     lastScroll = currentScroll;
 
-    /* Go-to-top button visibility */
+    /* Go-to-top button visibility — sticky floating */
     var goTop = document.getElementById('go-to-top');
     if (goTop) {
-      if (currentScroll > 400) {
+      if (currentScroll > 250) {
         goTop.classList.add('visible');
       } else {
         goTop.classList.remove('visible');

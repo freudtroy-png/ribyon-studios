@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     toggle.classList.remove('active');
     overlay.classList.remove('active');
     document.body.classList.remove('menu-open');
+    if (toggle) toggle.focus();
   }
 
   function openMenu() {
@@ -45,6 +46,17 @@ document.addEventListener('DOMContentLoaded', function () {
   if (overlay) {
     overlay.addEventListener('click', closeMenu);
   }
+
+  /* Close menu on Escape key */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && navMenu.classList.contains('open')) closeMenu();
+  });
+
+  /* Close menu on resize above mobile breakpoint */
+  var mql = window.matchMedia('(min-width: 769px)');
+  mql.addListener(function (e) {
+    if (e.matches && navMenu.classList.contains('open')) closeMenu();
+  });
 
   /* Close menu on nav link click */
   document.querySelectorAll('.nav-links a').forEach(function (link) {

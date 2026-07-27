@@ -8,6 +8,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Ribyon Studio",
+  "url": "https://ribyon-studios.vercel.app",
+  "logo": "https://ribyon-studios.vercel.app/images/RIBYON%20NEON%20LOGO.png",
+  "description": "Brand direction and design studio based in Nairobi, Kenya. Brand identity, web design, and brand strategy.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Nairobi",
+    "addressCountry": "KE"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "studio@ribyon.com",
+    "contactType": "sales"
+  },
+  "sameAs": [
+    "https://x.com/ribyonstudio",
+    "https://www.linkedin.com/company/ribyon-studio"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -18,5 +42,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script src="admin.js"></script>
+<!-- Cookie Consent Banner -->
+<div id="cookie-banner" role="dialog" aria-label="Cookie Consent">
+  <div class="cookie-inner">
+    <div class="cookie-text">
+      We use essential cookies to make our site work and analytics cookies to understand how you use it.
+      <a href="cookies.html">Learn more</a>.
+    </div>
+    <div class="cookie-buttons">
+      <button class="btn-cookie btn-cookie-essential" onclick="cookieAcceptEssential()">Essential only</button>
+      <button class="btn-cookie btn-cookie-accept" onclick="cookieAcceptAll()">Accept all</button>
+    </div>
+  </div>
+</div>
+<script src="cookie-consent.js" defer></script>
 </body>
 </html>

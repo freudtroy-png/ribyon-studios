@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ribyon-studios.vercel.app/sitemap.xml

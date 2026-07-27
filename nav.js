@@ -83,6 +83,12 @@ document.addEventListener('DOMContentLoaded', function () {
     revealElements.forEach(function (el) { el.classList.add('visible'); });
   }
 
+  /* Lazy image loaded handler */
+  document.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+    if (img.complete) { img.classList.add('loaded'); }
+    else { img.addEventListener('load', function () { this.classList.add('loaded'); }); }
+  });
+
   /* FAQ accordion */
   document.querySelectorAll('.faq-q').forEach(function (btn) {
     btn.addEventListener('click', function () {

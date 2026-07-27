@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ribyon-studios.vercel.app/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/about.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/contact.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/pricing.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/products.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/privacy.html</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/terms.html</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/cookies.html</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/brand-pyramid.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/consistency-content.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/fixed-price.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/global-brand-nairobi.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/strategy-before-design.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/blog/templates.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/galactic-core.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/pixelplus.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/pollant-travels.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/safari-yetu.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/tronavo.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/case-studies/tybrite-pos.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/services/brand-identity.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/services/brand-strategy.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/services/content-systems.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/services/web-digital.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/tiers/brand-kit.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/tiers/brand-platform.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ribyon-studios.vercel.app/tiers/brand-system.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+</urlset>

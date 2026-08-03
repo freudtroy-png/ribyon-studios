@@ -38,7 +38,8 @@ download:'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="cu
 mail:'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M1.5 4.5l6.5 4.5 6.5-4.5"/></svg>',
 duplicate:'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="10.5" height="10.5" rx="1"/><path d="M1.5 11.5V2a.5.5 0 01.5-.5h9"/></svg>',
 drag:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4h6M5 8h6M5 12h6"/></svg>',
-edit:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2l2.5 2.5L5 13.5H2.5V11L11.5 2z"/></svg>'
+edit:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2l2.5 2.5L5 13.5H2.5V11L11.5 2z"/></svg>',
+key:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="8" r="3.5"/><path d="M8.5 8H14v3h-2.5v-1.5"/></svg>'
 };
 
 /* ─── Defaults ─── */
@@ -131,8 +132,8 @@ function isSuper(){return role()==='superadmin';}
 function apiAuth(){return{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'};}
 
 function login(u,p){
-  if(!u||!p){document.getElementById('loginError').textContent='Enter username and password';return;}
-  fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
+  if(!u||!p){document.getElementById('loginError').textContent='Enter email and password';return;}
+  fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:u,password:p})})
     .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
     .then(function(res){
       if(res.ok&&res.j.token){
@@ -152,7 +153,7 @@ function login(u,p){
 function logout(){localStorage.removeItem('rs_auth');localStorage.removeItem('rs_token');renderApp();}
 
 function renderApp(){var u=localStorage.getItem('rs_user');if(localStorage.getItem('rs_auth')==='1'&&u)renderAdmin();else renderLogin();}
-function renderLogin(){document.getElementById('app').innerHTML='<div class="login-screen"><div class="login-box"><img src="logo.png" alt="Ribyon Studios" class="login-logo"><div class="login-title">Ribyon Studio</div><p class="login-sub">Content Management</p><input type="text" id="loginUser" placeholder="Username" autocomplete="username" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)"><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,this.value)"><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)">Sign in</button><p id="loginError" class="login-error"></p></div></div>';}
+function renderLogin(){document.getElementById('app').innerHTML='<div class="login-screen"><div class="login-box"><img src="logo.png" alt="Ribyon Studios" class="login-logo"><div class="login-title">Ribyon Studio</div><p class="login-sub">Content Management</p><input type="email" id="loginUser" placeholder="Email" autocomplete="email" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)"><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,this.value)"><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)">Sign in</button><p id="loginError" class="login-error"></p></div></div>';}
 
 function renderAdmin(){
   var data=get();var u=currentUser();
@@ -483,19 +484,21 @@ function renderUsers(main){
   main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Users</h2><p>Team accounts and roles</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="addUser()">'+I.plus+' Add user</button></div></div><div class="card"><div class="card-body" id="userList"><p style="color:var(--stone);font-size:0.85rem">Loading…</p></div></div></div>';
   loadUsers();
 }
+var _users=[];
 function loadUsers(){
   fetch(API+'/api/users',{headers:{'Authorization':'Bearer '+(getToken()||PW)}})
     .then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(j){renderUserRows(j.users||[]);})
+    .then(function(j){_users=j.users||[];renderUserRows(_users);})
     .catch(function(){var el=document.getElementById('userList');if(el)el.innerHTML='<p style="color:var(--red);font-size:0.85rem">Could not load users.</p>';});
 }
 function renderUserRows(users){
   var el=document.getElementById('userList');if(!el)return;
-  el.innerHTML='<table class="data-table"><thead><tr><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead><tbody>'+
-    users.map(function(u){return '<tr><td><strong>'+esc(u.username)+'</strong>'+(u.username===currentUser().username?' <span class="status status-paid" style="font-size:0.6rem">you</span>':'')+'</td><td><select onchange="changeUserRole('+u.id+',this.value)">'+ROLES.map(function(r){return '<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></td><td style="color:var(--stone);font-size:0.8rem">'+(u.created_at||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="resetUserPass('+u.id+')" title="Reset password">'+I.edit+'</button><button class="btn btn-danger btn-xs" onclick="deleteUser('+u.id+','+JSON.stringify(u.username)+')" title="Delete">'+I.trash+'</button></div></td></tr>';}).join('')+
+  el.innerHTML='<table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Created</th><th></th></tr></thead><tbody>'+
+    users.map(function(u){return '<tr><td><strong>'+esc(u.username)+'</strong>'+(u.email?'<span class="sub">'+esc(u.email)+'</span>':'')+(u.username===currentUser().username?' <span class="status status-paid" style="font-size:0.6rem">you</span>':'')+'</td><td><select onchange="changeUserRole('+u.id+',this.value)">'+ROLES.map(function(r){return '<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></td><td style="color:var(--stone);font-size:0.8rem">'+(u.created_at||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="editUser('+u.id+')" title="Edit user">'+I.edit+'</button><button class="btn btn-ghost btn-xs" onclick="resetUserPass('+u.id+')" title="Reset password">'+I.key+'</button><button class="btn btn-danger btn-xs" onclick="deleteUser('+u.id+','+JSON.stringify(u.username)+')" title="Delete">'+I.trash+'</button></div></td></tr>';}).join('')+
     '</tbody></table>';
 }
-function addUser(){modal('Add User','<div class="form-group"><label>Username</label><input type="text" id="nuName"></div><div class="form-group"><label>Password</label><input type="password" id="nuPass"></div><div class="form-group"><label>Role</label><select id="nuRole">'+ROLES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('')+'</select></div>',function(){var un=g('nuName').trim();var pw=g('nuPass');if(!un||!pw){toast('Username and password required');return;}fetch(API+'/api/users',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw,role:g('nuRole')})}).then(function(r){return r.json();}).then(function(j){closeModal();loadUsers();addNotif('User '+un+' added');toast(j.error||'Added');});},false);}
+function addUser(){modal('Add User','<div class="form-group"><label>Email</label><input type="email" id="nuEmail" placeholder="name@email.com"></div><div class="form-group"><label>Password</label><input type="password" id="nuPass"></div><div class="form-group"><label>Role</label><select id="nuRole">'+ROLES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('')+'</select></div>',function(){var em=g('nuEmail').trim();var pw=g('nuPass');if(!em||!pw){toast('Email and password required');return;}fetch(API+'/api/users',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw,role:g('nuRole')})}).then(function(r){return r.json();}).then(function(j){closeModal();loadUsers();addNotif('User '+em+' added');toast(j.error||'Added');});},false);}
+function editUser(id){var u=_users.find(function(x){return x.id===id;});modal('Edit User','<div class="form-group"><label>Email</label><input type="email" id="euEmail" value="'+esc(u&&u.email||'')+'"></div><div class="form-group"><label>Role</label><select id="euRole">'+ROLES.map(function(r){return '<option value="'+r+'"'+(u&&u.role===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></div>',function(){var em=g('euEmail').trim();if(!em){toast('Email required');return;}fetch(API+'/api/users?id='+id,{method:'PUT',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({email:em,role:g('euRole')})}).then(function(r){return r.json();}).then(function(j){closeModal();loadUsers();addNotif('User updated');toast(j.error||'Updated');});},false);}
 function changeUserRole(id,role){fetch(API+'/api/users?id='+id,{method:'PUT',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({role:role})}).then(function(r){return r.json();}).then(function(j){toast(j.error||'Role updated');addNotif('Role updated');});}
 function resetUserPass(id){modal('Reset Password','<div class="form-group"><label>New password</label><input type="password" id="rpPass"></div>',function(){var pw=g('rpPass');if(!pw){toast('Password required');return;}fetch(API+'/api/users?id='+id,{method:'PUT',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({password:pw})}).then(function(r){return r.json();}).then(function(j){closeModal();toast(j.error||'Password reset');});},false);}
 function deleteUser(id,name){if(!confirm('Delete user '+name+'?'))return;fetch(API+'/api/users?id='+id,{method:'DELETE',headers:{'Authorization':'Bearer '+(getToken()||PW)}}).then(function(r){return r.json();}).then(function(j){loadUsers();toast(j.error||'Deleted');});}

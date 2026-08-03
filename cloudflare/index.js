@@ -163,25 +163,26 @@ function requireRole(user, min, env, req) {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function handleLogin(req, env) {
   const body = await safeJSON(req);
-  if (!body || !body.username || !body.password) return err('Username and password required', 400, env, req);
+  if (!body) return err('Email and password required', 400, env, req);
+  const identifier = String(body.identifier || body.username || '').toLowerCase().trim();
+  if (!identifier || !body.password) return err('Email and password required', 400, env, req);
 
   // Master token double-duty: if the single ADMIN_TOKEN is used as a password
-  // with username "admin", log in as superadmin (backwards compatible).
-  const username = String(body.username).toLowerCase().trim();
-  if (username === 'admin' && env.ADMIN_TOKEN && constantTimeEq(body.password, env.ADMIN_TOKEN)) {
+  // with the admin email or "admin", log in as superadmin (backwards compatible).
+  if ((identifier === 'admin' || identifier === 'freudtroy@gmail.com') && env.ADMIN_TOKEN && constantTimeEq(body.password, env.ADMIN_TOKEN)) {
     const payload = { sub: 'admin', role: 'superadmin', iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 };
     const token = await signJWT(payload, env.JWT_SECRET || 'dev-jwt-secret');
-    return json({ token, user: { username: 'admin', role: 'superadmin' } }, 200, env, req);
+    return json({ token, user: { username: 'admin', email: 'freudtroy@gmail.com', role: 'superadmin' } }, 200, env, req);
   }
 
-  const row = await env.DB.prepare('SELECT username, password_hash, role FROM cms_users WHERE username = ?').bind(username).first();
+  const row = await env.DB.prepare('SELECT username, email, password_hash, role FROM cms_users WHERE LOWER(email) = ? OR LOWER(username) = ?').bind(identifier, identifier).first();
   if (!row) return err('Invalid credentials', 401, env, req);
   const ok = await verifyPassword(body.password, row.password_hash);
   if (!ok) return err('Invalid credentials', 401, env, req);
 
   const payload = { sub: row.username, role: row.role, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 };
   const token = await signJWT(payload, env.JWT_SECRET || 'dev-jwt-secret');
-  return json({ token, user: { username: row.username, role: row.role } }, 200, env, req);
+  return json({ token, user: { username: row.username, email: row.email, role: row.role } }, 200, env, req);
 }
 
 async function handleUsers(method, req, env, user) {
@@ -189,20 +190,21 @@ async function handleUsers(method, req, env, user) {
   if (forbidden) return forbidden;
 
   if (method === 'GET') {
-    const { results } = await env.DB.prepare('SELECT id, username, role, created_at FROM cms_users ORDER BY id').all();
+    const { results } = await env.DB.prepare('SELECT id, username, email, role, created_at FROM cms_users ORDER BY id').all();
     return json({ users: results }, 200, env, req);
   }
 
   if (method === 'POST') {
     const body = await safeJSON(req);
-    if (!body || !body.username || !body.password) return err('username and password required', 400, env, req);
-    const username = String(body.username).toLowerCase().trim();
+    if (!body || !body.email || !body.password) return err('email and password required', 400, env, req);
+    const email = String(body.email).toLowerCase().trim();
+    const username = String(body.username || email.split('@')[0]).toLowerCase().trim();
     const role = ['superadmin', 'admin', 'editor', 'viewer'].includes(body.role) ? body.role : 'viewer';
-    const existing = await env.DB.prepare('SELECT id FROM cms_users WHERE username = ?').bind(username).first();
+    const existing = await env.DB.prepare('SELECT id FROM cms_users WHERE LOWER(email) = ? OR LOWER(username) = ?').bind(email, username).first();
     if (existing) return err('User already exists', 409, env, req);
     const passwordHash = await hashPassword(body.password);
-    await env.DB.prepare('INSERT INTO cms_users (username, password_hash, role) VALUES (?, ?, ?)')
-      .bind(username, passwordHash, role).run();
+    await env.DB.prepare('INSERT INTO cms_users (username, email, password_hash, role) VALUES (?, ?, ?, ?)')
+      .bind(username, email, passwordHash, role).run();
     return json({ ok: true }, 201, env, req);
   }
 
@@ -212,11 +214,17 @@ async function handleUsers(method, req, env, user) {
     if (!id) return err('Missing id', 400, env, req);
     const body = await safeJSON(req);
     if (!body) return err('Bad request', 400, env, req);
-    const row = await env.DB.prepare('SELECT username, role FROM cms_users WHERE id = ?').bind(id).first();
+    const row = await env.DB.prepare('SELECT username, email, role FROM cms_users WHERE id = ?').bind(id).first();
     if (!row) return err('User not found', 404, env, req);
     if (body.password) {
       const passwordHash = await hashPassword(body.password);
       await env.DB.prepare('UPDATE cms_users SET password_hash = ? WHERE id = ?').bind(passwordHash, id).run();
+    }
+    if (body.email) {
+      const email = String(body.email).toLowerCase().trim();
+      const clash = await env.DB.prepare('SELECT id FROM cms_users WHERE LOWER(email) = ? AND id != ?').bind(email, id).first();
+      if (clash) return err('Email already in use', 409, env, req);
+      await env.DB.prepare('UPDATE cms_users SET email = ? WHERE id = ?').bind(email, id).run();
     }
     if (body.role && ['superadmin', 'admin', 'editor', 'viewer'].includes(body.role) && body.role !== row.role) {
       await env.DB.prepare('UPDATE cms_users SET role = ? WHERE id = ?').bind(body.role, id).run();

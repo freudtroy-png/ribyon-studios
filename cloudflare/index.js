@@ -186,8 +186,8 @@ async function saveBlob(env, data) {
 }
 
 function inviteUrl(env, token) {
-  const host = (env.ALLOWED_ORIGIN || 'https://ribyon-studios.vercel.app').replace(/\/$/, '');
-  return `${host}/portal.html?invite=${token}`;
+  const host = (env.PORTAL_URL || 'https://ribyon-portal.vercel.app').replace(/\/$/, '');
+  return `${host}/?invite=${token}`;
 }
 
 function requireRole(user, min, env, req) {

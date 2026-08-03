@@ -322,7 +322,7 @@ var _portalAccounts=[];
 function renderPortal(main){
   main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Client Portal</h2><p>Invite clients to a private portal: projects, invoices, files and messages.</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="inviteClientModal()">'+I.plus+' Invite client</button></div></div>'+
   '<div class="card"><div class="card-hd"><strong>Portal access</strong></div><div class="card-body" id="portalList"><p style="color:var(--stone);font-size:0.85rem">Loading…</p></div></div>'+
-  '<div class="card"><div class="card-hd"><strong>How it works</strong></div><div class="card-body"><p style="color:var(--stone);font-size:0.82rem;line-height:1.7">Send each client the invite link — they open it, set a password, and land in a private portal scoped to <b style="color:var(--ink)">their</b> projects, invoices and shared files.<br>Your portal link is: <b style="color:var(--orange)">https://ribyon-studios.vercel.app/portal.html</b></p></div></div></div>';
+  '<div class="card"><div class="card-hd"><strong>How it works</strong></div><div class="card-body"><p style="color:var(--stone);font-size:0.82rem;line-height:1.7">Send each client the invite link — they open it, set a password, and land in a private portal scoped to <b style="color:var(--ink)">their</b> projects, invoices and shared files.<br>Your portal link is: <b style="color:var(--orange)">https://ribyon-portal.vercel.app</b></p></div></div></div>';
   loadPortalAccounts();
 }
 function loadPortalAccounts(){

@@ -39,7 +39,8 @@ mail:'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="curren
 duplicate:'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="10.5" height="10.5" rx="1"/><path d="M1.5 11.5V2a.5.5 0 01.5-.5h9"/></svg>',
 drag:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4h6M5 8h6M5 12h6"/></svg>',
 edit:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2l2.5 2.5L5 13.5H2.5V11L11.5 2z"/></svg>',
-key:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="8" r="3.5"/><path d="M8.5 8H14v3h-2.5v-1.5"/></svg>'
+key:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="8" r="3.5"/><path d="M8.5 8H14v3h-2.5v-1.5"/></svg>',
+refresh:'<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8a5.5 5.5 0 10-1.6 3.9"/><path d="M13.5 5v3h-3"/></svg>'
 };
 
 /* ─── Defaults ─── */
@@ -219,6 +220,7 @@ var _currentSection='';
 function nav(sec){
   _currentSection=sec;document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active');});
   var link=document.querySelector('.sidebar-nav a[data-sec="'+sec+'"]');if(link)link.classList.add('active');
+  if(sec!=='portal'){clearInterval(_portalTimer);}
   if(window.innerWidth<=860){document.getElementById('sidebar').classList.remove('open');document.getElementById('sideOverlay').classList.remove('show');}
   var main=document.getElementById('mainArea');
   var fns={dash:renderDashboard,pages:renderPages,services:renderServices,portfolio:renderPortfolio,clients:renderClients,portal:renderPortal,blog:renderBlog,projects:renderProjects,invoices:renderInvoices,media:renderMedia,inquiries:renderInquiries,complaints:renderComplaints,analytics:renderAnalytics,activity:renderActivity,users:renderUsers,settings:renderSettings};
@@ -320,10 +322,27 @@ function deleteClient(id){if(!confirm('Delete?'))return;var data=get();data.clie
    ═══════════════════════════════════════════════════════ */
 var _portalAccounts=[];
 function renderPortal(main){
-  main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Client Portal</h2><p>Invite clients to a private portal: projects, invoices, files and messages.</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="inviteClientModal()">'+I.plus+' Invite client</button></div></div>'+
+  main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Client Portal</h2><p>Invite clients to a private portal: projects, invoices, files and messages.</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="refreshPortalData()">'+I.refresh+' Refresh</button><button class="btn btn-primary btn-sm" onclick="inviteClientModal()">'+I.plus+' Invite client</button></div></div>'+
   '<div class="card"><div class="card-hd"><strong>Portal access</strong></div><div class="card-body" id="portalList"><p style="color:var(--stone);font-size:0.85rem">Loading…</p></div></div>'+
   '<div class="card"><div class="card-hd"><strong>How it works</strong></div><div class="card-body"><p style="color:var(--stone);font-size:0.82rem;line-height:1.7">Send each client the invite link — they open it, set a password, and land in a private portal scoped to <b style="color:var(--ink)">their</b> projects, invoices and shared files.<br>Your portal link is: <b style="color:var(--orange)">https://ribyon-portal.vercel.app</b></p></div></div></div>';
-  loadPortalAccounts();
+  clearInterval(_portalTimer);
+  _portalTimer=setInterval(function(){refreshPortalData();},20000);
+  refreshPortalData();
+}
+var _portalTimer=null;
+function refreshPortalData(){
+  var list=document.getElementById('portalList');
+  if(list)list.innerHTML='<p style="color:var(--stone);font-size:0.85rem">Loading…</p>';
+  pullCloud().then(function(d){
+    if(d){
+      var data=get();
+      if(Array.isArray(d.messages)&&d.messages.length){data.messages=d.messages;}
+      if(Array.isArray(d.inquiries)&&d.inquiries.length){data.inquiries=d.inquiries;}
+      set(data);
+    }
+    syncPortalNotifs();
+    loadPortalAccounts();
+  }).catch(function(){loadPortalAccounts();});
 }
 function loadPortalAccounts(){
   fetch(API+'/api/portal/accounts',{headers:{'Authorization':'Bearer '+(getToken()||PW)}})
@@ -374,6 +393,17 @@ function resendInvite(id){
 }
 function revokePortal(id){if(!confirm('Remove this client\'s portal access?'))return;fetch(API+'/api/portal/accounts?id='+id,{method:'DELETE',headers:{'Authorization':'Bearer '+(getToken()||PW)}}).then(function(r){return r.json();}).then(function(j){loadPortalAccounts();toast(j.error||'Access revoked');});}
 function viewClientThread(cname){
+  pullCloud().then(function(d){
+    if(d){
+      var data=get();
+      if(Array.isArray(d.messages)&&d.messages.length){data.messages=d.messages;}
+      set(data);
+    }
+    syncPortalNotifs();
+    openThread(cname);
+  }).catch(function(){openThread(cname);});
+}
+function openThread(cname){
   var data=get();var msgs=(data.messages||[]).filter(function(m){return String(m.client).trim().toLowerCase()===String(cname).trim().toLowerCase();}).slice().reverse();
   var thread=msgs.map(function(m){return '<div class="msg '+(m.from==='ribyon'?'ribyon':'client')+'" style="align-self:'+(m.from==='ribyon'?'flex-start':'flex-end')+';max-width:80%;background:'+(m.from==='ribyon'?'var(--stone-bg)':'var(--orange)')+';color:'+(m.from==='ribyon'?'var(--ink)':'#fff')+';padding:0.7rem 0.95rem;border-radius:14px;margin-bottom:0.5rem;font-size:0.84rem;line-height:1.5"><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.65;margin-bottom:.2rem">'+m.from+'</div>'+esc(m.text)+'<div style="font-size:0.62rem;opacity:.6;margin-top:.3rem;text-align:right">'+fmtDate(m.date)+'</div></div>';}).join('')||'<p style="color:var(--stone);font-size:0.82rem">No messages yet.</p>';
   modal('Messages — '+cname,'<div style="max-height:46vh;overflow-y:auto;padding:0.25rem;display:flex;flex-direction:column">'+thread+'</div><div class="row" style="margin-top:0.75rem"><div class="form-group" style="grid-column:1/-1"><label>Reply</label><textarea id="threadReply" rows="2"></textarea></div></div>',function(){

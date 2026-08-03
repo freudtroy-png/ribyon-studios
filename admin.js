@@ -1,8 +1,12 @@
 /* ═══════════════════════════════════════════════════════════
-   Ribyon CMS v3 — Warm Precision
+   Ribyon CMS v4 — Ink & Ember
    Libs: Chart.js, SortableJS, Quill.js
    ═══════════════════════════════════════════════════════════ */
 const PW='admin123',KEY='rs_data';
+const API='https://ribyon-cms-api.freudtroy.workers.dev';
+const SITE_URL='https://ribyon-studios.vercel.app';
+const ROLES=['superadmin','admin','editor','viewer'];
+const ROLE_RANK={'superadmin':4,'admin':3,'editor':2,'viewer':1};
 
 const I={
 dash:'<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1"/><rect x="9" y="9" width="5.5" height="5.5" rx="1"/></svg>',
@@ -71,9 +75,18 @@ inquiries:[],complaints:[],invoices:[],media:[],projects:[],activity:[],notifica
 
 /* ─── Storage ─── */
 function get(){try{var d=localStorage.getItem(KEY);if(!d)return JSON.parse(JSON.stringify(DEFAULTS));var data=JSON.parse(d);migrate(data);return data;}catch(e){return JSON.parse(JSON.stringify(DEFAULTS));}}
-function set(d){localStorage.setItem(KEY,JSON.stringify(d));}
-function migrate(d){
-  if(!d.projects)d.projects=[];if(!d.activity)d.activity=[];if(!d.notifications)d.notifications=[];if(!d.settings)d.settings=DEFAULTS.settings;
+function set(d){localStorage.setItem(KEY,JSON.stringify(d));showSaveStatus('local');schedulePush();}
+
+/* ─── Cloud Sync (Cloudflare Worker + D1 + R2) ─── */
+var _syncTimer=null,_lastSyncedAt=0;
+function apiAuth(){return{'Authorization':'Bearer '+PW,'Content-Type':'application/json'};}
+function cloudEnabled(){try{return localStorage.getItem('rs_cloud')==='1';}catch(e){return false;}}
+function setCloudEnabled(on){try{localStorage.setItem('rs_cloud',on?'1':'0');}catch(e){}}
+async function pushCloud(d){try{showSaveStatus('syncing');var r=await fetch(API+'/api/data',{method:'PUT',headers:apiAuth(),body:JSON.stringify({data:d||get()})});_lastSyncedAt=Date.now();if(r.ok)showSaveStatus('synced');else showSaveStatus('local');return r.ok;}catch(e){showSaveStatus('local');return false;}}
+async function pullCloud(){try{var r=await fetch(API+'/api/data',{method:'GET',headers:apiAuth()});if(!r.ok)return null;var j=await r.json();return j.data||null;}catch(e){return null;}}
+function schedulePush(){if(!cloudEnabled())return;clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){pushCloud().then(function(ok){if(!ok)toast('Cloud sync failed');});},1200);}
+async function syncFromCloud(){var d=await pullCloud();if(d){migrate(d);set(d);renderApp();toast('Loaded from cloud');return true;}return false;}
+function migrate(d){  if(!d.projects)d.projects=[];if(!d.activity)d.activity=[];if(!d.notifications)d.notifications=[];if(!d.settings)d.settings=DEFAULTS.settings;
   (d.services||[]).forEach(function(s,i){if(s.order===undefined)s.order=i;});
   (d.portfolio||[]).forEach(function(p,i){if(p.order===undefined)p.order=i;});
   (d.clients||[]).forEach(function(c){if(c.email===undefined)c.email='';if(c.phone===undefined)c.phone='';if(c.notes===undefined)c.notes='';});
@@ -93,19 +106,57 @@ function logActivity(action,detail){var data=get();if(!data.activity)data.activi
 function addNotif(text){var data=get();if(!data.notifications)data.notifications=[];data.notifications.unshift({id:id(data.notifications),text:text,date:now(),read:false});if(data.notifications.length>50)data.notifications=data.notifications.slice(0,50);set(data);updateNotifBadge();}
 function updateNotifBadge(){var data=get();var n=(data.notifications||[]).filter(function(x){return !x.read;}).length;var dot=document.getElementById('notifDot');if(dot)dot.style.display=n>0?'block':'none';}
 
-/* ─── Toast ─── */
+/* ─── Toast & Save status ─── */
 var _toastTimer;
 function toast(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}clearTimeout(_toastTimer);t.textContent=msg;t.classList.add('show');_toastTimer=setTimeout(function(){t.classList.remove('show');},2200);}
+var _saveStatusTimer;
+function showSaveStatus(state){
+  var el=document.getElementById('saveStatus');if(!el)return;
+  var labels={local:'Saved locally',syncing:'Saving…',synced:'✓ Saved to cloud'};
+  el.textContent=labels[state]||'';
+  el.className='save-status save-'+state;
+  el.style.display='block';
+  clearTimeout(_saveStatusTimer);
+  if(state!=='syncing'){_saveStatusTimer=setTimeout(function(){el.style.display='none';},2600);}
+}
 
-/* ─── Login ─── */
-function login(pass){if(pass===PW){localStorage.setItem('rs_auth','1');renderApp();}else{document.getElementById('loginError').textContent='Incorrect password';}}
-function logout(){localStorage.removeItem('rs_auth');renderApp();}
+/* ─── Login & Roles ─── */
+function setAuth(token,user){try{if(token)localStorage.setItem('rs_token',token);else localStorage.removeItem('rs_token');localStorage.setItem('rs_user',JSON.stringify(user||{}));}catch(e){}}
+function getToken(){try{return localStorage.getItem('rs_token')||'';}catch(e){return '';}}
+function currentUser(){try{var u=localStorage.getItem('rs_user');return u?JSON.parse(u):{};}catch(e){return {};}}
+function role(){return currentUser().role||'viewer';}
+function canEdit(){return ROLE_RANK[role()]>=ROLE_RANK.editor;}
+function canManage(){return ROLE_RANK[role()]>=ROLE_RANK.admin;}
+function isSuper(){return role()==='superadmin';}
+function apiAuth(){return{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'};}
 
-function renderApp(){if(localStorage.getItem('rs_auth')==='1')renderAdmin();else renderLogin();}
-function renderLogin(){document.getElementById('app').innerHTML='<div class="login-screen"><div class="login-box"><img src="logo.png" alt="Ribyon Studios" class="login-logo"><p class="login-sub">Content Management</p><input type="password" id="loginPass" placeholder="Enter password" autocomplete="off" onkeydown="if(event.key===\'Enter\')login(this.value)"><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="login(document.getElementById(\'loginPass\').value)">Sign in</button><p id="loginError" class="login-error"></p></div></div>';}
+function login(u,p){
+  if(!u||!p){document.getElementById('loginError').textContent='Enter username and password';return;}
+  fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
+    .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+    .then(function(res){
+      if(res.ok&&res.j.token){
+        setAuth(res.j.token,res.j.user);localStorage.setItem('rs_auth','1');renderApp();
+        addNotif('Signed in as '+res.j.user.username+' ('+res.j.user.role+')');
+        if(cloudEnabled()){setTimeout(function(){syncFromCloud();},600);}else{document.getElementById('loginError').textContent='';}
+        return;
+      }
+      if(!cloudEnabled()&&p===PW){localStorage.setItem('rs_auth','1');setAuth('',{username:'admin',role:'superadmin'});renderApp();document.getElementById('loginError').textContent='';return;}
+      document.getElementById('loginError').textContent=res.j.error||'Incorrect credentials';
+    })
+    .catch(function(){
+      if(p===PW){localStorage.setItem('rs_auth','1');setAuth('',{username:'admin',role:'superadmin'});renderApp();document.getElementById('loginError').textContent='';return;}
+      document.getElementById('loginError').textContent='Cannot reach server';
+    });
+}
+function logout(){localStorage.removeItem('rs_auth');localStorage.removeItem('rs_token');renderApp();}
+
+function renderApp(){var u=localStorage.getItem('rs_user');if(localStorage.getItem('rs_auth')==='1'&&u)renderAdmin();else renderLogin();}
+function renderLogin(){document.getElementById('app').innerHTML='<div class="login-screen"><div class="login-box"><img src="logo.png" alt="Ribyon Studios" class="login-logo"><div class="login-title">Ribyon Studio</div><p class="login-sub">Content Management</p><input type="text" id="loginUser" placeholder="Username" autocomplete="username" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)"><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,this.value)"><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)">Sign in</button><p id="loginError" class="login-error"></p></div></div>';}
 
 function renderAdmin(){
-  var data=get();
+  var data=get();var u=currentUser();
+  var canE=canEdit(),canM=canManage(),sup=isSuper();
   document.getElementById('app').innerHTML=
     '<div class="app ready">'+
     '<div class="sidebar-overlay" id="sideOverlay" onclick="toggleSidebar()"></div>'+
@@ -128,15 +179,17 @@ function renderAdmin(){
     '<div class="nav-label">Insights</div>'+
     '<a href="#" onclick="nav(\'analytics\')" data-sec="analytics">'+I.chart+'Analytics</a>'+
     '<a href="#" onclick="nav(\'activity\')" data-sec="activity">'+I.activity+'Activity</a>'+
+    (sup?'<a href="#" onclick="nav(\'users\')" data-sec="users">'+I.client+'Users</a>':'')+
     '<a href="#" onclick="nav(\'settings\')" data-sec="settings">'+I.settings+'Settings</a>'+
     '</nav>'+
-    '<div class="sidebar-foot"><a href="/" target="_blank">'+I.link+' View site</a><a href="#" onclick="logout()">Sign out</a></div></aside>'+
+    '<div class="sidebar-foot"><a href="'+SITE_URL+'" target="_blank" rel="noopener">'+I.link+' View site</a><a href="#" onclick="logout()">Sign out</a></div></aside>'+
     '<header class="topbar"><div class="topbar-left"><div class="global-search" id="globalSearchWrap">'+
     '<span class="gs-ico">'+I.search+'</span>'+
     '<input type="text" id="globalSearch" placeholder="Search anything..." oninput="gsSearch(this.value)" onblur="setTimeout(function(){document.getElementById(\'gsResults\').classList.remove(\'open\')},200)" onfocus="gsSearch(this.value)">'+
     '<div class="gs-results" id="gsResults"></div></div></div>'+
-    '<div class="topbar-right"><button class="tb-btn" onclick="toggleNotifPanel()">'+I.bell+'<span class="tb-dot" id="notifDot"></span></button>'+
-    '<div class="tb-avatar" onclick="nav(\'settings\')" title="Settings">A</div></div></header>'+
+    '<div class="topbar-right"><span class="save-status" id="saveStatus" style="display:none"></span>'+
+    '<button class="tb-btn" onclick="toggleNotifPanel()">'+I.bell+'<span class="tb-dot" id="notifDot"></span></button>'+
+    '<div class="tb-avatar" onclick="nav(\'settings\')" title="'+(u.role||'')+'">'+(u.username?u.username.charAt(0).toUpperCase():'A')+'</div></div></header>'+
     '<main class="main" id="mainArea"></main></div>';
   updateNotifBadge();nav('dash');
 }
@@ -163,7 +216,7 @@ function nav(sec){
   var link=document.querySelector('.sidebar-nav a[data-sec="'+sec+'"]');if(link)link.classList.add('active');
   if(window.innerWidth<=860){document.getElementById('sidebar').classList.remove('open');document.getElementById('sideOverlay').classList.remove('show');}
   var main=document.getElementById('mainArea');
-  var fns={dash:renderDashboard,pages:renderPages,services:renderServices,portfolio:renderPortfolio,clients:renderClients,blog:renderBlog,projects:renderProjects,invoices:renderInvoices,media:renderMedia,inquiries:renderInquiries,complaints:renderComplaints,analytics:renderAnalytics,activity:renderActivity,settings:renderSettings};
+  var fns={dash:renderDashboard,pages:renderPages,services:renderServices,portfolio:renderPortfolio,clients:renderClients,blog:renderBlog,projects:renderProjects,invoices:renderInvoices,media:renderMedia,inquiries:renderInquiries,complaints:renderComplaints,analytics:renderAnalytics,activity:renderActivity,users:renderUsers,settings:renderSettings};
   if(fns[sec])fns[sec](main);
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sideOverlay').classList.toggle('show');}
@@ -210,8 +263,8 @@ function renderDashChart(data){
   var ctx=canvas.getContext('2d');
   _chartInstances.dash=new Chart(ctx,{
     type:'bar',
-    data:{labels:months.map(function(m){return m.lbl;}),datasets:[{label:'Revenue (KSh)',data:months.map(function(m){return m.rev;}),backgroundColor:'rgba(0,0,0,0.08)',borderColor:'#000',borderWidth:2,borderRadius:4,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(28,25,23,0.06)'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+    data:{labels:months.map(function(m){return m.lbl;}),datasets:[{label:'Revenue (KSh)',data:months.map(function(m){return m.rev;}),backgroundColor:'rgba(249,115,22,0.22)',borderColor:'#f97316',borderWidth:2,borderRadius:5,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(10,9,8,0.06)'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
 }
 
@@ -269,8 +322,16 @@ function editBlog(id){
   var data=get();var b=data.blog.find(function(x){return x.id===id;});if(!b)return;
   if(_quillInstance){_quillInstance.destroy();_quillInstance=null;}
   modal('Edit Post','<div class="row"><div class="form-group"><label>Title</label><input type="text" id="medBlTitle" value="'+esc(b.title)+'"></div><div class="form-group"><label>Slug</label><input type="text" id="medBlSlug" value="'+esc(b.slug)+'"></div></div><div class="row three"><div class="form-group"><label>Date</label><input type="date" id="medBlDate" value="'+(b.date||now())+'"></div><div class="form-group"><label>Status</label><select id="medBlStatus"><option value="draft"'+(b.status==='draft'?' selected':'')+'>Draft</option><option value="published"'+(b.status==='published'?' selected':'')+'>Published</option></select></div><div class="form-group"><label>Category</label><input type="text" id="medBlCat" value="'+esc(b.category||'')+'"></div></div><div class="form-group"><label>SEO description</label><input type="text" id="medBlSeo" value="'+esc(b.seoDesc||'')+'"></div><div class="form-group"><label>Excerpt</label><textarea id="medBlExcerpt">'+esc(b.excerpt||'')+'</textarea></div><div class="form-group"><label>Body</label><div id="quillEditor" style="background:var(--white)"></div></div>',
-    function(){b.title=g('medBlTitle');b.slug=g('medBlSlug');b.date=g('medBlDate');b.status=g('medBlStatus');b.category=g('medBlCat');b.seoDesc=g('medBlSeo');b.excerpt=g('medBlExcerpt');b.body=_quillInstance?_quillInstance.root.innerHTML:'';set(data);closeModal();renderBlog(document.getElementById('mainArea'));logActivity('Edited post',b.title);toast('Saved');},true);
-  if(typeof Quill!=='undefined'){_quillInstance=new Quill('#quillEditor',{theme:'snow',modules:{toolbar:[['bold','italic','underline','strike'],[{'header':[1,2,3,false]}],[{'list':'ordered'},{'list':'bullet'}],['link','blockquote','code-block'],['clean']]}});_quillInstance.root.innerHTML=b.body||'';}
+    function(){b.title=g('medBlTitle');b.slug=g('medBlSlug');b.date=g('medBlDate');b.status=g('medBlStatus');b.category=g('medBlCat');b.seoDesc=g('medBlSeo');b.excerpt=g('medBlExcerpt');var fb=document.getElementById('blogBodyFallback');b.body=_quillInstance?_quillInstance.root.innerHTML:(fb?fb.value:b.body);set(data);closeModal();renderBlog(document.getElementById('mainArea'));logActivity('Edited post',b.title);toast('Saved');},true);
+  var qe=document.getElementById('quillEditor');
+  if(typeof Quill!=='undefined'){
+    try{
+      _quillInstance=new Quill('#quillEditor',{theme:'snow',modules:{toolbar:[['bold','italic','underline','strike'],[{'header':[1,2,3,false]}],[{'list':'ordered'},{'list':'bullet'}],['link','blockquote','code-block'],['clean']]}});
+      _quillInstance.root.innerHTML=b.body||'';
+    }catch(e){qe.innerHTML='<textarea id="blogBodyFallback" style="width:100%;min-height:200px;padding:0.75rem;border:1.5px solid var(--stone-line);border-radius:8px;font-family:inherit;font-size:0.9rem;background:var(--white);color:var(--ink)">'+esc(b.body||'')+'</textarea>';}
+  }else{
+    qe.innerHTML='<textarea id="blogBodyFallback" style="width:100%;min-height:200px;padding:0.75rem;border:1.5px solid var(--stone-line);border-radius:8px;font-family:inherit;font-size:0.9rem;background:var(--white);color:var(--ink)">'+esc(b.body||'')+'</textarea>';
+  }
 }
 
 function addBlog(){var data=get();data.blog.push({id:id(data.blog),title:'New Post',slug:'new-post',excerpt:'',date:now(),status:'draft',body:'',category:'',tags:[],seoDesc:''});set(data);renderBlog(document.getElementById('mainArea'));toast('Created');}
@@ -318,11 +379,22 @@ function deleteInvoice(id){if(!confirm('Delete?'))return;var data=get();data.inv
 /* ═══════════════════════════════════════════════════════
    MEDIA
    ═══════════════════════════════════════════════════════ */
-function renderMedia(main){var data=get();var items=data.media||[];main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Media Library</h2><p>'+items.length+' files</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="clearAllMedia()">'+I.trash+' Clear</button></div></div><div class="upload-zone" onclick="document.getElementById(\'mediaInput\').click()">'+I.upload+'<p>Click to upload images</p></div><input type="file" id="mediaInput" accept="image/*" multiple style="display:none" onchange="handleMediaUpload(this.files)"><div style="margin-top:1rem" class="media-grid" id="mediaGrid">'+items.map(function(m){return '<div class="media-item" onclick="copyMediaUrl('+m.id+')" title="Click to copy URL"><img src="'+esc(m.data)+'" alt=""><button class="del" onclick="event.stopPropagation();deleteMedia('+m.id+')">'+I.trash+'</button></div>';}).join('')+'</div></div>';}
-function handleMediaUpload(files){var data=get();if(!data.media)data.media=[];var pending=files.length;Array.from(files).forEach(function(file){var reader=new FileReader();reader.onload=function(e){data.media.push({id:id(data.media),name:file.name,data:e.target.result,date:now()});pending--;if(pending===0){set(data);renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);toast('Uploaded');}};reader.readAsDataURL(file);});}
-function deleteMedia(id){if(!confirm('Delete?'))return;var data=get();data.media=data.media.filter(function(m){return m.id!==id;});set(data);renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);}
-function clearAllMedia(){if(!confirm('Delete all?'))return;var data=get();data.media=[];set(data);renderMedia(document.getElementById('mainArea'));updateBadge('media',0);toast('Cleared');}
-function copyMediaUrl(id){var data=get();var m=data.media.find(function(x){return x.id===id;});if(!m)return;var input=document.createElement('input');input.value=m.data;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('Copied');}
+function renderMedia(main){var data=get();var items=data.media||[];var cloud=cloudEnabled();main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Media Library</h2><p>'+items.length+' files'+(cloud?' · cloud':'')+'</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="downloadAllMedia()">'+I.download+' Download all</button><button class="btn btn-ghost btn-sm" onclick="clearAllMedia()">'+I.trash+' Clear</button></div></div><div class="upload-zone" onclick="document.getElementById(\'mediaInput\').click()">'+I.upload+'<p>Click to upload images'+(cloud?' · saved to Cloudflare':'')+'</p></div><input type="file" id="mediaInput" accept="image/*" multiple style="display:none" onchange="handleMediaUpload(this.files)"><div style="margin-top:1rem" class="media-grid" id="mediaGrid">'+items.map(function(m){return '<div class="media-item" onclick="copyMediaUrl('+m.id+')" title="Click to copy URL"><img src="'+esc(m.url||m.data)+'" alt=""><button class="del" onclick="event.stopPropagation();deleteMedia('+m.id+')">'+I.trash+'</button></div>';}).join('')+'</div></div>';}
+function handleMediaUpload(files){var data=get();if(!data.media)data.media=[];var pending=files.length;var cloud=cloudEnabled();Array.from(files).forEach(function(file){
+  if(cloud){
+    var fd=new FormData();fd.append('file',file);
+    fetch(API+'/api/media/upload',{method:'POST',headers:{'Authorization':'Bearer '+PW},body:fd})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(j){data.media.push({id:id(data.media),name:file.name,url:j.url,key:j.key,data:'',date:now()});pending--;if(pending===0){set(data);renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);toast('Uploaded to cloud');}})
+      .catch(function(){pending--;if(pending===0){toast('Upload failed');}});
+  }else{
+    var reader=new FileReader();reader.onload=function(e){data.media.push({id:id(data.media),name:file.name,url:'',data:e.target.result,date:now()});pending--;if(pending===0){set(data);renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);toast('Uploaded');}};reader.readAsDataURL(file);
+  }
+});}
+function deleteMedia(id){if(!confirm('Delete?'))return;var data=get();var m=data.media.find(function(x){return x.id===id;});data.media=data.media.filter(function(x){return x.id!==id;});set(data);if(m&&m.key&&cloudEnabled()){fetch(API+'/api/media/delete?key='+encodeURIComponent(m.key),{method:'DELETE',headers:{'Authorization':'Bearer '+PW}}).catch(function(){});}renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);}
+function clearAllMedia(){if(!confirm('Delete all?'))return;var data=get();var keys=(data.media||[]).map(function(m){return m.key;}).filter(Boolean);data.media=[];set(data);if(keys.length&&cloudEnabled()){keys.forEach(function(k){fetch(API+'/api/media/delete?key='+encodeURIComponent(k),{method:'DELETE',headers:{'Authorization':'Bearer '+PW}}).catch(function(){});});}renderMedia(document.getElementById('mainArea'));updateBadge('media',0);toast('Cleared');}
+function copyMediaUrl(id){var data=get();var m=data.media.find(function(x){return x.id===id;});if(!m)return;var val=m.url||m.data;var input=document.createElement('input');input.value=val;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('Copied');}
+function downloadAllMedia(){var data=get();var items=(data.media||[]).filter(function(m){return m.url||m.data;});if(!items.length){toast('No media');return;}toast('Preparing…');var dlNext=function(i){if(i>=items.length){toast('Downloaded '+items.length+' files');return;}var m=items[i];var src=m.url||m.data;var a=document.createElement('a');a.href=src;a.download=(m.name||('media-'+m.id))||'image';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){dlNext(i+1);},450);};dlNext(0);}
 
 /* ═══════════════════════════════════════════════════════
    INQUIRIES & COMPLAINTS
@@ -376,7 +448,7 @@ function renderAnalyticsCharts(data){
 
   var ac=document.getElementById('analyticsChart');if(ac){
     if(_chartInstances.analytics)_chartInstances.analytics.destroy();
-    _chartInstances.analytics=new Chart(ac.getContext('2d'),{type:'line',data:{labels:months.map(function(m){return m.lbl;}),datasets:[{label:'Revenue',data:months.map(function(m){return m.rev;}),borderColor:'#000',backgroundColor:'rgba(0,0,0,0.06)',fill:true,tension:0.4,pointBackgroundColor:'#000',pointRadius:4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(28,25,23,0.06)'},ticks:{font:{size:10},callback:function(v){return'KSh '+v;}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});}
+    _chartInstances.analytics=new Chart(ac.getContext('2d'),{type:'line',data:{labels:months.map(function(m){return m.lbl;}),datasets:[{label:'Revenue',data:months.map(function(m){return m.rev;}),borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.10)',fill:true,tension:0.4,pointBackgroundColor:'#f97316',pointRadius:4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(10,9,8,0.06)'},ticks:{font:{size:10},callback:function(v){return'KSh '+v;}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});}
 
   var dc=document.getElementById('donutChart');if(dc){
     if(_chartInstances.donut)_chartInstances.donut.destroy();
@@ -395,11 +467,38 @@ function exportReport(){var data=get();var inv=data.invoices||[];var csv='Invoic
 function renderActivity(main){var data=get();var items=data.activity||[];main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Activity Log</h2><p>'+(items.length)+' events</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="clearActivity()">'+I.trash+' Clear</button></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Time</th><th>Action</th><th>Detail</th></tr></thead><tbody>'+(items.length?items.slice(0,50).map(function(a){return '<tr><td style="white-space:nowrap;color:var(--stone)">'+fmtDate(a.date)+' '+a.time+'</td><td><strong>'+esc(a.action)+'</strong></td><td>'+esc(a.detail)+'</td></tr>';}).join(''):'<tr><td colspan="3"><div class="empty">'+I.empty+'<p>No activity</p></div></td></tr>')+'</tbody></table></div></div>';}
 function clearActivity(){if(!confirm('Clear log?'))return;var data=get();data.activity=[];set(data);nav('activity');toast('Cleared');}
 
-function renderSettings(main){var data=get();var s=data.settings||DEFAULTS.settings;main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Settings</h2></div></div><div class="card"><div class="card-hd"><strong>Studio</strong></div><div class="card-body"><div class="row"><div class="form-group"><label>Company</label><input type="text" id="setName" value="'+esc(s.companyName||'')+'"></div><div class="form-group"><label>Currency</label><input type="text" id="setCur" value="'+esc(s.currency||'KSh')+'"></div></div><div class="row"><div class="form-group"><label>Email</label><input type="email" id="setEmail" value="'+esc(s.companyEmail||'')+'"></div><div class="form-group"><label>Phone</label><input type="text" id="setPhone" value="'+esc(s.companyPhone||'')+'"></div></div><button class="btn btn-primary btn-sm" onclick="saveSettings()">'+I.check+' Save</button></div></div><div class="card"><div class="card-hd"><strong>Data</strong></div><div class="card-body"><p style="margin-bottom:0.75rem;font-size:0.82rem;color:var(--stone)">All data in localStorage. Export regularly.</p><button class="btn btn-ghost btn-sm" onclick="exportData()">'+I.download+' Backup</button> <button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'importInput\').click()">Import</button> <button class="btn btn-danger btn-sm" onclick="resetAll()" style="margin-left:0.25rem">Reset</button><input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this.files[0])"></div></div><div class="card"><div class="card-hd"><strong>About</strong></div><div class="card-body"><p style="font-size:0.82rem;color:var(--stone)">CMS v3 — Ribyon Studios</p></div></div></div>';}
+function renderSettings(main){var data=get();var s=data.settings||DEFAULTS.settings;main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Settings</h2></div></div><div class="card"><div class="card-hd"><strong>Studio</strong></div><div class="card-body"><div class="row"><div class="form-group"><label>Company</label><input type="text" id="setName" value="'+esc(s.companyName||'')+'"></div><div class="form-group"><label>Currency</label><input type="text" id="setCur" value="'+esc(s.currency||'KSh')+'"></div></div><div class="row"><div class="form-group"><label>Email</label><input type="email" id="setEmail" value="'+esc(s.companyEmail||'')+'"></div><div class="form-group"><label>Phone</label><input type="text" id="setPhone" value="'+esc(s.companyPhone||'')+'"></div></div><button class="btn btn-primary btn-sm" onclick="saveSettings()">'+I.check+' Save</button></div></div><div class="card"><div class="card-hd"><strong>Cloud Database</strong><span class="status '+(cloudEnabled()?'status-paid':'status-draft')+'">'+(cloudEnabled()?'Connected':'Off')+'</span></div><div class="card-body"><p style="margin-bottom:0.75rem;font-size:0.82rem;color:var(--stone)">Store your CMS data in Cloudflare D1 and images in R2. Enable to sync everything to the cloud.</p><button class="btn btn-ghost btn-sm" onclick="toggleCloud()">'+(cloudEnabled()?'Disable cloud':'Enable cloud')+'</button>'+(cloudEnabled()?'<button class="btn btn-success btn-sm" onclick="pushNow()" style="margin-left:0.25rem">'+I.upload+' Push now</button><button class="btn btn-ghost btn-sm" onclick="pullNow()" style="margin-left:0.25rem">'+I.download+' Pull</button>':'')+'</div></div><div class="card"><div class="card-hd"><strong>Data</strong></div><div class="card-body"><p style="margin-bottom:0.75rem;font-size:0.82rem;color:var(--stone)">All data in localStorage. Export regularly.</p><button class="btn btn-ghost btn-sm" onclick="exportData()">'+I.download+' Backup</button> <button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'importInput\').click()">Import</button> <button class="btn btn-danger btn-sm" onclick="resetAll()" style="margin-left:0.25rem">Reset</button><input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this.files[0])"></div></div><div class="card"><div class="card-hd"><strong>About</strong></div><div class="card-body"><p style="font-size:0.82rem;color:var(--stone)">CMS v4 — Ink &amp; Ember · Cloudflare connected</p></div></div></div>';}
 function saveSettings(){var data=get();data.settings={companyName:g('setName'),currency:g('setCur'),companyEmail:g('setEmail'),companyPhone:g('setPhone'),taxRate:data.settings.taxRate||16};set(data);logActivity('Updated','Settings');toast('Saved');}
 function exportData(){var data=get();var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ribyon-backup-'+now()+'.json';a.click();toast('Downloaded');}
 function importData(file){if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);set(d);toast('Imported');nav(_currentSection||'dash');}catch(err){toast('Invalid file');}};reader.readAsText(file);}
 function resetAll(){if(!confirm('Delete ALL content?'))return;if(!confirm('Really?'))return;set(JSON.parse(JSON.stringify(DEFAULTS)));nav('dash');toast('Reset');logActivity('Reset','All data reset');}
+
+function toggleCloud(){if(cloudEnabled()){setCloudEnabled(false);toast('Cloud disabled — data stays local');renderSettings(document.getElementById('mainArea'));}else{setCloudEnabled(true);toast('Connecting…');pushCloud().then(function(ok){if(ok){toast('Cloud enabled — pushed');addNotif('Cloud sync enabled');}else{setCloudEnabled(false);toast('Cloud unreachable');}renderSettings(document.getElementById('mainArea'));});}}
+function pushNow(){pushCloud(get()).then(function(ok){toast(ok?'Pushed to cloud':'Push failed');});}
+function pullNow(){syncFromCloud();}
+
+/* ─── Users (superadmin) ─── */
+function renderUsers(main){
+  if(!isSuper()){nav('settings');return;}
+  main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Users</h2><p>Team accounts and roles</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="addUser()">'+I.plus+' Add user</button></div></div><div class="card"><div class="card-body" id="userList"><p style="color:var(--stone);font-size:0.85rem">Loading…</p></div></div></div>';
+  loadUsers();
+}
+function loadUsers(){
+  fetch(API+'/api/users',{headers:{'Authorization':'Bearer '+(getToken()||PW)}})
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){renderUserRows(j.users||[]);})
+    .catch(function(){var el=document.getElementById('userList');if(el)el.innerHTML='<p style="color:var(--red);font-size:0.85rem">Could not load users.</p>';});
+}
+function renderUserRows(users){
+  var el=document.getElementById('userList');if(!el)return;
+  el.innerHTML='<table class="data-table"><thead><tr><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead><tbody>'+
+    users.map(function(u){return '<tr><td><strong>'+esc(u.username)+'</strong>'+(u.username===currentUser().username?' <span class="status status-paid" style="font-size:0.6rem">you</span>':'')+'</td><td><select onchange="changeUserRole('+u.id+',this.value)">'+ROLES.map(function(r){return '<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></td><td style="color:var(--stone);font-size:0.8rem">'+(u.created_at||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="resetUserPass('+u.id+')" title="Reset password">'+I.edit+'</button><button class="btn btn-danger btn-xs" onclick="deleteUser('+u.id+','+JSON.stringify(u.username)+')" title="Delete">'+I.trash+'</button></div></td></tr>';}).join('')+
+    '</tbody></table>';
+}
+function addUser(){modal('Add User','<div class="form-group"><label>Username</label><input type="text" id="nuName"></div><div class="form-group"><label>Password</label><input type="password" id="nuPass"></div><div class="form-group"><label>Role</label><select id="nuRole">'+ROLES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('')+'</select></div>',function(){var un=g('nuName').trim();var pw=g('nuPass');if(!un||!pw){toast('Username and password required');return;}fetch(API+'/api/users',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw,role:g('nuRole')})}).then(function(r){return r.json();}).then(function(j){closeModal();loadUsers();addNotif('User '+un+' added');toast(j.error||'Added');});},false);}
+function changeUserRole(id,role){fetch(API+'/api/users?id='+id,{method:'PUT',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({role:role})}).then(function(r){return r.json();}).then(function(j){toast(j.error||'Role updated');addNotif('Role updated');});}
+function resetUserPass(id){modal('Reset Password','<div class="form-group"><label>New password</label><input type="password" id="rpPass"></div>',function(){var pw=g('rpPass');if(!pw){toast('Password required');return;}fetch(API+'/api/users?id='+id,{method:'PUT',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({password:pw})}).then(function(r){return r.json();}).then(function(j){closeModal();toast(j.error||'Password reset');});},false);}
+function deleteUser(id,name){if(!confirm('Delete user '+name+'?'))return;fetch(API+'/api/users?id='+id,{method:'DELETE',headers:{'Authorization':'Bearer '+(getToken()||PW)}}).then(function(r){return r.json();}).then(function(j){loadUsers();toast(j.error||'Deleted');});}
 
 /* ═══════════════════════════════════════════════════════
    MODAL

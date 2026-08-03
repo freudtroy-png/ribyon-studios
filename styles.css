@@ -4844,3 +4844,134 @@ img[loading="lazy"][complete] {
 ::-webkit-scrollbar-track { background: var(--ink); }
 ::-webkit-scrollbar-thumb { background: var(--gray-dark); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gray-dim); }
+
+/* ===================================================================
+   FLOATING UTILITY BAR — back-to-top + language switcher
+   Fixed bottom-right, always visible after scroll
+   =================================================================== */
+
+/* Suppress Google's own UI chrome */
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body { top: 0 !important; }
+.goog-te-gadget-icon { display: none !important; }
+.goog-te-gadget { font-size: 0 !important; }
+.goog-te-gadget select { font-size: 0.75rem !important; }
+#google_translate_element_wrapper { display: none; }
+
+/* The floating pill container */
+.float-bar {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+/* Language switcher — bottom LEFT */
+.float-bar--lang {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+/* Each button in the bar */
+.float-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), opacity .3s var(--ease);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.float-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+/* Back to top — orange fill */
+.float-btn--top {
+  background: var(--orange);
+  color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+.float-btn--top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.float-btn--top:hover { background: var(--orange-dark); }
+
+/* Language — dark with orange border */
+.float-btn--lang {
+  background: var(--ink-card);
+  color: var(--white);
+  border: 1.5px solid rgba(249,115,22,0.35);
+  position: relative;
+}
+.float-btn--lang:hover { border-color: var(--orange); }
+
+/* Language dropdown panel — opens up from left */
+.float-lang-panel {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  right: auto;
+  background: var(--ink-card);
+  border: 1px solid rgba(249,115,22,0.2);
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 160px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.97);
+  transform-origin: bottom left;
+  transition: opacity .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.float-lang-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.float-lang-opt {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.float-lang-opt:hover { background: rgba(249,115,22,0.1); color: var(--white); }
+.float-lang-opt.active { color: var(--orange); }
+.float-lang-flag { font-size: 1rem; line-height: 1; }
+
+@media (max-width: 480px) {
+  .float-bar { bottom: 1.25rem; right: 1.25rem; }
+  .float-bar--lang { bottom: 1.25rem; left: 1.25rem; }
+}

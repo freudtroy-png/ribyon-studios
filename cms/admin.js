@@ -101,6 +101,7 @@ function calcBalance(inv){var total=inv.items.reduce(function(s,li){return s+((p
 function id(items){var m=0;items.forEach(function(i){if(i.id>m)m=i.id;});return m+1;}
 function pad(n){return String(n).padStart(2,'0');}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function jsStr(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
 function now(){return new Date().toISOString().split('T')[0];}
 function fmtDate(d){if(!d)return '';var p=d.split('-');return p[1]+'/'+p[2]+'/'+p[0];}
 function g(id){return document.getElementById(id)&&document.getElementById(id).value||'';}
@@ -353,7 +354,7 @@ function loadPortalAccounts(){
 function renderPortalRows(accs){
   var el=document.getElementById('portalList');if(!el)return;
   el.innerHTML='<table class="data-table"><thead><tr><th>Client</th><th>Status</th><th>Invited</th><th>Last login</th><th></th></tr></thead><tbody>'+
-    (accs.length?accs.map(function(a){return '<tr><td><strong>'+esc(a.client_name)+'</strong><span class="sub">'+esc(a.email)+'</span></td><td><span class="status status-'+(a.status==='active'?'paid':a.status==='invited'?'sent':'draft')+'">'+a.status+'</span></td><td style="color:var(--stone);font-size:0.8rem">'+(a.created_at||'').slice(0,10)+'</td><td style="color:var(--stone);font-size:0.8rem">'+(a.last_login||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="resendInvite('+a.id+')" title="Copy invite link">'+I.link+'</button><button class="btn btn-ghost btn-xs" onclick="viewClientThread('+JSON.stringify(esc(a.client_name))+')" title="Messages">'+I.inbox+'</button><button class="btn btn-danger btn-xs" onclick="revokePortal('+a.id+')" title="Remove access">'+I.trash+'</button></div></td></tr>';}).join(''):'<tr><td colspan="5" style="color:var(--stone);text-align:center">No portal accounts yet — invite your first client.</td></tr>')+
+    (accs.length?accs.map(function(a){return '<tr><td><strong>'+esc(a.client_name)+'</strong><span class="sub">'+esc(a.email)+'</span></td><td><span class="status status-'+(a.status==='active'?'paid':a.status==='invited'?'sent':'draft')+'">'+a.status+'</span></td><td style="color:var(--stone);font-size:0.8rem">'+(a.created_at||'').slice(0,10)+'</td><td style="color:var(--stone);font-size:0.8rem">'+(a.last_login||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="resendInvite('+a.id+')" title="Copy invite link">'+I.link+'</button><button class="btn btn-ghost btn-xs" onclick="viewClientThread(\''+jsStr(a.client_name)+'\')" title="Messages">'+I.inbox+'</button><button class="btn btn-danger btn-xs" onclick="revokePortal('+a.id+')" title="Remove access">'+I.trash+'</button></div></td></tr>';}).join(''):'<tr><td colspan="5" style="color:var(--stone);text-align:center">No portal accounts yet — invite your first client.</td></tr>')+
     '</tbody></table>';
 }
 function inviteClientModal(){

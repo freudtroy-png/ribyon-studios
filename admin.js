@@ -93,6 +93,8 @@ function migrate(d){  if(!d.projects)d.projects=[];if(!d.activity)d.activity=[];
   (d.clients||[]).forEach(function(c){if(c.email===undefined)c.email='';if(c.phone===undefined)c.phone='';if(c.notes===undefined)c.notes='';});
   (d.blog||[]).forEach(function(b){if(b.category===undefined)b.category='';if(b.tags===undefined)b.tags=[];if(b.seoDesc===undefined)b.seoDesc='';});
   (d.invoices||[]).forEach(function(i){if(!i.items)i.items=[{desc:i.desc||'Service',qty:1,rate:parseFloat(i.amount)||0}];if(i.payments===undefined)i.payments=[];if(i.balance===undefined)i.balance=calcBalance(i);if(i.dueDate===undefined)i.dueDate=i.date;if(i.currency===undefined)i.currency='KSh';if(i.notes===undefined)i.notes='';if(i.terms===undefined)i.terms='';});
+  if(!d.messages)d.messages=[];
+  (d.media||[]).forEach(function(m){if(m.client===undefined)m.client='';});
 }
 function calcBalance(inv){var total=inv.items.reduce(function(s,li){return s+((parseFloat(li.qty)||0)*(parseFloat(li.rate)||0));},0);var paid=(inv.payments||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);return Math.max(0,total-paid);}
 function id(items){var m=0;items.forEach(function(i){if(i.id>m)m=i.id;});return m+1;}
@@ -106,6 +108,7 @@ function g(id){return document.getElementById(id)&&document.getElementById(id).v
 function logActivity(action,detail){var data=get();if(!data.activity)data.activity=[];data.activity.unshift({id:id(data.activity),action:action,detail:detail,date:now(),time:new Date().toTimeString().slice(0,5)});if(data.activity.length>100)data.activity=data.activity.slice(0,100);set(data);}
 function addNotif(text){var data=get();if(!data.notifications)data.notifications=[];data.notifications.unshift({id:id(data.notifications),text:text,date:now(),read:false});if(data.notifications.length>50)data.notifications=data.notifications.slice(0,50);set(data);updateNotifBadge();}
 function updateNotifBadge(){var data=get();var n=(data.notifications||[]).filter(function(x){return !x.read;}).length;var dot=document.getElementById('notifDot');if(dot)dot.style.display=n>0?'block':'none';}
+function syncPortalNotifs(){var data=get();var msgs=(data.messages||[]).filter(function(m){return m.from==='client'&&!m.read;});if(!msgs.length)return;var seen={};try{seen=JSON.parse(localStorage.getItem('rs_pmsg_seen')||'{}');}catch(e){}var changed=false;msgs.forEach(function(m){if(!seen[m.id]){addNotif('Portal message from '+(m.client||'client')+': '+m.text.slice(0,80));seen[m.id]=1;m.read=true;changed=true;}});if(changed){localStorage.setItem('rs_pmsg_seen',JSON.stringify(seen));set(data);}};
 
 /* ─── Toast & Save status ─── */
 var _toastTimer;
@@ -170,6 +173,7 @@ function renderAdmin(){
     '<a href="#" onclick="nav(\'services\')" data-sec="services">'+I.svc+'Services<span class="badge">'+(data.services||[]).length+'</span></a>'+
     '<a href="#" onclick="nav(\'portfolio\')" data-sec="portfolio">'+I.brief+'Portfolio<span class="badge">'+(data.portfolio||[]).length+'</span></a>'+
     '<a href="#" onclick="nav(\'clients\')" data-sec="clients">'+I.client+'Clients<span class="badge">'+(data.clients||[]).length+'</span></a>'+
+    (canM?'<a href="#" onclick="nav(\'portal\')" data-sec="portal">'+I.link+'Portal<span class="badge" id="portalBadge">0</span></a>':'')+
     '<a href="#" onclick="nav(\'blog\')" data-sec="blog">'+I.blog+'Blog<span class="badge">'+(data.blog||[]).length+'</span></a>'+
     '<div class="nav-label">Operations</div>'+
     '<a href="#" onclick="nav(\'projects\')" data-sec="projects">'+I.projects+'Projects<span class="badge">'+(data.projects||[]).length+'</span></a>'+
@@ -192,7 +196,7 @@ function renderAdmin(){
     '<button class="tb-btn" onclick="toggleNotifPanel()">'+I.bell+'<span class="tb-dot" id="notifDot"></span></button>'+
     '<div class="tb-avatar" onclick="nav(\'settings\')" title="'+(u.role||'')+'">'+(u.username?u.username.charAt(0).toUpperCase():'A')+'</div></div></header>'+
     '<main class="main" id="mainArea"></main></div>';
-  updateNotifBadge();nav('dash');
+  updateNotifBadge();syncPortalNotifs();nav('dash');
 }
 
 /* ─── Notifications ─── */
@@ -217,7 +221,7 @@ function nav(sec){
   var link=document.querySelector('.sidebar-nav a[data-sec="'+sec+'"]');if(link)link.classList.add('active');
   if(window.innerWidth<=860){document.getElementById('sidebar').classList.remove('open');document.getElementById('sideOverlay').classList.remove('show');}
   var main=document.getElementById('mainArea');
-  var fns={dash:renderDashboard,pages:renderPages,services:renderServices,portfolio:renderPortfolio,clients:renderClients,blog:renderBlog,projects:renderProjects,invoices:renderInvoices,media:renderMedia,inquiries:renderInquiries,complaints:renderComplaints,analytics:renderAnalytics,activity:renderActivity,users:renderUsers,settings:renderSettings};
+  var fns={dash:renderDashboard,pages:renderPages,services:renderServices,portfolio:renderPortfolio,clients:renderClients,portal:renderPortal,blog:renderBlog,projects:renderProjects,invoices:renderInvoices,media:renderMedia,inquiries:renderInquiries,complaints:renderComplaints,analytics:renderAnalytics,activity:renderActivity,users:renderUsers,settings:renderSettings};
   if(fns[sec])fns[sec](main);
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sideOverlay').classList.toggle('show');}
@@ -306,10 +310,80 @@ function deletePortfolio(id){if(!confirm('Delete?'))return;var data=get();data.p
    CLIENTS
    ═══════════════════════════════════════════════════════ */
 function renderClients(main){var data=get();main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Clients</h2><p>'+(data.clients||[]).length+' clients</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="addClient()">'+I.plus+' Add</button></div></div><div id="clList">'+(data.clients||[]).map(function(c){return clCard(c);}).join('')+'</div></div>';}
-function clCard(c){return '<div class="card" id="cl'+c.id+'"><div class="card-hd"><div class="card-hd-left">'+(c.logo?'<img src="'+esc(c.logo)+'" class="card-thumb" style="object-fit:contain" alt="">':'')+'<strong>'+esc(c.name)+'</strong>'+(c.email?'<span class="sub">'+esc(c.email)+'</span>':'')+'</div><div class="card-actions"><button class="btn btn-ghost btn-sm" onclick="editClient('+c.id+')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteClient('+c.id+')">'+I.trash+'</button></div></div></div>';}
+function clCard(c){return '<div class="card" id="cl'+c.id+'"><div class="card-hd"><div class="card-hd-left">'+(c.logo?'<img src="'+esc(c.logo)+'" class="card-thumb" style="object-fit:contain" alt="">':'')+'<strong>'+esc(c.name)+'</strong>'+(c.email?'<span class="sub">'+esc(c.email)+'</span>':'')+'</div><div class="card-actions">'+(isSuper()||role()==='admin'?'<button class="btn btn-ghost btn-sm" onclick="inviteClient('+c.id+')" title="Send portal invite">'+I.link+' Invite</button>':'')+'<button class="btn btn-ghost btn-sm" onclick="editClient('+c.id+')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteClient('+c.id+')">'+I.trash+'</button></div></div></div>';}
 function editClient(id){var data=get();var c=data.clients.find(function(x){return x.id===id;});if(!c)return;modal('Edit Client','<div class="row"><div class="form-group"><label>Name</label><input type="text" id="medClName" value="'+esc(c.name)+'"></div><div class="form-group"><label>Logo path</label><input type="text" id="medClLogo" value="'+esc(c.logo)+'"></div></div><div class="row"><div class="form-group"><label>Email</label><input type="email" id="medClEmail" value="'+esc(c.email||'')+'"></div><div class="form-group"><label>Phone</label><input type="text" id="medClPhone" value="'+esc(c.phone||'')+'"></div></div><div class="form-group"><label>Notes</label><textarea id="medClNotes">'+esc(c.notes||'')+'</textarea></div>',function(){c.name=g('medClName');c.logo=g('medClLogo');c.email=g('medClEmail');c.phone=g('medClPhone');c.notes=g('medClNotes');set(data);closeModal();renderClients(document.getElementById('mainArea'));toast('Saved');});}
 function addClient(){var data=get();data.clients.push({id:id(data.clients),name:'New Client',logo:'',email:'',phone:'',notes:''});set(data);renderClients(document.getElementById('mainArea'));toast('Added');}
 function deleteClient(id){if(!confirm('Delete?'))return;var data=get();data.clients=data.clients.filter(function(x){return x.id!==id;});set(data);renderClients(document.getElementById('mainArea'));updateBadge('clients',data.clients.length);}
+
+/* ═══════════════════════════════════════════════════════
+   CLIENT PORTAL
+   ═══════════════════════════════════════════════════════ */
+var _portalAccounts=[];
+function renderPortal(main){
+  main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Client Portal</h2><p>Invite clients to a private portal: projects, invoices, files and messages.</p></div><div class="page-hd-actions"><button class="btn btn-primary btn-sm" onclick="inviteClientModal()">'+I.plus+' Invite client</button></div></div>'+
+  '<div class="card"><div class="card-hd"><strong>Portal access</strong></div><div class="card-body" id="portalList"><p style="color:var(--stone);font-size:0.85rem">Loading…</p></div></div>'+
+  '<div class="card"><div class="card-hd"><strong>How it works</strong></div><div class="card-body"><p style="color:var(--stone);font-size:0.82rem;line-height:1.7">Send each client the invite link — they open it, set a password, and land in a private portal scoped to <b style="color:var(--ink)">their</b> projects, invoices and shared files.<br>Your portal link is: <b style="color:var(--orange)">https://ribyon-studios.vercel.app/portal.html</b></p></div></div></div>';
+  loadPortalAccounts();
+}
+function loadPortalAccounts(){
+  fetch(API+'/api/portal/accounts',{headers:{'Authorization':'Bearer '+(getToken()||PW)}})
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){_portalAccounts=j.accounts||[];renderPortalRows(_portalAccounts);var b=document.getElementById('portalBadge');if(b)b.textContent=_portalAccounts.filter(function(a){return a.status==='invited';}).length;})
+    .catch(function(){var el=document.getElementById('portalList');if(el)el.innerHTML='<p style="color:var(--red);font-size:0.85rem">Could not load portal accounts.</p>';});
+}
+function renderPortalRows(accs){
+  var el=document.getElementById('portalList');if(!el)return;
+  el.innerHTML='<table class="data-table"><thead><tr><th>Client</th><th>Status</th><th>Invited</th><th>Last login</th><th></th></tr></thead><tbody>'+
+    (accs.length?accs.map(function(a){return '<tr><td><strong>'+esc(a.client_name)+'</strong><span class="sub">'+esc(a.email)+'</span></td><td><span class="status status-'+(a.status==='active'?'paid':a.status==='invited'?'sent':'draft')+'">'+a.status+'</span></td><td style="color:var(--stone);font-size:0.8rem">'+(a.created_at||'').slice(0,10)+'</td><td style="color:var(--stone);font-size:0.8rem">'+(a.last_login||'').slice(0,10)+'</td><td><div class="td-act"><button class="btn btn-ghost btn-xs" onclick="resendInvite('+a.id+')" title="Copy invite link">'+I.link+'</button><button class="btn btn-ghost btn-xs" onclick="viewClientThread('+JSON.stringify(esc(a.client_name))+')" title="Messages">'+I.inbox+'</button><button class="btn btn-danger btn-xs" onclick="revokePortal('+a.id+')" title="Remove access">'+I.trash+'</button></div></td></tr>';}).join(''):'<tr><td colspan="5" style="color:var(--stone);text-align:center">No portal accounts yet — invite your first client.</td></tr>')+
+    '</tbody></table>';
+}
+function inviteClientModal(){
+  var data=get();var clients=data.clients||[];
+  var opts=clients.map(function(c){return '<option value="'+esc(c.name)+'" data-id="'+c.id+'">'+esc(c.name)+'</option>';}).join('');
+  modal('Invite a client','<div class="form-group"><label>Client</label><select id="invClientSel" onchange="var s=this;var em=document.getElementById(\'invEmail\');if(!em)return;var cl=(get().clients||[]).find(function(c){return c.name===s.value;});if(cl&&cl.email)em.value=cl.email;">'+opts+'</select></div><div class="form-group"><label>Invite email</label><input type="email" id="invEmail" placeholder="name@company.com"></div>',function(){
+    var sel=document.getElementById('invClientSel');var em=document.getElementById('invEmail').value.trim();
+    var name=sel.value;
+    if(!name){toast('Choose a client');return;}
+    var cl=(data.clients||[]).find(function(c){return c.name===name;});
+    if(!em){toast('Enter the invite email');return;}
+    fetch(API+'/api/portal/invite',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({email:em,clientName:name,clientId:cl?cl.id:null})})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(!j.ok&&j.error){toast(j.error);return;}
+        closeModal();loadPortalAccounts();
+        if(j.url){navigator.clipboard?navigator.clipboard.writeText(j.url):copyFallback(j.url);toast('Invite link copied');addNotif('Invite sent to '+em);showInviteLink(j.url);}
+        else toast('Invite created');
+      }).catch(function(){toast('Could not create invite',true);});
+  },false);
+}
+function copyFallback(txt){var i=document.createElement('input');i.value=txt;document.body.appendChild(i);i.select();document.execCommand('copy');document.body.removeChild(i);}
+function showInviteLink(url){
+  var m=document.createElement('div');m.className='modal-overlay open';m.id='activeModal';
+  m.innerHTML='<div class="modal"><div class="modal-hd"><h3>Invite link</h3><button class="modal-close" onclick="closeModal()">'+I.close+'</button></div><div class="modal-body"><p style="font-size:0.82rem;color:var(--stone);margin-bottom:0.75rem">Share this link with the client. It\'s already copied.</p><div class="inv-link-box" id="invLinkBox" onclick="var t=this;var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand(\'copy\');toast(\'Copied\');">'+esc(url)+'</div></div><div class="modal-foot"><button class="btn btn-primary" onclick="closeModal()">Done</button></div></div>';
+  document.body.appendChild(m);
+}
+function resendInvite(id){
+  var a=_portalAccounts.find(function(x){return x.id===id;});if(!a)return;
+  if(!a.email){toast('No email on record');return;}
+  fetch(API+'/api/portal/invite',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({email:a.email,clientName:a.client_name})})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(j.url){navigator.clipboard?navigator.clipboard.writeText(j.url):copyFallback(j.url);showInviteLink(j.url);loadPortalAccounts();}
+      else toast(j.error||'Could not resend',true);
+    });
+}
+function revokePortal(id){if(!confirm('Remove this client\'s portal access?'))return;fetch(API+'/api/portal/accounts?id='+id,{method:'DELETE',headers:{'Authorization':'Bearer '+(getToken()||PW)}}).then(function(r){return r.json();}).then(function(j){loadPortalAccounts();toast(j.error||'Access revoked');});}
+function viewClientThread(cname){
+  var data=get();var msgs=(data.messages||[]).filter(function(m){return String(m.client).trim().toLowerCase()===String(cname).trim().toLowerCase();}).slice().reverse();
+  var thread=msgs.map(function(m){return '<div class="msg '+(m.from==='ribyon'?'ribyon':'client')+'" style="align-self:'+(m.from==='ribyon'?'flex-start':'flex-end')+';max-width:80%;background:'+(m.from==='ribyon'?'var(--stone-bg)':'var(--orange)')+';color:'+(m.from==='ribyon'?'var(--ink)':'#fff')+';padding:0.7rem 0.95rem;border-radius:14px;margin-bottom:0.5rem;font-size:0.84rem;line-height:1.5"><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.65;margin-bottom:.2rem">'+m.from+'</div>'+esc(m.text)+'<div style="font-size:0.62rem;opacity:.6;margin-top:.3rem;text-align:right">'+fmtDate(m.date)+'</div></div>';}).join('')||'<p style="color:var(--stone);font-size:0.82rem">No messages yet.</p>';
+  modal('Messages — '+cname,'<div style="max-height:46vh;overflow-y:auto;padding:0.25rem;display:flex;flex-direction:column">'+thread+'</div><div class="row" style="margin-top:0.75rem"><div class="form-group" style="grid-column:1/-1"><label>Reply</label><textarea id="threadReply" rows="2"></textarea></div></div>',function(){
+    var t=document.getElementById('threadReply').value.trim();
+    if(!t){toast('Type a reply');return;}
+    fetch(API+'/api/portal/reply',{method:'POST',headers:{'Authorization':'Bearer '+(getToken()||PW),'Content-Type':'application/json'},body:JSON.stringify({client:cname,text:t})})
+      .then(function(r){return r.json();})
+      .then(function(j){if(j.ok){closeModal();toast('Reply sent');addNotif('Replied to '+cname);}else toast(j.error||'Could not send',true);});
+  },false);
+}
 
 /* ═══════════════════════════════════════════════════════
    BLOG (Quill.js)
@@ -380,7 +454,7 @@ function deleteInvoice(id){if(!confirm('Delete?'))return;var data=get();data.inv
 /* ═══════════════════════════════════════════════════════
    MEDIA
    ═══════════════════════════════════════════════════════ */
-function renderMedia(main){var data=get();var items=data.media||[];var cloud=cloudEnabled();main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Media Library</h2><p>'+items.length+' files'+(cloud?' · cloud':'')+'</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="downloadAllMedia()">'+I.download+' Download all</button><button class="btn btn-ghost btn-sm" onclick="clearAllMedia()">'+I.trash+' Clear</button></div></div><div class="upload-zone" onclick="document.getElementById(\'mediaInput\').click()">'+I.upload+'<p>Click to upload images'+(cloud?' · saved to Cloudflare':'')+'</p></div><input type="file" id="mediaInput" accept="image/*" multiple style="display:none" onchange="handleMediaUpload(this.files)"><div style="margin-top:1rem" class="media-grid" id="mediaGrid">'+items.map(function(m){return '<div class="media-item" onclick="copyMediaUrl('+m.id+')" title="Click to copy URL"><img src="'+esc(m.url||m.data)+'" alt=""><button class="del" onclick="event.stopPropagation();deleteMedia('+m.id+')">'+I.trash+'</button></div>';}).join('')+'</div></div>';}
+function renderMedia(main){var data=get();var items=data.media||[];var cloud=cloudEnabled();var clients=(data.clients||[]).map(function(c){return c.name;}).filter(Boolean);main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Media Library</h2><p>'+items.length+' files'+(cloud?' · cloud':'')+'</p></div><div class="page-hd-actions"><button class="btn btn-ghost btn-sm" onclick="downloadAllMedia()">'+I.download+' Download all</button><button class="btn btn-ghost btn-sm" onclick="clearAllMedia()">'+I.trash+' Clear</button></div></div><div class="upload-zone" onclick="document.getElementById(\'mediaInput\').click()">'+I.upload+'<p>Click to upload images'+(cloud?' · saved to Cloudflare':'')+'</p></div><input type="file" id="mediaInput" accept="image/*" multiple style="display:none" onchange="handleMediaUpload(this.files)"><div style="margin-top:1rem" class="media-grid" id="mediaGrid">'+items.map(function(m){return '<div class="media-item" onclick="copyMediaUrl('+m.id+')" title="Click to copy URL"><img src="'+esc(m.url||m.data)+'" alt=""><div class="media-share"><select onclick="event.stopPropagation()" onchange="shareMedia('+m.id+',this.value)"><option value=""'+(m.client?'':' selected')+'>Share with…</option>'+clients.map(function(cn){return '<option value="'+esc(cn)+'"'+(m.client===cn?' selected':'')+'>'+esc(cn)+'</option>';}).join('')+'</select>'+(m.client?'<span class="media-share-tag">'+esc(m.client)+'</span>':'')+'</div><button class="del" onclick="event.stopPropagation();deleteMedia('+m.id+')">'+I.trash+'</button></div>';}).join('')+'</div></div>';}
 function handleMediaUpload(files){var data=get();if(!data.media)data.media=[];var pending=files.length;var cloud=cloudEnabled();Array.from(files).forEach(function(file){
   if(cloud){
     var fd=new FormData();fd.append('file',file);
@@ -395,6 +469,7 @@ function handleMediaUpload(files){var data=get();if(!data.media)data.media=[];va
 function deleteMedia(id){if(!confirm('Delete?'))return;var data=get();var m=data.media.find(function(x){return x.id===id;});data.media=data.media.filter(function(x){return x.id!==id;});set(data);if(m&&m.key&&cloudEnabled()){fetch(API+'/api/media/delete?key='+encodeURIComponent(m.key),{method:'DELETE',headers:{'Authorization':'Bearer '+PW}}).catch(function(){});}renderMedia(document.getElementById('mainArea'));updateBadge('media',data.media.length);}
 function clearAllMedia(){if(!confirm('Delete all?'))return;var data=get();var keys=(data.media||[]).map(function(m){return m.key;}).filter(Boolean);data.media=[];set(data);if(keys.length&&cloudEnabled()){keys.forEach(function(k){fetch(API+'/api/media/delete?key='+encodeURIComponent(k),{method:'DELETE',headers:{'Authorization':'Bearer '+PW}}).catch(function(){});});}renderMedia(document.getElementById('mainArea'));updateBadge('media',0);toast('Cleared');}
 function copyMediaUrl(id){var data=get();var m=data.media.find(function(x){return x.id===id;});if(!m)return;var val=m.url||m.data;var input=document.createElement('input');input.value=val;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('Copied');}
+function shareMedia(id,clientName){var data=get();var m=data.media.find(function(x){return x.id===id;});if(!m)return;m.client=clientName||'';set(data);renderMedia(document.getElementById('mainArea'));toast(clientName?'Shared with '+clientName:'Removed from portal');}
 function downloadAllMedia(){var data=get();var items=(data.media||[]).filter(function(m){return m.url||m.data;});if(!items.length){toast('No media');return;}toast('Preparing…');var dlNext=function(i){if(i>=items.length){toast('Downloaded '+items.length+' files');return;}var m=items[i];var src=m.url||m.data;var a=document.createElement('a');a.href=src;a.download=(m.name||('media-'+m.id))||'image';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){dlNext(i+1);},450);};dlNext(0);}
 
 /* ═══════════════════════════════════════════════════════

@@ -18,3 +18,15 @@ CREATE TABLE IF NOT EXISTS cms_users (
 
 -- Existing databases (v4 with username-only users): run once to add the email column
 -- ALTER TABLE cms_users ADD COLUMN email TEXT;
+
+CREATE TABLE IF NOT EXISTS portal_accounts (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  client_id     INTEGER,
+  client_name   TEXT,
+  email         TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  invite_token  TEXT,
+  status        TEXT NOT NULL DEFAULT 'invited',
+  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_login    DATETIME
+);

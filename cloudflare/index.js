@@ -152,6 +152,44 @@ async function authenticate(req, env) {
   return { username: payload.sub, role: payload.role || 'viewer' };
 }
 
+// Portal token: JWT signed with scope "portal" — carries client identity.
+async function authenticatePortal(req, env) {
+  const h = req.headers.get('Authorization') || '';
+  const token = h.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return null;
+  const payload = await verifyJWT(token, env.JWT_SECRET || 'dev-jwt-secret');
+  if (!payload || payload.scope !== 'portal') return null;
+  return { email: payload.sub, cid: payload.cid, cname: payload.cname };
+}
+
+function portalToken(user, env) {
+  const payload = {
+    sub: user.email, scope: 'portal', cid: user.client_id, cname: user.client_name,
+    iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
+  };
+  return signJWT(payload, env.JWT_SECRET || 'dev-jwt-secret');
+}
+
+async function loadBlob(env) {
+  const row = await env.DB.prepare('SELECT payload FROM cms_data WHERE id=1').first();
+  let data = {};
+  try { if (row && row.payload) data = JSON.parse(row.payload); } catch (e) { data = {}; }
+  return data;
+}
+
+async function saveBlob(env, data) {
+  const payload = JSON.stringify(data);
+  await env.DB.prepare(
+    'INSERT INTO cms_data (id, payload, updated_at) VALUES (1, ?, datetime(\'now\')) ' +
+    'ON CONFLICT(id) DO UPDATE SET payload=excluded.payload, updated_at=excluded.updated_at'
+  ).bind(payload).run();
+}
+
+function inviteUrl(env, token) {
+  const host = (env.ALLOWED_ORIGIN || 'https://ribyon-studios.vercel.app').replace(/\/$/, '');
+  return `${host}/portal.html?invite=${token}`;
+}
+
 function requireRole(user, min, env, req) {
   if (!user) return err('Unauthorized', 401, env, req);
   if (!roleAtLeast(user.role, min)) return err('Forbidden', 403, env, req);
@@ -313,6 +351,134 @@ async function handleMediaDelete(req, env, user) {
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Client Portal (portal_accounts + scoped data)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function handlePortalInvite(req, env, user) {
+  // superadmin or admin can create invites
+  const forbidden = requireRole(user, 'admin', env, req);
+  if (forbidden) return forbidden;
+  const body = await safeJSON(req);
+  if (!body || !body.email) return err('email required', 400, env, req);
+  const email = String(body.email).toLowerCase().trim();
+  const clientName = String(body.clientName || email.split('@')[0]).trim();
+
+  const existing = await env.DB.prepare('SELECT id, status, invite_token FROM portal_accounts WHERE LOWER(email) = ?').bind(email).first();
+  const token = crypto.randomUUID().replace(/-/g, '').slice(0, 24);
+  if (existing) {
+    await env.DB.prepare('UPDATE portal_accounts SET client_name = ?, invite_token = ?, status = \'invited\' WHERE id = ?').bind(clientName, token, existing.id).run();
+  } else {
+    // Dummy hash placeholder — password set on accept.
+    await env.DB.prepare('INSERT INTO portal_accounts (client_id, client_name, email, password_hash, invite_token, status) VALUES (?, ?, ?, \'!\', ?, \'invited\')')
+      .bind(body.clientId || null, clientName, email, token).run();
+  }
+  return json({ ok: true, invite: token, url: inviteUrl(env, token), email }, 200, env, req);
+}
+
+async function handlePortalList(req, env, user) {
+  const forbidden = requireRole(user, 'admin', env, req);
+  if (forbidden) return forbidden;
+  const { results } = await env.DB.prepare('SELECT id, client_id, client_name, email, status, created_at, last_login FROM portal_accounts ORDER BY id DESC').all();
+  return json({ accounts: results }, 200, env, req);
+}
+
+async function handlePortalDelete(req, env, user) {
+  const forbidden = requireRole(user, 'admin', env, req);
+  if (forbidden) return forbidden;
+  const url = new URL(req.url);
+  const id = Number(url.searchParams.get('id'));
+  if (!id) return err('Missing id', 400, env, req);
+  await env.DB.prepare('DELETE FROM portal_accounts WHERE id = ?').bind(id).run();
+  return json({ ok: true }, 200, env, req);
+}
+
+async function handlePortalAccept(req, env) {
+  const body = await safeJSON(req);
+  if (!body || !body.invite || !body.password || !body.email) return err('invite, email and password required', 400, env, req);
+  if (String(body.password).length < 6) return err('Password must be at least 6 characters', 400, env, req);
+  const email = String(body.email).toLowerCase().trim();
+  const row = await env.DB.prepare('SELECT id, client_id, client_name, email, invite_token, status FROM portal_accounts WHERE LOWER(email) = ?').bind(email).first();
+  if (!row) return err('No invite found for this email', 404, env, req);
+  if (!constantTimeEq(String(body.invite), row.invite_token || '')) return err('Invalid invite code', 401, env, req);
+  if (row.status === 'active') return err('Account already active — sign in', 400, env, req);
+  const passwordHash = await hashPassword(body.password);
+  await env.DB.prepare('UPDATE portal_accounts SET password_hash = ?, status = \'active\', last_login = datetime(\'now\') WHERE id = ?').bind(passwordHash, row.id).run();
+  const token = await portalToken({ email: row.email, client_id: row.client_id, client_name: row.client_name }, env);
+  return json({ ok: true, token, client: { name: row.client_name, email: row.email } }, 200, env, req);
+}
+
+async function handlePortalLogin(req, env) {
+  const body = await safeJSON(req);
+  if (!body || !body.email || !body.password) return err('Email and password required', 400, env, req);
+  const email = String(body.email).toLowerCase().trim();
+  const row = await env.DB.prepare('SELECT id, client_id, client_name, email, password_hash, status FROM portal_accounts WHERE LOWER(email) = ?').bind(email).first();
+  if (!row) return err('Invalid credentials', 401, env, req);
+  if (row.status !== 'active') return err('Account not activated — use your invite link', 403, env, req);
+  const ok = await verifyPassword(body.password, row.password_hash);
+  if (!ok) return err('Invalid credentials', 401, env, req);
+  await env.DB.prepare('UPDATE portal_accounts SET last_login = datetime(\'now\') WHERE id = ?').bind(row.id).run();
+  const token = await portalToken({ email: row.email, client_id: row.client_id, client_name: row.client_name }, env);
+  return json({ token, client: { name: row.client_name, email: row.email } }, 200, env, req);
+}
+
+// Scoped data for one client: projects/invoices/media/messages where client matches.
+function clientMatch(record, cname) {
+  if (!record || !cname) return false;
+  const a = String(record.client || '').trim().toLowerCase();
+  const b = String(cname).trim().toLowerCase();
+  return a === b;
+}
+
+async function handlePortalData(req, env, portal) {
+  const data = await loadBlob(env);
+  const cname = portal.cname;
+  const projects = (data.projects || []).filter(p => clientMatch(p, cname));
+  const invoices = (data.invoices || []).filter(i => clientMatch(i, cname));
+  const media = (data.media || []).filter(m => clientMatch(m, cname));
+  const messages = (data.messages || []).filter(m => clientMatch(m, cname));
+  const clients = data.clients || [];
+  const client = clients.find(c => String(c.name).trim().toLowerCase() === String(cname).trim().toLowerCase()) || { name: cname, email: '', phone: '', logo: '' };
+  return json({ client, projects, invoices, media, messages }, 200, env, req);
+}
+
+async function handlePortalMessage(req, env, portal) {
+  const body = await safeJSON(req);
+  if (!body || !body.text) return err('text required', 400, env, req);
+  const text = String(body.text).slice(0, 2000);
+  const data = await loadBlob(env);
+  if (!data.messages) data.messages = [];
+  data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: portal.cname, from: 'client', text, date: new Date().toISOString(), read: false });
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+async function handlePortalReply(req, env, user) {
+  const forbidden = requireRole(user, 'admin', env, req);
+  if (forbidden) return forbidden;
+  const body = await safeJSON(req);
+  if (!body || !body.client || !body.text) return err('client and text required', 400, env, req);
+  const text = String(body.text).slice(0, 2000);
+  const data = await loadBlob(env);
+  if (!data.messages) data.messages = [];
+  data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: String(body.client), from: 'ribyon', text, date: new Date().toISOString(), read: true });
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+async function handlePortalApprove(req, env, portal) {
+  const body = await safeJSON(req);
+  if (!body || !body.projectId) return err('projectId required', 400, env, req);
+  const data = await loadBlob(env);
+  const p = (data.projects || []).find(pr => pr.id === Number(body.projectId) && clientMatch(pr, portal.cname));
+  if (!p) return err('Project not found', 404, env, req);
+  p.approved = body.approved === true ? 'approved' : 'rejected';
+  p.approvedAt = new Date().toISOString();
+  if (!data.messages) data.messages = [];
+  data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: portal.cname, from: 'client', text: body.approved === true ? 'Approved deliverable: ' + p.title : 'Requested changes on: ' + p.title + (body.note ? ' — ' + body.note : ''), date: new Date().toISOString(), read: false });
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Worker entry
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default {
@@ -345,6 +511,27 @@ export default {
 
     // Public login
     if (method === 'POST' && path === '/api/auth/login') return handleLogin(req, env);
+
+    // Client portal — public endpoints
+    if (method === 'POST' && path === '/api/portal/accept') return handlePortalAccept(req, env);
+    if (method === 'POST' && path === '/api/portal/login') return handlePortalLogin(req, env);
+
+    // Client portal — admin endpoints
+    if (path === '/api/portal/invite') return handlePortalInvite(req, env, await authenticate(req, env));
+    if (path === '/api/portal/accounts') {
+      const admin = await authenticate(req, env);
+      if (method === 'GET') return handlePortalList(req, env, admin);
+      if (method === 'DELETE') return handlePortalDelete(req, env, admin);
+    }
+
+    // Client portal — authenticated client endpoints
+    const portal = await authenticatePortal(req, env);
+    if (portal && path === '/api/portal/data' && method === 'GET') return handlePortalData(req, env, portal);
+    if (portal && path === '/api/portal/message' && method === 'POST') return handlePortalMessage(req, env, portal);
+    if (portal && path === '/api/portal/approve' && method === 'POST') return handlePortalApprove(req, env, portal);
+
+    // Client portal — admin replies to a client's thread
+    if (path === '/api/portal/reply' && method === 'POST') return handlePortalReply(req, env, await authenticate(req, env));
 
     // Everything below requires a token
     const user = await authenticate(req, env);

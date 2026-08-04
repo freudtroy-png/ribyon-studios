@@ -20,7 +20,10 @@
  * Secrets:
  *   npx wrangler secret put ADMIN_TOKEN   (master token)
  *   npx wrangler secret put JWT_SECRET    (JWT signing key)
+ *   npx wrangler secret put BREVO_API_KEY (Brevo transactional email key)
  */
+
+import { buildEmail, sendBrevo } from './emails.js';
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
@@ -327,11 +330,11 @@ async function handleMediaUpload(req, env, user) {
 
   const name = file.name || 'upload';
   const ext = (name.split('.').pop() || '').toLowerCase();
-  const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
+  const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'txt', 'csv'];
   if (!allowed.includes(ext)) return err('Invalid file type', 400, env, req);
 
   const arrayBuffer = await file.arrayBuffer();
-  const mimeType = file.type || 'image/jpeg';
+  const mimeType = file.type || 'application/octet-stream';
   const filename = `${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : ext}`;
   const key = `media/${filename}`;
   await env.MEDIA.put(key, arrayBuffer, { httpMetadata: { contentType: mimeType } });
@@ -348,6 +351,93 @@ async function handleMediaDelete(req, env, user) {
   if (!key.startsWith('media/')) return err('Invalid key', 400, env, req);
   await env.MEDIA.delete(key);
   return json({ ok: true }, 200, env, req);
+}
+
+// ─── Email (via Resend if env.RESEND_API_KEY is set) ───
+async function handleSendEmail(req, env, user) {
+  const forbidden = requireRole(user, 'editor', env, req);
+  if (forbidden) return forbidden;
+  const body = await safeJSON(req);
+  if (!body || !body.to) return err('recipient required', 400, env, req);
+  const sender = env.EMAIL_FROM || 'ribyonstudios@gmail.com';
+  const senderName = env.EMAIL_FROM_NAME || 'Ribyon Studios';
+
+  // Scenario mode: body.template selects a designed template; data fills it.
+  if (body.template) {
+    const scenario = String(body.template);
+    const { subject, html } = buildEmail(scenario, body.data || body.params || {});
+    const res = await sendBrevo(env, {
+      to: String(body.to),
+      toName: (body.data && body.data.clientName) || body.toName || '',
+      subject,
+      html,
+      text: body.text,
+      replyTo: body.replyTo,
+      tags: ['ribyon', scenario],
+    });
+    if (!res.ok) {
+      const msg = (res.body && res.body.message) || 'Email provider error';
+      return err(msg, res.status || 502, env, req);
+    }
+    return json({ ok: true, messageId: res.body.messageId }, 200, env, req);
+  }
+
+  // Legacy/raw mode: free-form subject + text / html.
+  const subject = String(body.subject || 'Message from Ribyon Studios').slice(0, 300);
+  const text = String(body.text || '');
+  const res = await sendBrevo(env, {
+    to: String(body.to),
+    toName: body.toName || '',
+    subject,
+    html: body.html,
+    text,
+    replyTo: body.replyTo,
+    tags: body.tags || ['ribyon'],
+  });
+  if (!res.ok) {
+    const msg = (res.body && res.body.message) || 'Email provider error';
+    return err(msg, res.status || 502, env, req);
+  }
+  return json({ ok: true, messageId: res.body.messageId }, 200, env, req);
+}
+
+// Generate an .ics calendar invite that the browser can download.
+function icsTimestamp(d) {
+  let x;
+  try { x = new Date(d); } catch (e) { return ''; }
+  if (isNaN(x.getTime())) return '';
+  return x.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+async function handleCalendar(req, env, user) {
+  const forbidden = requireRole(user, 'editor', env, req);
+  if (forbidden) return forbidden;
+  const url = new URL(req.url);
+  const summary = url.searchParams.get('summary') || 'Ribyon event';
+  const description = url.searchParams.get('description') || '';
+  const location = url.searchParams.get('location') || '';
+  const start = icsTimestamp(url.searchParams.get('start'));
+  const end = icsTimestamp(url.searchParams.get('end')) || start;
+  if (!start) return err('start date required (ISO)', 400, env, req);
+  const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Ribyon//Calendar//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:${crypto.randomUUID()}@ribyonstudios`,
+    `DTSTAMP:${now}`, `DTSTART:${start}`, `DTEND:${end}`,
+    `SUMMARY:${summary.replace(/[;,]/g, '\\$&')}`,
+    description ? `DESCRIPTION:${description.replace(/[;,]/g, '\\$&')}` : '',
+    location ? `LOCATION:${location.replace(/[,;]/g, '\\$&')}` : '',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].filter(Boolean).join('\r\n');
+  return new Response(ics, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="ribyon-event.ics"',
+      'Cache-Control': 'no-store',
+      ...corsHeaders(env, req),
+    },
+  });
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -371,7 +461,13 @@ async function handlePortalInvite(req, env, user) {
     await env.DB.prepare('INSERT INTO portal_accounts (client_id, client_name, email, password_hash, invite_token, status) VALUES (?, ?, ?, \'!\', ?, \'invited\')')
       .bind(body.clientId || null, clientName, email, token).run();
   }
-  return json({ ok: true, invite: token, url: inviteUrl(env, token), email }, 200, env, req);
+  const url = inviteUrl(env, token);
+  if (env.BREVO_API_KEY) {
+    // fire-and-forget branded invite email (don't block on provider)
+    const built = buildEmail('invite', { clientName, email, inviteUrl: url });
+    sendBrevo(env, { to: email, toName: clientName, subject: built.subject, html: built.html, tags: ['ribyon', 'invite'] }).catch(function () {});
+  }
+  return json({ ok: true, invite: token, url, email }, 200, env, req);
 }
 
 async function handlePortalList(req, env, user) {
@@ -435,9 +531,43 @@ async function handlePortalData(req, env, portal) {
   const invoices = (data.invoices || []).filter(i => clientMatch(i, cname));
   const media = (data.media || []).filter(m => clientMatch(m, cname));
   const messages = (data.messages || []).filter(m => clientMatch(m, cname));
+  const feed = (data.feed || []).filter(f => clientMatch(f, cname)).slice(-50).reverse();
   const clients = data.clients || [];
-  const client = clients.find(c => String(c.name).trim().toLowerCase() === String(cname).trim().toLowerCase()) || { name: cname, email: '', phone: '', logo: '' };
-  return json({ client, projects, invoices, media, messages }, 200, env, req);
+  const client = clients.find(c => String(c.name).trim().toLowerCase() === String(cname).trim().toLowerCase()) || { name: cname, email: '', phone: '', logo: '', displayName: '' };
+  return json({ client, projects, invoices, media, messages, feed }, 200, env, req);
+}
+
+// Client-uploaded file to R2, tagged with the client's name so the admin sees it.
+async function handlePortalUpload(req, env, portal) {
+  if (!portal.cname) return err('Unauthorized', 401, env, req);
+  let form;
+  try { form = await req.formData(); } catch (e) { return err('Invalid form', 400, env, req); }
+  const file = form.get('file');
+  if (!file) return err('No file provided', 400, env, req);
+  const name = file.name || 'upload';
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'txt', 'csv'];
+  if (!allowed.includes(ext)) return err('Invalid file type', 400, env, req);
+  const arrayBuffer = await file.arrayBuffer();
+  const mimeType = file.type || 'application/octet-stream';
+  const filename = `${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : ext}`;
+  const key = `media/${filename}`;
+  await env.MEDIA.put(key, arrayBuffer, { httpMetadata: { contentType: mimeType } });
+  const base = `https://${new URL(req.url).host}`;
+  const data = await loadBlob(env);
+  if (!data.media) data.media = [];
+  data.media.push({
+    id: data.media.length ? Math.max(...data.media.map(m => m.id)) + 1 : 1,
+    name,
+    url: `${base}/media/${filename}`,
+    key,
+    data: '',
+    date: new Date().toISOString().slice(0, 10),
+    client: portal.cname,
+    fromPortal: true,
+  });
+  await saveBlob(env, data);
+  return json({ url: `${base}/media/${filename}`, name, key, client: portal.cname }, 201, env, req);
 }
 
 async function handlePortalMessage(req, env, portal) {
@@ -447,6 +577,7 @@ async function handlePortalMessage(req, env, portal) {
   const data = await loadBlob(env);
   if (!data.messages) data.messages = [];
   data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: portal.cname, from: 'client', text, date: new Date().toISOString(), read: false });
+  addFeed(data, portal.cname, 'message', 'Sent a message');
   await saveBlob(env, data);
   return json({ ok: true }, 200, env, req);
 }
@@ -459,13 +590,48 @@ async function handlePortalReply(req, env, user) {
   const text = String(body.text).slice(0, 2000);
   const data = await loadBlob(env);
   if (!data.messages) data.messages = [];
-  data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: String(body.client), from: 'ribyon', text, date: new Date().toISOString(), read: true });
+  data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: String(body.client), from: 'ribyon', text, date: new Date().toISOString(), read: true, clientRead: false });
+  addFeed(data, String(body.client), 'message', 'Ribyon replied');
   await saveBlob(env, data);
   return json({ ok: true }, 200, env, req);
 }
 
-async function handlePortalApprove(req, env, portal) {
+// Mark a client's messages as read by the admin (or a client's thread read by the client).
+async function handlePortalRead(req, env, portal) {
   const body = await safeJSON(req);
+  const data = await loadBlob(env);
+  const cname = portal.cname;
+  const markClient = body && body.mark === 'client'; // client read the ribyon replies
+  let changed = false;
+  (data.messages || []).forEach(m => {
+    if (!clientMatch(m, cname)) return;
+    if (markClient) {
+      if (m.from === 'ribyon' && !m.clientRead) { m.clientRead = true; changed = true; }
+    } else {
+      if (m.from === 'client' && !m.read) { m.read = true; changed = true; }
+    }
+  });
+  if (changed) await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+// Admin marks a client's inbound messages as read.
+async function handlePortalMarkRead(req, env, user) {
+  const forbidden = requireRole(user, 'admin', env, req);
+  if (forbidden) return forbidden;
+  const body = await safeJSON(req);
+  if (!body || !body.client) return err('client required', 400, env, req);
+  const data = await loadBlob(env);
+  const cname = String(body.client);
+  let changed = false;
+  (data.messages || []).forEach(m => {
+    if (clientMatch(m, cname) && m.from === 'client' && !m.read) { m.read = true; changed = true; }
+  });
+  if (changed) await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+async function handlePortalApprove(req, env, portal) {  const body = await safeJSON(req);
   if (!body || !body.projectId) return err('projectId required', 400, env, req);
   const data = await loadBlob(env);
   const p = (data.projects || []).find(pr => pr.id === Number(body.projectId) && clientMatch(pr, portal.cname));
@@ -474,8 +640,86 @@ async function handlePortalApprove(req, env, portal) {
   p.approvedAt = new Date().toISOString();
   if (!data.messages) data.messages = [];
   data.messages.push({ id: data.messages.length ? Math.max(...data.messages.map(m => m.id)) + 1 : 1, client: portal.cname, from: 'client', text: body.approved === true ? 'Approved deliverable: ' + p.title : 'Requested changes on: ' + p.title + (body.note ? ' — ' + body.note : ''), date: new Date().toISOString(), read: false });
+  addFeed(data, portal.cname, 'approval', body.approved === true ? 'Approved deliverable: ' + p.title : 'Requested changes on: ' + p.title);
   await saveBlob(env, data);
   return json({ ok: true }, 200, env, req);
+}
+
+// Append an entry to the per-client activity feed (kept inside the same blob).
+function addFeed(data, cname, type, text) {
+  if (!data.feed) data.feed = [];
+  data.feed.push({ id: data.feed.length ? Math.max(...data.feed.map(f => f.id)) + 1 : 1, client: cname, type, text, date: new Date().toISOString() });
+  if (data.feed.length > 300) data.feed = data.feed.slice(-300);
+}
+
+// Pay an invoice (records a full-balance payment in the portal).
+async function handlePortalPay(req, env, portal) {
+  const body = await safeJSON(req);
+  if (!body || !body.invoiceId) return err('invoiceId required', 400, env, req);
+  const data = await loadBlob(env);
+  const inv = (data.invoices || []).find(i => i.id === Number(body.invoiceId) && clientMatch(i, portal.cname));
+  if (!inv) return err('Invoice not found', 404, env, req);
+  const total = inv.total !== undefined ? inv.total : (inv.amount || 0);
+  const paid = (inv.payments || []).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const bal = Math.max(0, total - paid);
+  if (bal <= 0) return err('Invoice already paid', 400, env, req);
+  if (!inv.payments) inv.payments = [];
+  inv.payments.push({ amount: bal, date: new Date().toISOString(), method: 'portal' });
+  inv.status = 'paid';
+  inv.balance = 0;
+  addFeed(data, portal.cname, 'payment', 'Paid ' + (inv.number || 'invoice') + ' — ' + bal.toLocaleString() + ' ' + (inv.currency || 'KSh'));
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+// Approve / request changes on a single milestone.
+async function handlePortalMilestone(req, env, portal) {
+  const body = await safeJSON(req);
+  if (!body || !body.projectId || body.milestoneIndex === undefined) return err('projectId and milestoneIndex required', 400, env, req);
+  const data = await loadBlob(env);
+  const p = (data.projects || []).find(pr => pr.id === Number(body.projectId) && clientMatch(pr, portal.cname));
+  if (!p) return err('Project not found', 404, env, req);
+  const m = (p.milestones || [])[Number(body.milestoneIndex)];
+  if (!m) return err('Milestone not found', 404, env, req);
+  m.approved = body.approved === true ? 'approved' : 'rejected';
+  m.approvedAt = new Date().toISOString();
+  addFeed(data, portal.cname, 'milestone', (m.approved === 'approved' ? 'Approved milestone: ' : 'Requested changes on milestone: ') + (m.label || m.title || ''));
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+// Client submits a new project / quote request from the portal.
+async function handlePortalRequest(req, env, portal) {
+  const body = await safeJSON(req);
+  if (!body || !body.title) return err('title required', 400, env, req);
+  const title = String(body.title).slice(0, 160);
+  const details = String(body.details || '').slice(0, 2000);
+  const data = await loadBlob(env);
+  if (!data.inquiries) data.inquiries = [];
+  data.inquiries.push({ id: data.inquiries.length ? Math.max(...data.inquiries.map(i => i.id)) + 1 : 1, name: portal.cname, email: portal.email, subject: title, message: details, status: 'new', date: new Date().toISOString().split('T')[0], source: 'portal' });
+  addFeed(data, portal.cname, 'request', 'Requested a new project: ' + title);
+  await saveBlob(env, data);
+  return json({ ok: true }, 200, env, req);
+}
+
+// Update client profile (phone, display name, prefs) + optional password change.
+async function handlePortalProfile(req, env, portal) {
+  const body = await safeJSON(req) || {};
+  const data = await loadBlob(env);
+  const cname = portal.cname;
+  const client = (data.clients || []).find(c => String(c.name).trim().toLowerCase() === String(cname).trim().toLowerCase());
+  if (client) {
+    if (body.phone !== undefined) client.phone = String(body.phone).slice(0, 40);
+    if (body.name !== undefined && String(body.name).trim()) client.displayName = String(body.name).slice(0, 80);
+    if (body.prefs && typeof body.prefs === 'object') client.prefs = Object.assign(client.prefs || {}, body.prefs);
+  }
+  if (body.password && String(body.password).length >= 6) {
+    const hash = await hashPassword(body.password, null);
+    await env.DB.prepare('UPDATE portal_accounts SET password_hash = ? WHERE LOWER(email) = ?').bind(hash, String(portal.email).toLowerCase()).run();
+  }
+  addFeed(data, cname, 'profile', 'Updated profile');
+  await saveBlob(env, data);
+  return json({ ok: true, client: client || { name: cname, phone: '', displayName: '' } }, 200, env, req);
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -528,10 +772,17 @@ export default {
     const portal = await authenticatePortal(req, env);
     if (portal && path === '/api/portal/data' && method === 'GET') return handlePortalData(req, env, portal);
     if (portal && path === '/api/portal/message' && method === 'POST') return handlePortalMessage(req, env, portal);
+    if (portal && path === '/api/portal/read' && method === 'POST') return handlePortalRead(req, env, portal);
+    if (portal && path === '/api/portal/upload' && method === 'POST') return handlePortalUpload(req, env, portal);
     if (portal && path === '/api/portal/approve' && method === 'POST') return handlePortalApprove(req, env, portal);
+    if (portal && path === '/api/portal/pay' && method === 'POST') return handlePortalPay(req, env, portal);
+    if (portal && path === '/api/portal/milestone' && method === 'POST') return handlePortalMilestone(req, env, portal);
+    if (portal && path === '/api/portal/request' && method === 'POST') return handlePortalRequest(req, env, portal);
+    if (portal && path === '/api/portal/profile' && method === 'POST') return handlePortalProfile(req, env, portal);
 
     // Client portal — admin replies to a client's thread
     if (path === '/api/portal/reply' && method === 'POST') return handlePortalReply(req, env, await authenticate(req, env));
+    if (path === '/api/portal/markread' && method === 'POST') return handlePortalMarkRead(req, env, await authenticate(req, env));
 
     // Everything below requires a token
     const user = await authenticate(req, env);
@@ -545,6 +796,8 @@ export default {
     if (path === '/api/data') return handleData(method, req, env, user);
     if (path === '/api/media/upload') return handleMediaUpload(req, env, user);
     if (path === '/api/media/delete') return handleMediaDelete(req, env, user);
+    if (path === '/api/email/send') return handleSendEmail(req, env, user);
+    if (path === '/api/calendar/ics') return handleCalendar(req, env, user);
 
     return err('Not Found', 404, env, req);
   },

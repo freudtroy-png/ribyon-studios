@@ -15,6 +15,8 @@ bucket_name = "ribyon-media"
 [vars]
 ALLOWED_ORIGIN = "https://ribyon-studios.vercel.app"
 PORTAL_URL = "https://ribyon-portal.vercel.app"
+EMAIL_FROM = "ribyonstudios@gmail.com"
+EMAIL_FROM_NAME = "Ribyon Studios"
 
 [dev]
 port = 8787

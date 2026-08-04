@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your project is ready — Ribyon Studios</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-wrapper { width: 100% !important; }
+      .email-body { padding: 28px 20px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <div style="display:none;max-height:0;overflow:hidden;color:#f5f0e8;">
+    Your {{project_name}} is complete. Files, guidelines, and everything you need to go live.&nbsp;‌&nbsp;‌
+  </div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0e8;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+
+        <table class="email-wrapper" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#0a0908;border-radius:16px;overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:32px 48px 28px;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td>
+                    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:18px;font-weight:800;color:#e5e0d6;letter-spacing:-0.03em;">Ribyon Studios</span>
+                  </td>
+                  <td align="right">
+                    <span style="display:inline-block;background:rgba(249,115,22,0.12);color:#f97316;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:4px 10px;border-radius:4px;border:1px solid rgba(249,115,22,0.25);">Delivered</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr><td style="height:3px;background:linear-gradient(90deg,#f97316,#fbbf24);"></td></tr>
+
+          <!-- Body -->
+          <tr>
+            <td class="email-body" style="padding:48px 48px 40px;">
+
+              <p style="margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#f97316;">Project complete</p>
+
+              <h1 style="margin:0 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:30px;font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#e5e0d6;">
+                {{project_name}} is ready.
+              </h1>
+
+              <p style="margin:0 0 32px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.75;color:#a39e94;">
+                Everything is packaged and ready to go. Below you'll find links to your files, a summary of what's included, and everything you need to launch with confidence.
+              </p>
+
+              <!-- Download button -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+                <tr>
+                  <td>
+                    <a href="{{files_link}}" style="display:inline-block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;text-decoration:none;padding:16px 32px;border-radius:999px;letter-spacing:0.05em;text-transform:uppercase;">
+                      ↓ Download your files
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- What's included -->
+              <p style="margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#59554c;">What's included</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#11100e;border-radius:10px;overflow:hidden;margin-bottom:32px;">
+                {{#deliverables}}
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                  <td style="padding:14px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="24" valign="middle">
+                          <span style="display:inline-block;width:8px;height:8px;background:#f97316;border-radius:50%;"></span>
+                        </td>
+                        <td>
+                          <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;color:#a39e94;">{{item}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {{/deliverables}}
+              </table>
+
+              <!-- Divider -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                <tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr>
+              </table>
+
+              <!-- Ownership note -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(249,115,22,0.05);border-radius:8px;border-left:3px solid #f97316;margin-bottom:28px;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#e5e0d6;line-height:1.5;">
+                      Everything delivered today is 100% yours. No licenses, no ongoing fees, no strings attached.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Personal note -->
+              <p style="margin:0 0 32px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.75;color:#a39e94;">
+                {{personal_note}}
+              </p>
+
+              <!-- CTAs -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-right:12px;">
+                    <a href="{{files_link}}" style="display:inline-block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;text-decoration:none;padding:13px 24px;border-radius:999px;letter-spacing:0.05em;text-transform:uppercase;">
+                      View files →
+                    </a>
+                  </td>
+                  <td>
+                    <a href="mailto:hello@ribyonstudios.com" style="display:inline-block;color:#a39e94;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600;text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                      Questions? Reply here
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Referral nudge -->
+          <tr>
+            <td style="padding:20px 48px;background:#11100e;border-top:1px solid rgba(255,255,255,0.06);">
+              <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#59554c;line-height:1.6;">
+                Know someone who needs a brand like this? We'd love an introduction. Every referral gets priority scheduling.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 48px;border-top:1px solid rgba(255,255,255,0.06);">
+              <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#3a3730;line-height:1.6;">
+                <strong style="color:#59554c;">Ribyon Studios</strong> · Brand direction &amp; design · Nairobi, Kenya ·
+                <a href="mailto:hello@ribyonstudios.com" style="color:#3a3730;text-decoration:none;">hello@ribyonstudios.com</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

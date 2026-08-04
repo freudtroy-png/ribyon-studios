@@ -1,0 +1,9 @@
+const fs=require('fs');
+const s=fs.readFileSync('D:/Ribyon Studios Redesign/cloudflare/index.js','utf8');
+function find(k){const idx=s.indexOf(k);return idx>=0?s.substring(Math.max(0,idx-120),idx+180).replace(/\n/g,' '):'NOT FOUND';}
+console.log('EMAIL_FROM def:', find('EMAIL_FROM'));  
+console.log('---send invocation sites---');
+const keys=['sendEmail','api/email/send','handleSendEmail','send invite invitation emails','inviteUrl','/api/invite'];
+for(const k of keys){console.log('>>',k,':',s.split(k).length-1+ 'occurrences');}
+console.log('--- routes ---');
+console.log(s.match(/path === handleSendEmail.chR/g));/g)} =>

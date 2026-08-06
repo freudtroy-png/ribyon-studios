@@ -56,73 +56,85 @@ const B = {
   body: 'margin:0;font-size:14px;color:' + BRAND.ink + ';line-height:1.75;font-family:' + BRAND.fontBody,
 };
 
-// Shared responsive shell (Ribyon Ink & Ember).
+// Shared responsive shell — white card, envelope illustration, pill button
 function shell({ preHeader, eyebrow, title, subtitle, bodyHTML, cta }) {
-  const accentBar =
-    '<table cellpadding="0" cellspacing="0" border="0" align="center"><tr>' +
-    '<td style="width:40px;height:3px;background:' + BRAND.orange + ';border-radius:4px;font-size:0;line-height:0">&nbsp;</td></tr></table>';
+  const envelopeSVG =
+    '<table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 8px"><tr><td align="center" style="padding:0">' +
+    '<div style="display:inline-block;position:relative">' +
+    '<div style="position:absolute;bottom:-6px;left:50%;margin-left:-44px;width:88px;height:18px;background:radial-gradient(ellipse,rgba(249,115,22,0.28),transparent 70%);border-radius:50%;font-size:0"></div>' +
+    '<svg width="96" height="78" viewBox="0 0 96 78" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs>' +
+    '<linearGradient id="eb" x1="0" y1="0" x2="96" y2="78" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ff9a3c"/><stop offset="100%" stop-color="#f97316"/></linearGradient>' +
+    '<linearGradient id="ef" x1="0" y1="0" x2="96" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffb366"/><stop offset="100%" stop-color="#f97316" stop-opacity="0.7"/></linearGradient>' +
+    '</defs>' +
+    '<rect x="0" y="18" width="96" height="60" rx="9" fill="url(#eb)"/>' +
+    '<path d="M0 78 L48 52 L96 78 Z" fill="#ea580c" opacity="0.35"/>' +
+    '<path d="M0 18 Q4 6 9 3 L48 28 L87 3 Q92 6 96 18 Z" fill="url(#ef)"/>' +
+    '<path d="M0 78 L44 54" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>' +
+    '<path d="M96 78 L52 54" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>' +
+    '</svg></div></td></tr></table>';
+
   const ctaHTML = cta
-    ? '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px"><tr><td align="center">' +
-      '<a href="' + esc(cta.href) + '" class="email-cta" style="display:inline-block;background:' + BRAND.orange + ';color:#ffffff;text-decoration:none;padding:15px 38px;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;font-family:' + BRAND.fontBody + '">' + esc(cta.label) + ' &rarr;</a>' +
+    ? '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 4px"><tr><td align="center">' +
+      '<a href="' + esc(cta.href) + '" style="display:inline-block;background:' + BRAND.orange + ';color:#0a0908;text-decoration:none;padding:16px 48px;border-radius:999px;font-size:15px;font-weight:800;letter-spacing:0.01em;font-family:' + BRAND.fontBody + '">' + esc(cta.label) + ' \u2192</a>' +
       '</td></tr></table>'
     : '';
-  const note = (cta && cta.note) || 'If you have questions, hit reply and we&rsquo;ll help.';
+
+  const noteText = (cta && cta.note) || 'Questions? Just reply to this email.';
+
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>' +
     '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>' +
     '<meta name="x-apple-disable-message-reformatting"/>' +
-    '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Sora:wght@400;600;700&display=swap" rel="stylesheet"/>' +
-    '<title>' + esc(eyebrow || 'Ribyon Studios') + '</title>' +
-    '<style>@media only screen and (max-width:600px){.email-wrap{padding:16px 8px!important}.email-card{border-radius:12px!important}.email-hero{padding:32px 22px 26px!important}.email-hero-title{font-size:22px!important}.email-body{padding:26px 24px!important}}</style>' +
+    '<title>' + esc(title || 'Ribyon Studios') + '</title>' +
+    '<style>@media only screen and (max-width:600px){.ew{padding:16px 8px!important}.ec{border-radius:20px!important}.eb{padding:28px 20px 32px!important}}</style>' +
     '</head>' +
-    '<body style="margin:0;padding:0;background:' + BRAND.paper + ';font-family:' + BRAND.fontBody + ';-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">' +
-    '<span style="display:none;font-size:1px;color:#ffffff;mso-hide:all;opacity:0;max-height:0;overflow:hidden">' + esc(preHeader || eyebrow) + '</span>' +
-    '<table width="100%" cellpadding="0" cellspacing="0" border="0" class="email-wrap" role="presentation" style="width:100%;background:' + BRAND.paper + ';padding:32px 12px">' +
-    '<tr><td align="center" bgcolor="' + BRAND.paper + '" style="background:' + BRAND.paper + ';padding:0">' +
-    '<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="max-width:560px">' +
+    '<body style="margin:0;padding:0;background:#f0ece4;font-family:' + BRAND.fontBody + ';-webkit-text-size-adjust:100%">' +
+    '<span style="display:none;font-size:1px;color:#f0ece4;mso-hide:all;opacity:0;max-height:0;overflow:hidden">' + esc(preHeader || title) + '</span>' +
+
+    // Outer
+    '<table width="100%" cellpadding="0" cellspacing="0" border="0" class="ew" style="background:#f0ece4;padding:36px 16px">' +
+    '<tr><td align="center">' +
+    '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:440px">' +
 
     // Card
-    '<tr><td bgcolor="#ffffff" class="email-card" style="background:#ffffff;border-radius:14px;border:1px solid ' + BRAND.border + ';overflow:hidden">' +
+    '<tr><td class="ec" bgcolor="#ffffff" style="background:#ffffff;border-radius:28px;overflow:hidden;box-shadow:0 20px 56px rgba(0,0,0,0.1)">' +
+    '<table width="100%" cellpadding="0" cellspacing="0" border="0">' +
 
-    // Ink hero band with orange wordmark
-    '<tr><td class="email-hero" bgcolor="#0a0908" style="background:#0a0908;padding:34px 32px 28px;text-align:center">' +
-      '<p style="margin:0;font-size:30px;font-weight:800;color:' + BRAND.orange + ';letter-spacing:8px;font-family:' + BRAND.fontDisplay + '">RIBYON</p>' +
-      '<p style="margin:5px 0 0;font-size:10px;font-weight:600;color:' + BRAND.gold + ';letter-spacing:6px;text-transform:uppercase;font-family:' + BRAND.fontBody + '">Studios</p>' +
-      '<div style="height:26px;font-size:0;line-height:0">&nbsp;</div>' +
-      (eyebrow ? '<p style="margin:0 0 10px;font-size:11px;font-weight:700;color:' + BRAND.orange + ';letter-spacing:3px;text-transform:uppercase;font-family:' + BRAND.fontBody + '">' + esc(eyebrow) + '</p>' : '') +
-      '<h1 class="email-hero-title" style="margin:0;font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.25;font-family:' + BRAND.fontDisplay + '">' + title + '</h1>' +
-      (subtitle ? '<p style="margin:10px 0 0;font-size:14px;color:rgba(255,255,255,0.72);font-family:' + BRAND.fontBody + '">' + subtitle + '</p>' : '') +
-      '<div style="height:22px;font-size:0;line-height:0">&nbsp;</div>' +
-      accentBar +
+    // Top gradient background + envelope
+    '<tr><td bgcolor="#fff8f3" style="background:linear-gradient(160deg,#fff8f3 0%,#ffffff 60%);padding:44px 40px 16px;text-align:center">' +
+    envelopeSVG +
     '</td></tr>' +
 
-    // Body
-    '<tr><td class="email-body" style="padding:32px 40px 34px">' +
+    // Content
+    '<tr><td class="eb" align="center" style="padding:8px 40px 44px;text-align:center">' +
+    (eyebrow ? '<p style="margin:0 0 12px;font-family:' + BRAND.fontBody + ';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:' + BRAND.orange + '">' + esc(eyebrow) + '</p>' : '') +
+    '<h1 style="margin:0 0 12px;font-family:' + BRAND.fontBody + ';font-size:26px;font-weight:800;color:#0a0908;letter-spacing:-0.03em;line-height:1.2">' + title + '</h1>' +
+    (subtitle ? '<p style="margin:0 0 6px;font-family:' + BRAND.fontBody + ';font-size:15px;color:' + BRAND.sub + ';line-height:1.6">' + subtitle + '</p>' : '') +
+    '<div style="height:20px;font-size:0">&nbsp;</div>' +
     bodyHTML +
     ctaHTML +
-    '<p style="margin:14px 0 0;font-size:12px;color:' + BRAND.faint + ';text-align:center;font-family:' + BRAND.fontBody + '">' + note + '</p>' +
+    '<p style="margin:16px 0 0;font-family:' + BRAND.fontBody + ';font-size:12px;color:' + BRAND.faint + '">' + noteText + '</p>' +
     '</td></tr>' +
 
+    // Footer inside card
+    '<tr><td style="border-top:1px solid rgba(0,0,0,0.06);padding:18px 40px 24px;text-align:center">' +
+    '<p style="margin:0 0 4px;font-family:' + BRAND.fontBody + ';font-size:13px;font-weight:700;color:#0a0908"><span style="color:' + BRAND.orange + '">Ribyon</span> Studios</p>' +
+    '<p style="margin:0;font-family:' + BRAND.fontBody + ';font-size:11px;color:' + BRAND.faint + ';line-height:1.6">' + BRAND.tagline + '<br>' +
+    '<a href="' + BRAND.siteUrl + '" style="color:' + BRAND.orange + ';text-decoration:none">ribyonstudios.com</a></p>' +
     '</td></tr>' +
+
+    '</table></td></tr>' +
     // END CARD
 
-    // Footer
-    '<tr><td align="center" style="padding:24px 16px 0;text-align:center">' +
-      '<p style="margin:0 0 4px;font-size:13px;font-weight:800;color:' + BRAND.ink + ';letter-spacing:5px;text-transform:uppercase;font-family:' + BRAND.fontDisplay + '"><span style="color:' + BRAND.orange + '">RIBYON</span> STUDIOS</p>' +
-      '<p style="margin:0 0 10px;font-size:11px;color:' + BRAND.faint + ';line-height:1.6;font-family:' + BRAND.fontBody + '">' + BRAND.tagline + '</p>' +
-      '<p style="margin:0;font-size:11px;color:' + BRAND.faint + ';font-family:' + BRAND.fontBody + '"><a href="' + BRAND.siteUrl + '" style="color:' + BRAND.orangeDark + ';text-decoration:none">ribyon-studios.vercel.app</a> &nbsp;&middot;&nbsp; <a href="mailto:ribyonstudios@gmail.com" style="color:' + BRAND.orangeDark + ';text-decoration:none">ribyonstudios@gmail.com</a></p>' +
-    '</td></tr>' +
-
-    '</table>' +
-    '</td></tr></table>' +
+    '</table></td></tr></table>' +
     '</body></html>';
 }
 
-// content helpers
 function greeting(name) {
-  return '<p style="margin:0 0 20px;font-size:16px;font-weight:700;color:' + BRAND.ink + ';font-family:' + BRAND.fontBody + '">Hi ' + esc(name) + ',</p>';
+  return '<p style="margin:0 0 16px;font-family:' + BRAND.fontBody + ';font-size:15px;font-weight:700;color:' + BRAND.ink + ';text-align:center">Hi ' + esc(name) + ',</p>';
 }
 function para(html) {
-  return '<p style="margin:0 0 20px;font-size:14px;color:' + BRAND.text + ';line-height:1.75;font-family:' + BRAND.fontBody + '">' + html + '</p>';
+  return '<p style="margin:0 0 16px;font-family:' + BRAND.fontBody + ';font-size:14px;color:' + BRAND.text + ';line-height:1.75;text-align:center">' + html + '</p>';
 }
 // info rows: [[label, valueHTML], ...]
 function infoCard(rows) {

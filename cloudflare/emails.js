@@ -337,7 +337,7 @@ function buildEmail(scenario, params) {
 }
 
 // Brevo transactional send.
-async function sendBrevo(env, { to, toName, subject, html, text, replyTo, tags }) {
+async function sendBrevo(env, { to, toName, subject, html, text, replyTo, tags, attachments }) {
   const apiKey = env.BREVO_API_KEY;
   if (!apiKey) return { ok: false, status: 503, body: { message: 'Email not configured (BREVO_API_KEY missing)' } };
   const payload = {
@@ -349,6 +349,7 @@ async function sendBrevo(env, { to, toName, subject, html, text, replyTo, tags }
   };
   if (replyTo) payload.replyTo = { email: replyTo };
   if (tags && tags.length) payload.tags = tags;
+  if (attachments && attachments.length) payload.attachment = attachments;
   const r = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },

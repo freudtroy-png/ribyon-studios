@@ -36,6 +36,12 @@ function corsHeaders(env, req) {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control',
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Max-Age': '86400',
+    // Defense-in-depth headers
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'",
   };
 }
 
@@ -56,6 +62,55 @@ function err(msg, status = 400, env, req) {
 
 async function safeJSON(req) {
   try { return await req.json(); } catch (e) { return null; }
+}
+
+// Respond with JSON, optionally attaching extra headers (e.g. Set-Cookie).
+function jsonEx(data, status = 200, env, req, extraHeaders = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      ...corsHeaders(env, req),
+      ...extraHeaders,
+    },
+  });
+}
+
+// ── HttpOnly session cookies ──
+const SESSION_COOKIE = 'rs_session';
+const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+// SameSite=None; Secure so the cookie can be sent from the Vercel CMS origin
+// (https://ribyon-cms.vercel.app) to the worker origin over cross-site XHR.
+function sessionCookieHeader(token) {
+  const base = `${SESSION_COOKIE}=${encodeURIComponent(token || '')}; Path=/; HttpOnly; SameSite=None; Secure`;
+  return token ? `${base}; Max-Age=${SESSION_MAX_AGE}` : `${base}; Max-Age=0`;
+}
+
+function readCookie(req, name) {
+  const c = req.headers.get('Cookie') || '';
+  for (const part of c.split(';')) {
+    const idx = part.indexOf('=');
+    if (idx > -1 && part.slice(0, idx).trim() === name) {
+      try { return decodeURIComponent(part.slice(idx + 1).trim()); } catch (e) { return ''; }
+    }
+  }
+  return '';
+}
+
+// Normalize one or many base64 attachments into Brevo's `attachment` shape.
+function normalizeAttachments(att) {
+  if (att == null) return undefined;
+  const list = Array.isArray(att) ? att : [att];
+  const out = list
+    .filter((a) => a && a.name && a.content)
+    .map((a) => ({
+      name: String(a.name).slice(0, 160),
+      content: String(a.content),
+      type: a.type || 'application/octet-stream',
+    }));
+  return out.length ? out : undefined;
 }
 
 function constantTimeEq(a, b) {
@@ -141,10 +196,13 @@ function roleAtLeast(role, min) {
 
 async function authenticate(req, env) {
   const h = req.headers.get('Authorization') || '';
-  const token = h.replace(/^Bearer\s+/i, '').trim();
+  let token = h.replace(/^Bearer\s+/i, '').trim();
+
+  // Session-cookie fallback (HttpOnly cookie set at login).
+  if (!token) token = readCookie(req, SESSION_COOKIE);
   if (!token) return null;
 
-  // Master ADMIN_TOKEN grants superadmin
+  // Master ADMIN_TOKEN grants superadmin (kept out of the client — server-only secret).
   if (env.ADMIN_TOKEN && constantTimeEq(token, env.ADMIN_TOKEN)) {
     return { username: 'admin', role: 'superadmin', master: true };
   }
@@ -213,7 +271,7 @@ async function handleLogin(req, env) {
   if ((identifier === 'admin' || identifier === 'freudtroy@gmail.com') && env.ADMIN_TOKEN && constantTimeEq(body.password, env.ADMIN_TOKEN)) {
     const payload = { sub: 'admin', role: 'superadmin', iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 };
     const token = await signJWT(payload, env.JWT_SECRET || 'dev-jwt-secret');
-    return json({ token, user: { username: 'admin', email: 'freudtroy@gmail.com', role: 'superadmin' } }, 200, env, req);
+    return jsonEx({ token, user: { username: 'admin', email: 'freudtroy@gmail.com', role: 'superadmin' } }, 200, env, req, { 'Set-Cookie': sessionCookieHeader(token) });
   }
 
   const row = await env.DB.prepare('SELECT username, email, password_hash, role FROM cms_users WHERE LOWER(email) = ? OR LOWER(username) = ?').bind(identifier, identifier).first();
@@ -223,7 +281,11 @@ async function handleLogin(req, env) {
 
   const payload = { sub: row.username, role: row.role, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 };
   const token = await signJWT(payload, env.JWT_SECRET || 'dev-jwt-secret');
-  return json({ token, user: { username: row.username, email: row.email, role: row.role } }, 200, env, req);
+  return jsonEx({ token, user: { username: row.username, email: row.email, role: row.role } }, 200, env, req, { 'Set-Cookie': sessionCookieHeader(token) });
+}
+
+async function handleLogout(req, env) {
+  return jsonEx({ ok: true }, 200, env, req, { 'Set-Cookie': sessionCookieHeader('') });
 }
 
 async function handleUsers(method, req, env, user) {
@@ -319,6 +381,98 @@ async function handleData(method, req, env, user) {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Media endpoints (R2)
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── File scanning (magic-byte + content sniffing before storage) ───
+// Returns { ok:true, mime } or { ok:false, error }. Rejects content whose magic
+// bytes do not match the declared extension, and blocks executable/embeddable
+// payloads regardless of extension. Defense-in-depth pre-store scan (not a
+// full AV engine — pair with a real scanner for high-risk use).
+function asciiSlice(buf, start, end) { return Buffer.from(new Uint8Array(buf, start, Math.min(end, buf.byteLength))).toString('latin1'); }
+
+async function scanFileBytes(mimeType, ext, buf) {
+  const head8 = asciiSlice(buf, 0, 32);
+  const fullAscii = asciiSlice(buf, 0, 4096);
+
+  // Always-block executable / script / wasm magic no matter the claimed ext.
+  const BLOCK = [
+    { name: 'Windows PE/executable', sig: 'MZ' },
+    { name: 'ELF binary', sig: '\x7FELF' },
+    { name: 'Mach-O binary', sig: '\xFE\xED\xFA\xCE' },
+    { name: 'Java class', sig: '\xCA\xFE\xBA\xBE' },
+    { name: 'WebAssembly', sig: '\x00asm' },
+    { name: 'shell script', sig: '#!' },
+  ];
+  for (const b of BLOCK) {
+    if (head8.slice(0, b.sig.length) === b.sig) return { ok: false, error: `Blocked: ${b.name} content is not allowed` };
+  }
+
+  // For anything that should be an image, reject embedded HTML/JS regardless.
+  const isHtmlLike = /<(script|body|html|!DOCTYPE)/i.test(head8);
+
+  // Extension-driven magic-byte matching.
+  function matched(rule) {
+    const [sig, kind] = rule;
+    if (kind === 'latin1') return head8.slice(0, sig.length) === sig;
+    const off = rule[2] || 0;
+    const need = sig.length;
+    if (buf.byteLength < off + need) return false;
+    const u = new Uint8Array(buf, off, need);
+    return sig.every((v, i) => u[i] === v);
+  }
+
+  // SVG: must contain <svg>, must NOT contain scripts / event handlers / javascript:.
+  if (ext === 'svg') {
+    const body = asciiSlice(buf, 0, 16384);
+    if (!/<svg/i.test(body)) return { ok: false, error: 'Invalid SVG (no <svg> root element)' };
+    if (/<script|onload\s*=|onerror\s*=|onclick\s*=|onmouseover\s*=|\bjavascript\s*:/i.test(body)) {
+      return { ok: false, error: 'SVG cannot contain scripts or event handlers' };
+    }
+    // Fuzz the MIME even if the client lied.
+    return { ok: true, mime: 'image/svg+xml' };
+  }
+
+  // Text-ish files: reject HTML/script smuggling.
+  if (ext === 'txt' || ext === 'csv') {
+    const body = asciiSlice(buf, 0, 4096);
+    if (/<script|<!doctype\s+html|<html\b|<body\b/i.test(body)) {
+      return { ok: false, error: 'Blocked: HTML/script content is not allowed in text files' };
+    }
+    return { ok: true, mime: (mimeType && mimeType !== 'application/octet-stream') ? mimeType : (ext === 'csv' ? 'text/csv' : 'text/plain') };
+  }
+
+  // Binary formats: require matching magic bytes, and reject embedded HTML/JS.
+  const sigs = signaturesFor(ext);
+  if (sigs) {
+    const any = sigs.some((s) => matched(s));
+    if (!any) return { ok: false, error: `File content does not match expected "${ext}" format (possible spoof or corruption)` };
+  } else if (isHtmlLike) {
+    return { ok: false, error: 'Blocked: HTML/script content is not allowed for this file type' };
+  }
+
+  // Mime tightening for known formats.
+  const mimeFor = {
+    pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+    png: 'image/png', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif',
+    zip: 'application/zip',
+  };
+  return { ok: true, mime: mimeFor[ext] || mimeType || 'application/octet-stream' };
+
+  function signaturesFor(e) {
+    switch (e) {
+      case 'pdf': return [['%PDF-', 'latin1']];
+      case 'jpg': case 'jpeg': return [[[0xFF, 0xD8, 0xFF], 'bytes']];
+      case 'png': return [[[0x89, 0x50, 0x4E, 0x47], 'bytes']];
+      case 'gif': return [[[0x47, 0x49, 0x46, 0x38], 'bytes']];
+      case 'webp': return [[[0x52, 0x49, 0x46, 0x46], 'bytes', 0], [[0x57, 0x45, 0x42, 0x50], 'bytes', 8]];
+      case 'avif': return [[[0x00, 0x00, 0x00], 'bytes', 0], [[0x66, 0x74, 0x79, 0x70], 'bytes', 4]];
+      case 'doc': return [[[0xD0, 0xCF, 0x11, 0xE0], 'bytes']];
+      case 'zip': case 'docx': case 'xlsx': case 'pptx': return [[[0x50, 0x4B, 0x03, 0x04], 'bytes']];
+      case 'ppt': return [[[0xD0, 0xCF, 0x11, 0xE0], 'bytes']];
+      case 'xls': return [[[0xD0, 0xCF, 0x11, 0xE0], 'bytes']];
+      default: return null;
+    }
+  }
+}
+
 async function handleMediaUpload(req, env, user) {
   const forbidden = requireRole(user, 'editor', env, req);
   if (forbidden) return forbidden;
@@ -333,8 +487,15 @@ async function handleMediaUpload(req, env, user) {
   const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'txt', 'csv'];
   if (!allowed.includes(ext)) return err('Invalid file type', 400, env, req);
 
+  // Size limit (25 MB) — reject without reading a huge body into memory.
+  const MAX = 25 * 1024 * 1024;
+  if (file.size > MAX) return err('File too large (max 25 MB)', 413, env, req);
+
   const arrayBuffer = await file.arrayBuffer();
-  const mimeType = file.type || 'application/octet-stream';
+  const scan = await scanFileBytes(file.type, ext, arrayBuffer);
+  if (!scan.ok) return err(scan.error || 'File scan failed', 400, env, req);
+
+  const mimeType = scan.mime || file.type || 'application/octet-stream';
   const filename = `${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : ext}`;
   const key = `media/${filename}`;
   await env.MEDIA.put(key, arrayBuffer, { httpMetadata: { contentType: mimeType } });
@@ -374,6 +535,7 @@ async function handleSendEmail(req, env, user) {
       text: body.text,
       replyTo: body.replyTo,
       tags: ['ribyon', scenario],
+      attachments: normalizeAttachments(body.attachment || body.attachments),
     });
     if (!res.ok) {
       const msg = (res.body && res.body.message) || 'Email provider error';
@@ -393,6 +555,7 @@ async function handleSendEmail(req, env, user) {
     text,
     replyTo: body.replyTo,
     tags: body.tags || ['ribyon'],
+    attachments: normalizeAttachments(body.attachment || body.attachments),
   });
   if (!res.ok) {
     const msg = (res.body && res.body.message) || 'Email provider error';
@@ -548,8 +711,11 @@ async function handlePortalUpload(req, env, portal) {
   const ext = (name.split('.').pop() || '').toLowerCase();
   const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'txt', 'csv'];
   if (!allowed.includes(ext)) return err('Invalid file type', 400, env, req);
+  if (file.size > 25 * 1024 * 1024) return err('File too large (max 25 MB)', 413, env, req);
   const arrayBuffer = await file.arrayBuffer();
-  const mimeType = file.type || 'application/octet-stream';
+  const scan = await scanFileBytes(file.type, ext, arrayBuffer);
+  if (!scan.ok) return err(scan.error || 'File scan failed', 400, env, req);
+  const mimeType = scan.mime || file.type || 'application/octet-stream';
   const filename = `${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : ext}`;
   const key = `media/${filename}`;
   await env.MEDIA.put(key, arrayBuffer, { httpMetadata: { contentType: mimeType } });
@@ -753,8 +919,9 @@ export default {
       return json({ ok: true, service: 'ribyon-cms-api' }, 200, env, req);
     }
 
-    // Public login
+    // Public login / logout
     if (method === 'POST' && path === '/api/auth/login') return handleLogin(req, env);
+    if (method === 'POST' && path === '/api/auth/logout') return handleLogout(req, env);
 
     // Client portal — public endpoints
     if (method === 'POST' && path === '/api/portal/accept') return handlePortalAccept(req, env);

@@ -4975,3 +4975,206 @@ body { top: 0 !important; }
   .float-bar { bottom: 1.25rem; right: 1.25rem; }
   .float-bar--lang { bottom: 1.25rem; left: 1.25rem; }
 }
+
+/* ===================================================================
+   EMAIL MODALS — newsletter signup + confirmation cards
+   =================================================================== */
+
+/* Backdrop */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,9,8,0.6);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s var(--ease);
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Card */
+.modal-card {
+  background: #fff;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+  transform: translateY(16px) scale(0.97);
+  transition: transform .4s var(--ease-out);
+}
+.modal-backdrop.open .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.07);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  transition: background .2s var(--ease);
+}
+.modal-close:hover { background: rgba(0,0,0,0.14); }
+.modal-close svg { stroke: #333; }
+
+/* ── NEWSLETTER MODAL ── */
+.modal-nl-header {
+  background: linear-gradient(160deg, #f97316 0%, #fbbf24 100%);
+  padding: 3rem 2rem 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+/* Decorative concentric arcs */
+.modal-nl-header::before,
+.modal-nl-header::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15);
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+.modal-nl-header::before { width: 280px; height: 280px; }
+.modal-nl-header::after  { width: 180px; height: 180px; }
+
+/* SVG envelope illustration */
+.modal-envelope {
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,0.2));
+}
+
+/* Body */
+.modal-body {
+  padding: 2rem 2rem 2.25rem;
+  text-align: center;
+}
+.modal-body h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin: 0 0 0.6rem;
+  line-height: 1.15;
+}
+.modal-body p {
+  font-size: 0.9rem;
+  color: var(--gray-mid);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+.modal-input-wrap {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+.modal-input {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.modal-input::placeholder { color: var(--gray-mid); }
+.modal-input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+}
+.modal-btn {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--orange);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .25s var(--ease), transform .25s var(--ease-out), box-shadow .25s var(--ease);
+  letter-spacing: 0.01em;
+}
+.modal-btn:hover {
+  background: var(--orange-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(249,115,22,0.3);
+}
+.modal-fine {
+  font-size: 0.72rem;
+  color: var(--gray-mid);
+  margin: 0.75rem 0 0;
+}
+
+/* ── CONFIRMATION MODAL ── */
+.modal-confirm-body {
+  padding: 2.5rem 2rem 2.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-confirm-icon {
+  width: 88px; height: 88px;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.modal-confirm-icon::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249,115,22,0.15), transparent 70%);
+}
+.modal-confirm-body h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 0.75rem;
+}
+.modal-confirm-body p {
+  font-size: 0.9rem;
+  color: var(--gray-mid);
+  line-height: 1.65;
+  margin: 0 0 2rem;
+  max-width: 280px;
+}
+.modal-confirm-body p strong { color: var(--orange); font-weight: 600; }
+.modal-btn-dark {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .25s var(--ease), transform .25s var(--ease-out);
+  letter-spacing: 0.01em;
+}
+.modal-btn-dark:hover { background: var(--ink-hover); transform: translateY(-1px); }

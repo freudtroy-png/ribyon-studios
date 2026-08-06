@@ -1,147 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="x-apple-disable-message-reformatting">
   <title>We got your message — Ribyon Studios</title>
-  <!--[if mso]>
-  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
-  <![endif]-->
   <style>
-    * { box-sizing: border-box; }
-    body, table, td, p, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-    table, td { mso-table-lspace: 0; mso-table-rspace: 0; }
-    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-    @media only screen and (max-width: 600px) {
-      .email-wrapper { width: 100% !important; }
-      .email-body { padding: 32px 24px !important; }
-      .email-header { padding: 24px !important; }
-      .stat-cell { display: block !important; width: 100% !important; padding: 12px 0 !important; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0ece4; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+    @media (max-width: 600px) {
+      .card { border-radius: 20px !important; margin: 16px !important; }
+      .card-body { padding: 32px 24px 36px !important; }
     }
   </style>
-</head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-  <!-- Preheader (hidden preview text) -->
-  <div style="display:none;max-height:0;overflow:hidden;color:#f5f0e8;">
-    We've received your message and will be in touch within 48 hours.&nbsp;‌&nbsp;‌&nbsp;‌
-  </div>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="shortcut icon" href="../favicon.ico">
+<body style="margin:0;padding:40px 20px;background:#f0ece4;">
 
-  <!-- Outer wrapper -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0e8;">
+  <!-- Hidden preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;">We've received your message and will be in touch within 48 hours.&#847;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" style="padding:40px 20px;">
+      <td align="center">
 
-        <!-- Email card -->
-        <table class="email-wrapper" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#0a0908;border-radius:16px;overflow:hidden;">
+        <!-- Card -->
+        <table class="card" width="440" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:440px;width:100%;background:#ffffff;border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.1);">
 
-          <!-- Header bar -->
+          <!-- Envelope illustration area -->
           <tr>
-            <td class="email-header" style="padding:32px 48px;border-bottom:1px solid rgba(255,255,255,0.06);">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:18px;font-weight:800;color:#e5e0d6;letter-spacing:-0.03em;">Ribyon Studios</span>
-                  </td>
-                  <td align="right">
-                    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#3a3730;">Nairobi · Est. 2021</span>
-                  </td>
-                </tr>
-              </table>
+            <td align="center" style="padding:48px 40px 24px;background:#ffffff;">
+              <!-- Envelope SVG — 3D style with gradient, glow underneath -->
+              <div style="display:inline-block;position:relative;">
+                <!-- Glow -->
+                <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:100px;height:24px;background:radial-gradient(ellipse,rgba(249,115,22,0.35),transparent 70%);border-radius:50%;filter:blur(8px);"></div>
+                <svg width="108" height="88" viewBox="0 0 108 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="envBody" x1="0" y1="0" x2="108" y2="88" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#ff9a3c"/>
+                      <stop offset="100%" stop-color="#f97316"/>
+                    </linearGradient>
+                    <linearGradient id="envFlap" x1="0" y1="0" x2="108" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#ffb366"/>
+                      <stop offset="100%" stop-color="#f97316" stop-opacity="0.8"/>
+                    </linearGradient>
+                    <linearGradient id="envFold" x1="0" y1="40" x2="108" y2="88" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#ea580c"/>
+                      <stop offset="100%" stop-color="#c2410c"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Body -->
+                  <rect x="0" y="20" width="108" height="68" rx="10" fill="url(#envBody)"/>
+                  <!-- Bottom fold triangles (give 3D depth) -->
+                  <path d="M0 88 L54 60 L108 88 Z" fill="url(#envFold)" opacity="0.5"/>
+                  <!-- Flap (open, folded back) -->
+                  <path d="M0 20 Q4 8 10 4 L54 32 L98 4 Q104 8 108 20 Z" fill="url(#envFlap)"/>
+                  <!-- Diagonal crease lines -->
+                  <path d="M0 88 L48 62" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                  <path d="M108 88 L60 62" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                </svg>
+              </div>
             </td>
           </tr>
 
-          <!-- Orange accent line -->
+          <!-- Content -->
           <tr>
-            <td style="height:3px;background:linear-gradient(90deg,#f97316,#fbbf24);"></td>
-          </tr>
+            <td class="card-body" align="center" style="padding:8px 40px 44px;">
 
-          <!-- Body -->
-          <tr>
-            <td class="email-body" style="padding:48px 48px 40px;">
-
-              <!-- Eyebrow -->
-              <p style="margin:0 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#f97316;">Message received</p>
-
-              <!-- Headline -->
-              <h1 style="margin:0 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:32px;font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#e5e0d6;">
-                We've got your message.
+              <h1 style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:800;color:#0a0908;letter-spacing:-0.03em;margin:0 0 12px;line-height:1.2;">
+                Message received.
               </h1>
 
-              <!-- Body copy -->
-              <p style="margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.7;color:#a39e94;">
-                Thank you for reaching out. We review every inquiry personally — not with an automated system. You can expect a response within 48 hours.
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:#7d786e;line-height:1.65;margin:0 0 8px;max-width:300px;">
+                We've sent a confirmation to
+              </p>
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#f97316;line-height:1.65;margin:0 0 28px;">
+                {{email}}
               </p>
 
-              <p style="margin:0 0 32px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.7;color:#a39e94;">
-                In the meantime, if there's anything urgent or you'd like to add context to your message, just reply to this email.
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:#7d786e;line-height:1.65;margin:0 0 32px;max-width:300px;">
+                We review every message personally and will be in touch within 48 hours.
               </p>
 
-              <!-- Divider -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr>
-              </table>
-
-              <!-- What happens next -->
-              <p style="margin:32px 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#59554c;">What happens next</p>
-
-              <!-- Steps -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <!-- CTA -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                 <tr>
-                  <td style="padding:0 0 16px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:800;color:#f97316;">01</span>
-                        </td>
-                        <td>
-                          <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#e5e0d6;font-weight:600;">We read your message carefully.</p>
-                          <p style="margin:4px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#59554c;">We'll understand your situation and what you need before we respond.</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:0 0 16px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:800;color:#f97316;">02</span>
-                        </td>
-                        <td>
-                          <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#e5e0d6;font-weight:600;">We share our honest read.</p>
-                          <p style="margin:4px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#59554c;">We'll tell you what we'd do, what it costs, and whether we're the right fit.</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:800;color:#f97316;">03</span>
-                        </td>
-                        <td>
-                          <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#e5e0d6;font-weight:600;">No pitch. No pressure.</p>
-                          <p style="margin:4px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#59554c;">If it's a fit, we'll scope the work with a fixed price. If it's not, we'll tell you honestly.</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- CTA button -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:36px;">
-                <tr>
-                  <td>
-                    <a href="https://ribyonstudios.com" style="display:inline-block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;text-decoration:none;padding:14px 28px;border-radius:999px;letter-spacing:0.05em;text-transform:uppercase;">
-                      Visit our website →
+                  <td style="border-radius:999px;overflow:hidden;">
+                    <a href="https://ribyonstudios.com"
+                      style="display:block;background:#0a0908;color:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;padding:16px 48px;border-radius:999px;letter-spacing:0.01em;white-space:nowrap;">
+                      Back to Ribyon Studios
                     </a>
                   </td>
                 </tr>
@@ -152,31 +102,16 @@
 
           <!-- Footer -->
           <tr>
-            <td style="padding:24px 48px;border-top:1px solid rgba(255,255,255,0.06);">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#3a3730;line-height:1.6;">
-                      <strong style="color:#59554c;">Ribyon Studios</strong> · Brand direction &amp; design · Nairobi, Kenya
-                    </p>
-                    <p style="margin:6px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;color:#3a3730;">
-                      <a href="https://ribyonstudios.com" style="color:#f97316;text-decoration:none;">ribyonstudios.com</a>
-                      &nbsp;·&nbsp;
-                      <a href="mailto:hello@ribyonstudios.com" style="color:#3a3730;text-decoration:none;">hello@ribyonstudios.com</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
+            <td align="center" style="padding:20px 40px 28px;border-top:1px solid rgba(0,0,0,0.06);">
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#b8b2a8;line-height:1.6;margin:0;">
+                Ribyon Studios · Brand direction &amp; design · Nairobi<br>
+                <a href="https://ribyonstudios.com" style="color:#f97316;text-decoration:none;">ribyonstudios.com</a>
+              </p>
             </td>
           </tr>
 
         </table>
-        <!-- End email card -->
-
-        <!-- Fine print -->
-        <p style="margin:24px 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;color:#7d786e;text-align:center;">
-          You're receiving this because you contacted Ribyon Studios. You don't need to unsubscribe — this is a one-time confirmation.
-        </p>
+        <!-- /Card -->
 
       </td>
     </tr>

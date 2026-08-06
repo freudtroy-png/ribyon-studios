@@ -45,7 +45,11 @@
   ]
 }
 </script>
-</head>
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="shortcut icon" href="favicon.ico">
 <body>
   <div class="scroll-progress"><div class="scroll-progress-bar"></div></div>
   <nav class="navbar">
@@ -613,5 +617,107 @@
   </div>
 </div>
 <script src="cookie-consent.js" defer></script>
+
+<!-- ── NEWSLETTER SIGNUP MODAL ── -->
+<div class="modal-backdrop" id="newsletterModal" role="dialog" aria-modal="true" aria-label="Newsletter signup">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('newsletterModal')" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+
+    <!-- Orange gradient header with envelope illustration -->
+    <div class="modal-nl-header">
+      <svg class="modal-envelope" width="120" height="96" viewBox="0 0 120 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Envelope body -->
+        <rect x="8" y="28" width="104" height="68" rx="8" fill="white" opacity="0.95"/>
+        <!-- Envelope flap -->
+        <path d="M8 36 L60 64 L112 36 L112 28 Q112 28 60 56 Q8 28 8 28 Z" fill="white" opacity="0.8"/>
+        <!-- Envelope diagonal lines (sealed) -->
+        <path d="M8 96 L52 64" stroke="rgba(249,115,22,0.2)" stroke-width="1.5"/>
+        <path d="M112 96 L68 64" stroke="rgba(249,115,22,0.2)" stroke-width="1.5"/>
+        <!-- Letter sticking out -->
+        <rect x="32" y="8" width="56" height="52" rx="4" fill="white" opacity="0.9"/>
+        <line x1="42" y1="22" x2="78" y2="22" stroke="rgba(0,0,0,0.12)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="42" y1="30" x2="78" y2="30" stroke="rgba(0,0,0,0.08)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="42" y1="38" x2="66" y2="38" stroke="rgba(0,0,0,0.08)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="modal-body">
+      <h2>Get our best<br>thinking first.</h2>
+      <p>Brand strategy, identity design, and the occasional hot take — straight to your inbox. No spam. Just the good stuff.</p>
+      <form id="newsletterForm" onsubmit="submitNewsletter(event)">
+        <div class="modal-input-wrap">
+          <input class="modal-input" type="email" id="nlEmail" placeholder="Your email address" required>
+        </div>
+        <button type="submit" class="modal-btn">Sign up free</button>
+      </form>
+      <p class="modal-fine">We won't share your email or send you anything you didn't ask for.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── EMAIL CONFIRMATION MODAL ── -->
+<div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-label="Email sent confirmation">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('confirmModal')" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+    <div class="modal-confirm-body">
+      <!-- Orange envelope icon -->
+      <div class="modal-confirm-icon">
+        <svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="22" width="72" height="52" rx="10" fill="url(#envGrad)"/>
+          <path d="M8 32 L44 54 L80 32" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+          <path d="M8 74 L32 52" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <path d="M80 74 L56 52" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <defs>
+            <linearGradient id="envGrad" x1="8" y1="22" x2="80" y2="74" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f97316"/>
+              <stop offset="100%" stop-color="#ea580c"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h2>Message sent.</h2>
+      <p>We've received your message and sent a confirmation to <strong id="confirmEmail">your email</strong>. We'll be in touch within 48 hours.</p>
+      <button class="modal-btn" onclick="closeModal('confirmModal')" style="max-width:280px;">Back to site</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Modal helpers */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+/* Close on backdrop click */
+document.querySelectorAll('.modal-backdrop').forEach(function(m) {
+  m.addEventListener('click', function(e) {
+    if (e.target === m) closeModal(m.id);
+  });
+});
+/* Newsletter submit */
+function submitNewsletter(e) {
+  e.preventDefault();
+  var email = document.getElementById('nlEmail').value;
+  closeModal('newsletterModal');
+  document.getElementById('confirmEmail').textContent = email;
+  openModal('confirmModal');
+}
+/* Auto-open newsletter modal after 8 seconds on first visit */
+if (!sessionStorage.getItem('nl_shown')) {
+  setTimeout(function() {
+    openModal('newsletterModal');
+    sessionStorage.setItem('nl_shown', '1');
+  }, 8000);
+}
+</script>
+
 </body>
 </html>

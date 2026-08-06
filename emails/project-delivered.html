@@ -5,153 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your project is ready — Ribyon Studios</title>
   <style>
-    @media only screen and (max-width: 600px) {
-      .email-wrapper { width: 100% !important; }
-      .email-body { padding: 28px 20px !important; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0ece4; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    @media (max-width: 600px) {
+      .card { border-radius: 20px !important; }
+      .card-body { padding: 28px 20px 36px !important; }
     }
   </style>
-</head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-  <div style="display:none;max-height:0;overflow:hidden;color:#f5f0e8;">
-    Your {{project_name}} is complete. Files, guidelines, and everything you need to go live.&nbsp;‌&nbsp;‌
-  </div>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="shortcut icon" href="../favicon.ico">
+<body style="margin:0;padding:40px 20px;background:#f0ece4;">
 
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0e8;">
+  <div style="display:none;max-height:0;overflow:hidden;">{{project_name}} is complete — your files are ready to download.&#847;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" style="padding:40px 20px;">
+      <td align="center">
+        <table class="card" width="440" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:440px;width:100%;background:#ffffff;border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.1);">
 
-        <table class="email-wrapper" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#0a0908;border-radius:16px;overflow:hidden;">
-
-          <!-- Header -->
+          <!-- Illustration header — open envelope with checkmark -->
           <tr>
-            <td style="padding:32px 48px 28px;border-bottom:1px solid rgba(255,255,255,0.06);">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:18px;font-weight:800;color:#e5e0d6;letter-spacing:-0.03em;">Ribyon Studios</span>
-                  </td>
-                  <td align="right">
-                    <span style="display:inline-block;background:rgba(249,115,22,0.12);color:#f97316;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:4px 10px;border-radius:4px;border:1px solid rgba(249,115,22,0.25);">Delivered</span>
-                  </td>
-                </tr>
-              </table>
+            <td align="center" style="padding:48px 40px 24px;background:linear-gradient(160deg,#fff8f3 0%,#ffffff 60%);">
+              <div style="display:inline-block;position:relative;">
+                <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:100px;height:24px;background:radial-gradient(ellipse,rgba(249,115,22,0.3),transparent 70%);filter:blur(8px);border-radius:50%;"></div>
+                <svg width="108" height="100" viewBox="0 0 108 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="devBody" x1="0" y1="0" x2="108" y2="88" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#ff9a3c"/>
+                      <stop offset="100%" stop-color="#f97316"/>
+                    </linearGradient>
+                    <linearGradient id="devFlap" x1="0" y1="0" x2="108" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#ffb366"/>
+                      <stop offset="100%" stop-color="#f97316" stop-opacity="0.7"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Envelope body -->
+                  <rect x="0" y="20" width="108" height="68" rx="10" fill="url(#devBody)"/>
+                  <!-- Bottom fold -->
+                  <path d="M0 88 L54 60 L108 88 Z" fill="#ea580c" opacity="0.4"/>
+                  <!-- Flap open -->
+                  <path d="M0 20 Q4 8 10 4 L54 32 L98 4 Q104 8 108 20 Z" fill="url(#devFlap)"/>
+                  <!-- Diagonal lines -->
+                  <path d="M0 88 L48 62" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                  <path d="M108 88 L60 62" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                  <!-- Green checkmark circle on top right -->
+                  <circle cx="84" cy="16" r="16" fill="#22c55e"/>
+                  <path d="M76 16 L82 22 L92 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
             </td>
           </tr>
 
-          <tr><td style="height:3px;background:linear-gradient(90deg,#f97316,#fbbf24);"></td></tr>
-
-          <!-- Body -->
+          <!-- Content -->
           <tr>
-            <td class="email-body" style="padding:48px 48px 40px;">
-
-              <p style="margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#f97316;">Project complete</p>
-
-              <h1 style="margin:0 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:30px;font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#e5e0d6;">
-                {{project_name}} is ready.
+            <td class="card-body" align="center" style="padding:8px 40px 44px;">
+              <h1 style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:800;color:#0a0908;letter-spacing:-0.03em;margin:0 0 12px;line-height:1.2;">
+                {{project_name}}<br>is ready.
               </h1>
-
-              <p style="margin:0 0 32px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.75;color:#a39e94;">
-                Everything is packaged and ready to go. Below you'll find links to your files, a summary of what's included, and everything you need to launch with confidence.
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:#7d786e;line-height:1.65;margin:0 0 28px;max-width:300px;">
+                Everything is packaged and waiting for you — files, guidelines, and everything you need to launch.
               </p>
 
               <!-- Download button -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px;">
                 <tr>
                   <td>
-                    <a href="{{files_link}}" style="display:inline-block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;text-decoration:none;padding:16px 32px;border-radius:999px;letter-spacing:0.05em;text-transform:uppercase;">
+                    <a href="{{files_link}}"
+                      style="display:block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800;text-decoration:none;padding:16px 48px;border-radius:999px;white-space:nowrap;">
                       ↓ Download your files
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- What's included -->
-              <p style="margin:0 0 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#59554c;">What's included</p>
-
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#11100e;border-radius:10px;overflow:hidden;margin-bottom:32px;">
-                {{#deliverables}}
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:14px 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td width="24" valign="middle">
-                          <span style="display:inline-block;width:8px;height:8px;background:#f97316;border-radius:50%;"></span>
-                        </td>
-                        <td>
-                          <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;color:#a39e94;">{{item}}</span>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                {{/deliverables}}
-              </table>
-
-              <!-- Divider -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
-                <tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr>
-              </table>
-
               <!-- Ownership note -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(249,115,22,0.05);border-radius:8px;border-left:3px solid #f97316;margin-bottom:28px;">
-                <tr>
-                  <td style="padding:16px 20px;">
-                    <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#e5e0d6;line-height:1.5;">
-                      Everything delivered today is 100% yours. No licenses, no ongoing fees, no strings attached.
-                    </p>
-                  </td>
-                </tr>
-              </table>
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#f97316;font-weight:600;margin:0 0 28px;">
+                100% yours — no licenses, no ongoing fees.
+              </p>
 
               <!-- Personal note -->
-              <p style="margin:0 0 32px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.75;color:#a39e94;">
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:#7d786e;line-height:1.7;margin:0 0 28px;max-width:320px;">
                 {{personal_note}}
               </p>
 
-              <!-- CTAs -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <!-- Secondary CTA -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                 <tr>
-                  <td style="padding-right:12px;">
-                    <a href="{{files_link}}" style="display:inline-block;background:#f97316;color:#0a0908;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800;text-decoration:none;padding:13px 24px;border-radius:999px;letter-spacing:0.05em;text-transform:uppercase;">
-                      View files →
-                    </a>
-                  </td>
                   <td>
-                    <a href="mailto:hello@ribyonstudios.com" style="display:inline-block;color:#a39e94;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600;text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <a href="mailto:hello@ribyonstudios.com"
+                      style="display:block;background:#0a0908;color:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:999px;white-space:nowrap;">
                       Questions? Reply here
                     </a>
                   </td>
                 </tr>
               </table>
-
             </td>
           </tr>
 
-          <!-- Referral nudge -->
+          <!-- Referral strip -->
           <tr>
-            <td style="padding:20px 48px;background:#11100e;border-top:1px solid rgba(255,255,255,0.06);">
-              <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#59554c;line-height:1.6;">
-                Know someone who needs a brand like this? We'd love an introduction. Every referral gets priority scheduling.
+            <td style="padding:18px 36px;background:#faf8f5;border-top:1px solid rgba(0,0,0,0.06);">
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#7d786e;text-align:center;margin:0;line-height:1.6;">
+                Know someone who needs this? <strong style="color:#0a0908;">Send them our way</strong> — every referral gets priority scheduling.
               </p>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding:20px 48px;border-top:1px solid rgba(255,255,255,0.06);">
-              <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#3a3730;line-height:1.6;">
-                <strong style="color:#59554c;">Ribyon Studios</strong> · Brand direction &amp; design · Nairobi, Kenya ·
-                <a href="mailto:hello@ribyonstudios.com" style="color:#3a3730;text-decoration:none;">hello@ribyonstudios.com</a>
+            <td align="center" style="padding:18px 36px 24px;border-top:1px solid rgba(0,0,0,0.06);">
+              <p style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;color:#b8b2a8;line-height:1.6;margin:0;">
+                Ribyon Studios · Brand direction &amp; design · Nairobi<br>
+                <a href="https://ribyonstudios.com" style="color:#f97316;text-decoration:none;">ribyonstudios.com</a>
+                &nbsp;·&nbsp;
+                <a href="mailto:hello@ribyonstudios.com" style="color:#b8b2a8;text-decoration:none;">hello@ribyonstudios.com</a>
               </p>
             </td>
           </tr>
 
         </table>
-
       </td>
     </tr>
   </table>
-
 </body>
 </html>

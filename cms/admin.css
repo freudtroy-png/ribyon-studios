@@ -14,6 +14,7 @@
   --surface-2:#fafafb;      /* subtle inner fill */
   --line:#e9e9ee;           /* hairlines */
   --line-strong:#d9d9e0;
+  --stone-line:#e2e2e8;     /* faint dividers (PDF templates) */
   --orange:#f97316; --orange-deep:#ea580c; --orange-pale:#fff3ea;
   --stone:#6d6d76;          /* muted text */
   --stone-light:#a1a1aa;
@@ -43,6 +44,7 @@
   --surface-2:#1b1b21;
   --line:#28282f;
   --line-strong:#37373f;
+  --stone-line:#33333b;
   --orange:#fb923c; --orange-deep:#fb923c; --orange-pale:#2a190d;
   --stone:#9a9aa4; --stone-light:#6d6d77;
   --red:#f87171; --red-pale:#2a1414;
@@ -60,7 +62,7 @@
 }
 :root[data-theme="dark"] body{color-scheme:dark}
 :root[data-theme="dark"] .stat, :root[data-theme="dark"] .dash-card, :root[data-theme="dark"] .card, :root[data-theme="dark"] .kanban-card{color-scheme:dark}
-:root[data-theme="dark"] .side-logo, :root[data-theme="dark"] .login-logo{filter:brightness(0) invert(1)}
+:root[data-theme="dark"] .side-logo, :root[data-theme="dark"] .login-logo, :root[data-theme="dark"] .pdf-preview .pdf-hd img{filter:brightness(0) invert(1)}
 
 /* ─── Reset & Base ─── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -272,9 +274,18 @@ textarea{resize:vertical;min-height:72px;line-height:1.55}
 
 /* ─── PDF Preview ─── */
 .pdf-preview{background:var(--pdf-bg);border:1px solid var(--line);border-radius:var(--radius-sm);padding:1.4rem;font-size:.78rem;line-height:1.55;box-shadow:var(--shadow-sm)}
-.pdf-preview .pdf-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;padding-bottom:.85rem;border-bottom:2px solid var(--ink)}
-.pdf-preview .pdf-hd h2{font-family:var(--font-display);font-size:1.25rem;font-weight:700}
-.pdf-preview .pdf-hd .pdf-inv-no{font-size:.85rem;color:var(--stone);text-align:right}
+.pdf-preview .pdf-hd{margin-bottom:1.25rem}
+.pdf-preview .pdf-hd-band{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.1rem;background:var(--surface-2);border:1px solid rgba(249,115,22,.22);border-left:4px solid var(--orange);border-radius:var(--radius-sm);position:relative}
+.pdf-preview .pdf-hd-brand{display:flex;align-items:center;gap:.8rem;min-width:0}
+.pdf-preview .pdf-hd-brand .pdf-logo{max-height:2.6rem;max-width:9rem;object-fit:contain;display:block}
+.pdf-preview .pdf-hd-co{min-width:0}
+.pdf-preview .pdf-hd-co h2{font-family:var(--font-display);font-size:1.15rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdf-preview .pdf-hd-co p{font-size:.68rem;color:var(--stone);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdf-preview .pdf-hd-right{text-align:right;flex-shrink:0;line-height:1.7}
+.pdf-preview .pdf-hd-right strong{display:block;font-family:var(--font-display);font-size:.95rem;color:var(--ink)}
+.pdf-preview .pdf-hd-right span{display:block;font-size:.66rem;color:var(--stone)}
+.pdf-preview .pdf-pill{display:inline-block;background:var(--orange);color:#fff;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;padding:.22rem .6rem;border-radius:99px;margin-bottom:.35rem;width:fit-content;margin-left:auto}
+.pdf-preview .pdf-restricted{display:inline-block;margin-top:.15rem;font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--red);background:var(--red-pale);padding:.18rem .55rem;border-radius:99px;width:fit-content;margin-left:auto}
 .pdf-preview .pdf-addr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
 .pdf-preview .pdf-addr strong{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--stone)}
 .pdf-preview .pdf-addr p{margin-top:.2rem;color:var(--ink)}
@@ -282,6 +293,13 @@ textarea{resize:vertical;min-height:72px;line-height:1.55}
 .pdf-preview .pdf-table th{text-align:left;padding:.4rem .5rem;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--stone);border-bottom:1.5px solid var(--line-strong)}
 .pdf-preview .pdf-table td{padding:.4rem .5rem;border-bottom:1px solid var(--ink-06);color:var(--ink)}
 .pdf-preview .pdf-total{text-align:right;margin-top:.5rem;font-family:var(--font-display);font-size:1.05rem;font-weight:700}
+
+/* ─── PDF Viewer (in-site scrollable preview) ─── */
+.pdf-viewer{display:flex;flex-direction:column;gap:.6rem;min-height:0}
+.pdf-viewer-frame{width:100%;height:72vh;border:1px solid var(--line);border-radius:var(--radius-sm);background:#fff;box-shadow:var(--shadow-sm)}
+.pdf-viewer-toolbar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pdf-viewer-toolbar .spacer{flex:1}
+.pdf-viewer-note{font-size:.7rem;color:var(--stone)}
 
 /* ─── Status ─── */
 .status{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:600;padding:.16rem .6rem;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
@@ -293,6 +311,17 @@ textarea{resize:vertical;min-height:72px;line-height:1.55}
 .status-draft{background:var(--amber-pale);color:var(--amber)}
 .status-sent{background:var(--blue-pale);color:var(--blue)}
 .status-cancelled{background:var(--surface-2);color:var(--stone)}
+
+/* ─── Data classification badge ─── */
+.cls-badge{display:inline-flex;align-items:center;font-size:.6rem;font-weight:700;padding:.14rem .55rem;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;border:1px solid transparent}
+.cls-int{background:var(--amber-pale);color:var(--amber);border-color:rgba(180,120,20,.25)}
+.cls-conf{background:var(--red-pale);color:var(--red);border-color:rgba(200,60,60,.3)}
+.cls-pub{background:var(--green-pale);color:var(--green);border-color:rgba(30,140,90,.25)}
+.select-cls{align-self:center}
+
+/* ─── Link-style button ─── */
+.btn-link{background:none;border:none;color:var(--orange);font-weight:600;cursor:pointer;padding:0;font-size:inherit;text-decoration:underline;text-underline-offset:2px}
+.btn-link:hover{color:var(--orange-dark,#b45309);text-decoration:underline}
 
 /* ─── Media ─── */
 .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:.7rem}

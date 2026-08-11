@@ -3534,14 +3534,7 @@ textarea:focus-visible {
   border-radius: 3px;
 }
 
-/* Page transition — fade in on load */
-body {
-  animation: pageFadeIn .4s var(--ease-out) both;
-}
-@keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+/* Page transition handled by JS reveal animations instead */
 
 /* ===================================================================
    SERVICE & TIER PAGES — shared layout
@@ -4986,7 +4979,8 @@ body { top: 0 !important; }
   inset: 0;
   background: rgba(10,9,8,0.6);
   backdrop-filter: blur(6px);
-  z-index: 900;
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5010,7 +5004,7 @@ body { top: 0 !important; }
   overflow: hidden;
   box-shadow: 0 32px 80px rgba(0,0,0,0.35);
   transform: translateY(16px) scale(0.97);
-  transition: transform .4s var(--ease-out);
+  transition: transform .4s var(--ease-out), opacity .35s var(--ease-out);
 }
 .modal-backdrop.open .modal-card {
   transform: translateY(0) scale(1);
@@ -5178,3 +5172,31 @@ body { top: 0 !important; }
   letter-spacing: 0.01em;
 }
 .modal-btn-dark:hover { background: var(--ink-hover); transform: translateY(-1px); }
+
+/* Subscribe button in nav */
+.btn-subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: var(--gray);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color .25s var(--ease), color .25s var(--ease), background .25s var(--ease);
+  white-space: nowrap;
+}
+.btn-subscribe:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.navbar.scrolled .btn-subscribe {
+  border-color: rgba(255,255,255,0.1);
+}
+@media (max-width: 768px) {
+  .btn-subscribe { display: none; }
+}

@@ -208,6 +208,7 @@ document.addEventListener('DOMContentLoaded',function(){initTheme();});
 function renderLogin(){document.getElementById('app').innerHTML='<div class="login-screen"><div class="login-box"><img src="logo.png" alt="Ribyon Studios" class="login-logo"><div class="login-title">Ribyon</div><p class="login-sub">Content Management</p><input type="email" id="loginUser" placeholder="Email" autocomplete="email" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)"><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login(document.getElementById(\'loginUser\').value,this.value)"><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="login(document.getElementById(\'loginUser\').value,document.getElementById(\'loginPass\').value)">Sign in</button><p id="loginError" class="login-error"></p></div></div>';}
 
 function renderAdmin(){
+  maybeAutoSeed();
   var data=get();var u=currentUser();
   var canE=canEdit(),canM=canManage(),sup=isSuper();  document.getElementById('app').innerHTML=
     '<div class="app ready">'+
@@ -1057,9 +1058,10 @@ main.innerHTML='<div class="page active"><div class="page-hd"><div><h2>Settings<
 '<button class="btn btn-ghost btn-sm" onclick="downloadProjectCalendar()">'+I.calendar+' Export calendar</button>'+
 '</div><p class="set-hint" style="margin-top:0.6rem;font-size:0.7rem">Sender: <code>ribyonstudios@gmail.com</code> via Brevo. Set <code>BREVO_API_KEY</code> in Cloudflare to enable email.</p></div></div>'+
 '<div class="card"><div class="card-hd"><strong>Content overview</strong></div><div class="card-body"><div class="set-stats">'+setChips+'</div></div></div>'+
-'<div class="card"><div class="card-hd"><strong>Data</strong></div><div class="card-body"><p class="set-hint">Backup, import or reset your local content.</p><div class="set-actions">'+
+'<div class="card"><div class="card-hd"><strong>Data</strong></div><div class="card-body"><p class="set-hint">Backup, import, seed demo content or reset your local content.</p><div class="set-actions">'+
 '<button class="btn btn-ghost btn-sm" onclick="exportData()">'+I.download+' Backup</button>'+
 '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'importInput\').click()">Import</button>'+
+'<button class="btn btn-ghost btn-sm" onclick="seedDemoData()">'+I.plus+' Seed demo</button>'+
 '<button class="btn btn-danger btn-sm" onclick="resetAll()">'+I.trash+' Reset</button>'+
 '</div><input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this.files[0])"></div></div>'+
 '<div class="card"><div class="card-hd"><strong>About</strong></div><div class="card-body"><p class="set-hint">CMS v4 · Ink &amp; Ember · Cloudflare connected · '+total+' items</p></div></div>'+
@@ -1071,6 +1073,184 @@ function downloadProjectCalendar(){var data=get();var proj=(data.projects||[]).f
 function icsTS(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');}
 function importData(file){if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);set(d);toast('Imported');nav(_currentSection||'dash');}catch(err){toast('Invalid file');}};reader.readAsText(file);}
 function resetAll(){if(!confirm('Delete ALL content?'))return;if(!confirm('Really?'))return;set(JSON.parse(JSON.stringify(DEFAULTS)));nav('dash');toast('Reset');logActivity('Reset','All data reset');}
+
+/* ─── Demo content seed ─── */
+function maybeAutoSeed(){
+  try{if(localStorage.getItem('rs_seeded'))return;}catch(e){}
+  var data=get();
+  var empty=!(data.invoices||[]).length&&!(data.projects||[]).length&&!(data.quotations||[]).length&&!(data.contracts||[]).length&&!(data.payments||[]).length&&!(data.transactions||[]).length&&!(data.inquiries||[]).length&&!(data.complaints||[]).length&&!(data.media||[]).length&&!(data.questionnaires||[]).length;
+  if(!empty)return;
+  try{localStorage.setItem('rs_seeded','1');}catch(e){}
+  seedDemoData(true);
+}
+function seedDemoData(auto){
+  if(!auto&&!confirm('Add demo content to every empty section? Existing content is kept — only gaps are filled.'))return;
+  var data=get();
+  var D=function(o){var x=new Date();x.setDate(x.getDate()+(o||0));return x.toISOString().split('T')[0];};
+  var fill=function(k,arr){if(arr&&arr.length&&!((data[k]||[]).length)){data[k]=arr;}};
+  var CON='confidential',INT='internal',PUB='public';
+
+  /* Clients — fill gaps on default clients + add a couple more */
+  var clC=function(id,name,email,phone,notes,cls,logo){return {id:id,name:name,email:email,phone:phone,notes:notes,classification:cls||INT,logo:logo||''};};
+  var existing=(data.clients||[]);
+  var meta={'Galactic Core':['accounts@galacticcore.com','+254 700 111 001','Flagship brand client — fintech. Quarterly brand retainer.',CON,''],'Technologies':['hello@technologies.ke','+254 711 222 002','Software house — identity refresh in progress.',INT,'images/ICON TECHNOLOGIES.png'],'Pixel Plus':['studio@pixelplus.ke','+254 722 333 003','Retail & POS. Packaging rebrand upcoming.',INT,'images/PIXEL PLUS LOGO.png'],'Pollant Travels':['bookings@pollanttravels.com','+254 733 444 004','Tour operator — campaign strategy.',INT,'images/POLLANT TRAVELS.png'],'Safari Yetu':['team@safariyetusafaris.ke','+254 744 555 005','Safari operator — content system & social.',INT,'images/SAFARI YETU LOGO WHITE.png']};
+  existing.forEach(function(c){var m=meta[c.name];if(m){if(!c.email)c.email=m[0];if(!c.phone)c.phone=m[1];if(!c.notes)c.notes=m[2];if(!c.classification)c.classification=m[3];}});
+  if(existing.length<7){
+    var have=existing.map(function(c){return c.name;});
+    if(have.indexOf('Tronavo')<0)existing.push(clC(id(existing),'Tronavo','hello@tronavo.io','+254 755 666 006','Product startup — brand & website build.','internal',''));
+    if(have.indexOf('Tybrite POS')<0)existing.push(clC(id(existing),'Tybrite POS','sales@tybritepos.co.ke','+254 766 777 007','POS software — product brand system.','internal',''));
+  }
+  data.clients=existing;
+
+  /* Projects */
+  var P=function(title,desc,client,deadlineOff,status,tasks,miles,cls){return {id:0,title:title,desc:desc,client:client,deadline:D(deadlineOff),status:status,tasks:tasks||[],classification:cls||INT,milestones:(miles||[]).map(function(m){return {label:m[0],amount:m[1],done:m[2]===1};})};};
+  var seedProjects=[
+    P('Galactic Core brand & site','Full identity system plus marketing site rebuild for the flagship fintech client.','Galactic Core',-20,'active',['Discovery','Identity','Website'],[[['Kickoff',50000,1],['Identity concepts',120000,1],['Website build',240000,0],['Launch',150000,0]]],INT),
+    P('Technologies identity refresh','Refresh of the software house brand — positioning, logo and guidelines.','Technologies',-10,'active',[],[[['Research',40000,1],['Positioning',60000,1],['Identity',90000,0]]],INT),
+    P('Safari Yetu content system','Templates, tone and social grid so the team publishes fast and on-brand.','Safari Yetu',-5,'active',[],[[['Audit',20000,1],['Template build',60000,0]]],PUB),
+    P('Pixel Plus packaging kit','Label and packaging system for the retail client — shelf-ready artwork.','Pixel Plus',45,'todo',[],[[['Packaging concepts',80000,0],['Prepress',30000,0]]],INT),
+    P('Tybrite POS product brand','Product naming and visual system for the POS software.','Tybrite POS',20,'todo',[],[[['Naming',30000,0],['Product brand',70000,0]]],CON),
+    P('Pollant Travels campaign','Season campaign: brand film storyboard, social suite and OOH.','Pollant Travels',-120,'done',[],[[['Strategy',60000,1],['Film',180000,1],['Social suite',90000,1]]],PUB),
+    P('Tronavo website build','Marketing site for the product startup — design, build, CMS.','Tronavo',-90,'done',[],[[['UX/UI',120000,1],['Build',160000,1],['CMS',50000,1]]],INT)
+  ];
+  fill('projects',seedProjects.map(function(p,i){p.id=i+1;return p;}));
+
+  /* Invoices */
+  var inv=function(number,client,dOff,dueOff,items,status,payments,notes,cls){var total=items.reduce(function(s,li){return s+(li.qty||1)*(li.rate||0);},0);var paid=payments.reduce(function(s,p){return s+(p[0]||0);},0);return {id:0,number:number,client:client,date:D(dOff),dueDate:D(dueOff),items:items,total:total,amount:total,status:status,payments:payments.map(function(p){return {amount:p[0],date:D(p[1]),method:p[2],reference:p[3]||''};}),balance:Math.max(0,total-paid),notes:notes||'',terms:'',currency:'KSh',classification:cls||INT};};
+  var seedInvoices=[
+    inv('INV-2026-0101','Galactic Core',-120,-90,[{desc:'Brand identity system',qty:1,rate:170000},{desc:'Website design & build',qty:1,rate:340000}],'paid',[[510000,-88,'Bank Transfer','MPESA-ref-8841']],'Full payment received.'),
+    inv('INV-2026-0102','Safari Yetu',-60,-30,[{desc:'Content system build',qty:1,rate:150000},{desc:'Social template pack',qty:1,rate:90000}],'sent',[[100000,-40,'M-Pesa','XKX7201']],'Deposit received — balance due.'),
+    inv('INV-2026-0103','Pixel Plus',-15,15,[{desc:'Packaging concept phase',qty:1,rate:80000}],'draft',[],'Draft — pending approval.'),
+    inv('INV-2026-0104','Pollant Travels',-200,-130,[{desc:'Campaign strategy',qty:1,rate:60000},{desc:'Brand film production',qty:1,rate:180000},{desc:'Social suite',qty:1,rate:90000}],'paid',[[330000,-160,'Cheque','CHQ-5522']],''),
+    inv('INV-2026-0105','Tybrite POS',-40,30,[{desc:'Product brand system',qty:1,rate:100000}],'sent',[[50000,-30,'M-Pesa','TYP2201']],'50% deposit.'),
+    inv('INV-2026-0106','Technologies',-80,50,[{desc:'Identity refresh',qty:1,rate:120000}],'overdue',[[120000,-70,'Bank Transfer','TECH-REF-77']],'')
+  ];
+  fill('invoices',seedInvoices.map(function(i,k){i.id=k+1;return i;}));
+
+  /* Transactions (ledger) */
+  var tx=function(type,title,category,amount,dOff,ref){return {id:0,type:type,title:title,category:category,amount:amount,date:D(dOff),ref:ref||''};};
+  fill('transactions',[
+    tx('income','Galactic Core — brand & site','Project fee',510000,-88,'INV-2026-0101'),
+    tx('income','Safari Yetu deposit','Deposit',100000,-40,'INV-2026-0102'),
+    tx('income','Pollant Travels — campaign','Project fee',330000,-160,'INV-2026-0104'),
+    tx('income','Tybrite POS deposit','Deposit',50000,-30,'INV-2026-0105'),
+    tx('income','Technologies — identity','Project fee',120000,-70,'INV-2026-0106'),
+    tx('expense','Adobe Creative Cloud','Software',21000,-90,''),
+    tx('expense','Figma & design tools','Software',9000,-85,''),
+    tx('expense','Cloudflare R2 storage','Software',4000,-5,''),
+    tx('expense','Freelance motion designer','Contractors',45000,-45,''),
+    tx('expense','Studio rent','Rent',65000,-15,''),
+    tx('expense','Typeface licensing','Licensing',12000,-60,''),
+    tx('expense','Print samples — Pixel Plus','Marketing',18000,-12,'')
+  ].map(function(t,i){t.id=i+1;return t;}));
+
+  /* Payments */
+  var pm=function(client,invNo,amount,dOff,method,ref,status){return {id:0,client:client,invoiceId:null,invoiceNumber:invNo,amount:amount,date:D(dOff),method:method,reference:ref||'',status:status||'received'};};
+  fill('payments',[
+    pm('Galactic Core','INV-2026-0101',510000,-88,'Bank Transfer','MPESA-ref-8841'),
+    pm('Safari Yetu','INV-2026-0102',100000,-40,'M-Pesa','XKX7201'),
+    pm('Pollant Travels','INV-2026-0104',330000,-160,'Cheque','CHQ-5522'),
+    pm('Tybrite POS','INV-2026-0105',50000,-30,'M-Pesa','TYP2201'),
+    pm('Technologies','INV-2026-0106',120000,-70,'Bank Transfer','TECH-REF-77')
+  ].map(function(p,i){p.id=i+1;return p;}));
+
+  /* Quotations */
+  var quo=function(number,client,dOff,validOff,items,status,notes,cls){return {id:0,number:number,client:client,date:D(dOff),validUntil:D(validOff),items:items,total:items.reduce(function(s,li){return s+(li.qty||1)*(li.rate||0);},0),status:status,notes:notes||'',classification:cls||INT};};
+  fill('quotations',[
+    quo('QUO-2026-0101','Safari Yetu',-65,-20,[{desc:'Content system build',qty:1,rate:150000},{desc:'Social template pack',qty:1,rate:90000}],'accepted','Accepted — converted to invoice.'),
+    quo('QUO-2026-0102','Pixel Plus',-18,30,[{desc:'Packaging concept phase',qty:1,rate:80000},{desc:'Prepress support',qty:1,rate:30000}],'sent','Awaiting client sign-off.'),
+    quo('QUO-2026-0103','Tronavo',-160,-90,[{desc:'Website design & build',qty:1,rate:340000}],'expired','Expired — project delivered via invoice instead.')
+  ].map(function(q,i){q.id=i+1;return q;}));
+
+  /* Contracts */
+  var ctr=function(number,client,title,service,value,sOff,eOff,status,miles,notes,cls){return {id:0,number:number,client:client,title:title,service:service,value:value,startDate:D(sOff),endDate:eOff?D(eOff):'',status:status,milestones:(miles||[]).map(function(m){return {label:m[0],amount:m[1]};}),notes:notes||'',classification:cls||CON};};
+  fill('contracts',[
+    ctr('CTR-2026-0101','Galactic Core','Annual brand partnership','Brand Identity',1800000,-120,240,'active',[['Quarterly strategy',450000],['Brand guardianship',450000]],'Ongoing retainer — renewed annually.',CON),
+    ctr('CTR-2026-0102','Safari Yetu','Content system & social','Content Systems',240000,-60,90,'active',[['Audit',20000],['System build',150000],['Handover',70000]],'',INT),
+    ctr('CTR-2026-0103','Pollant Travels','Season campaign','Brand Strategy',330000,-200,-120,'completed',[['Strategy',60000],['Film',180000],['Social suite',90000]],'',PUB),
+    ctr('CTR-2026-0104','Tronavo','Website build','Web & Digital',340000,-150,-90,'completed',[['UX/UI',120000],['Build',160000],['CMS',50000]],'',INT),
+    ctr('CTR-2026-0105','Tybrite POS','Product brand system','Brand Identity',100000,-40,80,'draft',[['Naming',30000],['Product brand',70000]],'Draft terms under review.',CON)
+  ].map(function(c,i){c.id=i+1;return c;}));
+
+  /* Questionnaires + answers */
+  var qq=function(title,svcId,desc,questions,dOff){return {id:0,title:title,serviceId:svcId,description:desc,questions:questions,date:D(dOff)};};
+  fill('questionnaires',[
+    qq('Brand identity kickoff',1,'Questions we ask before starting any identity project.',[{text:'Describe your brand in three words.',type:'text',required:true,options:[]},{text:'Who are your top three competitors?',type:'textarea',required:false,options:[]},{text:'What tone should the brand use?',type:'select',required:true,options:['Confident','Warm','Bold','Quiet','Playful']},{text:'Target revenue in 3 years (KSh)?',type:'number',required:false,options:[]}],-120),
+    qq('Website discovery',2,'Gather goals, audiences and scope before design.',[{text:'What is the main goal of the site?',type:'textarea',required:true,options:[]},{text:'How many pages?',type:'number',required:false,options:[]},{text:'Do you have a CMS preference?',type:'select',required:false,options:['None','WordPress','Headless (static)','Not sure']}],-118),
+    qq('Content system intake',4,'Understand publishing workflow and team size.',[{text:'How many people publish content?',type:'number',required:true,options:[]},{text:'Which platforms matter most?',type:'textarea',required:false,options:[]},{text:'Do you have brand guidelines already?',type:'select',required:true,options:['Yes','No','In progress']}],-58)
+  ].map(function(q,i){q.id=i+1;return q;}));
+  fill('questionnaireAnswers',[
+    {id:1,questionnaireId:1,clientName:'Galactic Core',date:D(-118),answers:[{question:'Describe your brand in three words.',answer:'Modern, ambitious, precise'},{question:'Who are your top three competitors?',answer:'Legacy banks, neo-banks, local fintechs'},{question:'What tone should the brand use?',answer:'Confident'},{question:'Target revenue in 3 years (KSh)?',answer:'450000000'}]},
+    {id:2,questionnaireId:1,clientName:'Safari Yetu',date:D(-110),answers:[{question:'Describe your brand in three words.',answer:'Warm, adventurous, trusted'},{question:'Who are your top three competitors?',answer:'Intl safari operators'},{question:'What tone should the brand use?',answer:'Warm'},{question:'Target revenue in 3 years (KSh)?',answer:'120000000'}]},
+    {id:3,questionnaireId:3,clientName:'Safari Yetu',date:D(-55),answers:[{question:'How many people publish content?',answer:'3'},{question:'Which platforms matter most?',answer:'Instagram, website, email'},{question:'Do you have brand guidelines already?',answer:'In progress'}]}
+  ]);
+
+  /* Media — tiny inline SVGs so they render offline, plus one Drive link */
+  var svgMedia=function(name,label,color,client,drive){var svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="800" height="500" fill="%23'+color+'"/><text x="400" y="260" font-family="Arial" font-size="34" fill="white" text-anchor="middle">'+encodeURIComponent(label)+'</text></svg>';return {id:0,name:name,url:'',data:'data:image/svg+xml;utf8,'+encodeURIComponent(svg),date:D(-7),client:client||'',drive:drive||'',key:''};};
+  fill('media',[
+    svgMedia('galactic-core-brand-board.png','GALACTIC CORE','c13a2a','Galactic Core'),
+    svgMedia('safari-yetu-content-grid.png','SAFARI YETU GRID','2d5a3d','Safari Yetu'),
+    svgMedia('pixel-plus-packaging.png','PIXEL PLUS','b5651d','Pixel Plus','https://drive.google.com/file/d/demoPixel'),
+    svgMedia('tybrite-pos-product.png','TYBRITE POS','3a3f7a','Tybrite POS'),
+    svgMedia('tronavo-website-home.png','TRONAVO HOME','1f2937','Tronavo'),
+    svgMedia('ribyon-process-map.png','PROCESS MAP','7a5c1e','')
+  ].map(function(m,i){m.id=i+1;return m;}));
+
+  /* Inquiries */
+  var inq=function(name,email,phone,message,dOff,status){return {id:0,name:name,email:email,phone:phone,message:message,date:D(dOff),status:status};};
+  fill('inquiries',[
+    inq('Amina Yusuf','amina@kijanienergy.co.ke','+254 700 555 111','Hi! We are a solar startup looking for a full brand and website. Could you share your process and a quote?',-3,'new'),
+    inq('David Ochieng','david@nairobi-coffee.com','+254 722 444 222','Interested in a brand refresh for our coffee roastery. Do you work with restaurants/cafes?',-6,'new'),
+    inq('Sarah Kimani','sarah@greenfieldsfarm.ke','+254 733 333 333','We need packaging design for our produce line. What is the timeline for a project like this?',-12,'read'),
+    inq('Joseph Wanjala','joe@mandaevents.co','+254 744 222 444','Looking for event brand identity — invitation suite, signage and social kit.',-20,'read')
+  ].map(function(i,j){i.id=j+1;return i;}));
+
+  /* Complaints */
+  var comp=function(client,subject,details,dOff,status){return {id:0,client:client,subject:subject,details:details,date:D(dOff),status:status};};
+  fill('complaints',[
+    comp('Pixel Plus','Logo files late','We missed the print deadline because the final logo pack arrived a day late.',-22,'open'),
+    comp('Pollant Travels','Invoice mismatch','Amount on invoice differed from the agreed quote by KSh 5,000.',-90,'resolved')
+  ].map(function(c,i){c.id=i+1;return c;}));
+
+  /* Notifications */
+  fill('notifications',[
+    {id:1,text:'Invoice INV-2026-0106 for Technologies is overdue',date:D(1),time:'09:00',type:'bell',read:false},
+    {id:2,text:'Pixel Plus packaging project starts in 14 days',date:D(2),time:'08:30',type:'bell',read:false},
+    {id:3,text:'Safari Yetu content system handover scheduled this week',date:D(3),time:'17:15',type:'bell',read:true}
+  ]);
+
+  /* Activity */
+  fill('activity',[
+    {id:1,action:'Seeded demo content',detail:'All sections populated',date:D(0),time:'10:00',who:'admin',role:'superadmin',where:'settings'},
+    {id:2,action:'Created invoice',detail:'#INV-2026-0105 — Tybrite POS',date:D(-30),time:'14:20',who:'admin',role:'superadmin',where:'invoices'},
+    {id:3,action:'Recorded payment',detail:'#INV-2026-0101 — KSh 510,000',date:D(-88),time:'11:05',who:'admin',role:'superadmin',where:'invoices'},
+    {id:4,action:'Updated project',detail:'Galactic Core brand & site',date:D(-20),time:'16:40',who:'admin',role:'superadmin',where:'projects'},
+    {id:5,action:'Sent quotation',detail:'QUO-2026-0102 — Pixel Plus',date:D(-18),time:'09:50',who:'admin',role:'superadmin',where:'quotations'},
+    {id:6,action:'Published post',detail:'Why brand direction matters more than a logo',date:D(-15),time:'12:30',who:'admin',role:'superadmin',where:'blog'}
+  ]);
+
+  /* Portal messages */
+  fill('messages',[
+    {id:1,client:'Galactic Core',from:'client',text:'Hi team — the brand board looks great. Can we review the website wireframes next week?',date:new Date(Date.now()-86400000*2).toISOString(),read:false},
+    {id:2,client:'Galactic Core',from:'ribyon',text:'Absolutely. Sending wireframes for review on Wednesday.',date:new Date(Date.now()-86400000*1).toISOString(),read:true},
+    {id:3,client:'Safari Yetu',from:'client',text:'Love the new content grid. One small tweak to the caption tones and we are set.',date:new Date(Date.now()-86400000*1).toISOString(),read:false},
+    {id:4,client:'Safari Yetu',from:'ribyon',text:'Noted — caption tone guide updated and shared in Drive.',date:new Date(Date.now()-86400000*0).toISOString(),read:true}
+  ]);
+
+  /* Blog bodies for the default posts that still say placeholder */
+  (data.blog||[]).forEach(function(b){
+    if(!b.body||b.body==='Full article content here...'){
+      b.body='<p>A logo is a mark. A brand is a direction. Most companies start with a logo because it is the visible, tangible piece — but a logo without a point of view is just decoration.</p><p>Brand direction is the combination of strategy, tone and design that makes every decision obvious. When it is right, your messaging, product and visuals stop arguing with each other.</p><p><strong>How we do it:</strong> research, positioning, a tight visual system, then guidelines that scale.</p>';
+    }
+  });
+
+  set(data);
+  try{localStorage.setItem('rs_seeded','1');}catch(e){}
+  addNotif(auto?'Demo content seeded':'Demo content seeded across all sections');
+  logActivity('Seeded demo content','All sections populated','settings');
+  if(_currentSection&&typeof nav==='function')nav(_currentSection);else if(!auto)nav('dash');
+  if(!auto)toast('Seeded — every section now has content');
+}
 
 function toggleCloud(){if(cloudEnabled()){setCloudEnabled(false);toast('Cloud disabled — data stays local');renderSettings(document.getElementById('mainArea'));}else{setCloudEnabled(true);toast('Connecting…');pushCloud().then(function(ok){if(ok){toast('Cloud enabled — pushed');addNotif('Cloud sync enabled');}else{setCloudEnabled(false);toast('Cloud unreachable');}renderSettings(document.getElementById('mainArea'));});}}
 function pushNow(){pushCloud(get()).then(function(ok){toast(ok?'Pushed to cloud':'Push failed');});}

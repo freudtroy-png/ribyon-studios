@@ -56,23 +56,90 @@ const B = {
   body: 'margin:0;font-size:14px;color:' + BRAND.ink + ';line-height:1.75;font-family:' + BRAND.fontBody,
 };
 
-// Shared responsive shell — white card, envelope illustration, pill button
+// Shared responsive shell — matches newsletter popup: white card, warm gradient header, envelope, pill button
 function shell({ preHeader, eyebrow, title, subtitle, bodyHTML, cta }) {
-  const envelopeSVG =
-    '<table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 8px"><tr><td align="center" style="padding:0">' +
-    '<div style="display:inline-block;position:relative">' +
-    '<div style="position:absolute;bottom:-6px;left:50%;margin-left:-44px;width:88px;height:18px;background:radial-gradient(ellipse,rgba(249,115,22,0.28),transparent 70%);border-radius:50%;font-size:0"></div>' +
-    '<svg width="96" height="78" viewBox="0 0 96 78" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+  // Email-safe envelope — pure SVG, no divs
+  var envelopeSVG =
+    '<table cellpadding="0" cellspacing="0" border="0" align="center" width="120" style="margin:0 auto 6px"><tr>' +
+    '<td align="center" height="100" style="line-height:0;font-size:0">' +
+    '<svg width="108" height="90" viewBox="0 0 108 90" fill="none" xmlns="http://www.w3.org/2000/svg">' +
     '<defs>' +
-    '<linearGradient id="eb" x1="0" y1="0" x2="96" y2="78" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ff9a3c"/><stop offset="100%" stop-color="#f97316"/></linearGradient>' +
-    '<linearGradient id="ef" x1="0" y1="0" x2="96" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffb366"/><stop offset="100%" stop-color="#f97316" stop-opacity="0.7"/></linearGradient>' +
+    '<linearGradient id="envB" x1="0" y1="0" x2="108" y2="90" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0%" stop-color="#ff9a3c"/><stop offset="100%" stop-color="#f97316"/></linearGradient>' +
+    '<linearGradient id="envF" x1="0" y1="0" x2="108" y2="40" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0%" stop-color="#ffb870"/><stop offset="100%" stop-color="#f97316" stop-opacity="0.75"/></linearGradient>' +
     '</defs>' +
-    '<rect x="0" y="18" width="96" height="60" rx="9" fill="url(#eb)"/>' +
-    '<path d="M0 78 L48 52 L96 78 Z" fill="#ea580c" opacity="0.35"/>' +
-    '<path d="M0 18 Q4 6 9 3 L48 28 L87 3 Q92 6 96 18 Z" fill="url(#ef)"/>' +
-    '<path d="M0 78 L44 54" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>' +
-    '<path d="M96 78 L52 54" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>' +
-    '</svg></div></td></tr></table>';
+    '<ellipse cx="54" cy="86" rx="44" ry="6" fill="#f97316" opacity="0.18"/>' +
+    '<rect x="0" y="20" width="108" height="66" rx="10" fill="url(#envB)"/>' +
+    '<path d="M0 86 L54 58 L108 86 Z" fill="#dc6a0a" opacity="0.38"/>' +
+    '<path d="M0 20 Q5 6 11 3 L54 30 L97 3 Q103 6 108 20 Z" fill="url(#envF)"/>' +
+    '<line x1="0" y1="86" x2="46" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>' +
+    '<line x1="108" y1="86" x2="62" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>' +
+    '</svg></td></tr></table>';
+
+  var ctaHTML = cta
+    ? '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 6px"><tr><td align="center">' +
+      '<a href="' + esc(cta.href) + '" style="display:inline-block;background:#f97316;color:#0a0908;text-decoration:none;padding:16px 52px;border-radius:50px;font-size:15px;font-weight:800;letter-spacing:0.01em;font-family:' + BRAND.fontBody + ';mso-padding-alt:0;white-space:nowrap">' +
+      '<!--[if mso]><i style="letter-spacing:26px;mso-font-width:-100%;mso-text-raise:30pt">&nbsp;</i><![endif]-->' +
+      esc(cta.label) + ' \u2192' +
+      '<!--[if mso]><i style="letter-spacing:26px;mso-font-width:-100%">&nbsp;</i><![endif]-->' +
+      '</a></td></tr></table>'
+    : '';
+
+  var noteText = (cta && cta.note) || 'Questions? Just reply to this email.';
+
+  return '<!DOCTYPE html><html lang="en" xmlns:v="urn:schemas-microsoft-com:vml"><head>' +
+    '<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>' +
+    '<meta name="x-apple-disable-message-reformatting"/>' +
+    '<title>' + esc(title || 'Ribyon Studios') + '</title>' +
+    '<style>' +
+    'body,table,td,p,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}' +
+    'table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}' +
+    '@media only screen and (max-width:600px){' +
+    '.ew{padding:16px 8px!important}' +
+    '.ec{border-radius:20px!important}' +
+    '.eh{padding:36px 24px 16px!important}' +
+    '.eb{padding:8px 24px 36px!important}' +
+    '}' +
+    '</style>' +
+    '</head>' +
+    '<body style="margin:0;padding:0;background:#f0ece4;font-family:' + BRAND.fontBody + ';-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">' +
+    '<span style="display:none;font-size:1px;color:#f0ece4;mso-hide:all;max-height:0;overflow:hidden">' + esc(preHeader || title) + '&#847;</span>' +
+
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="ew" style="background:#f0ece4;padding:40px 16px">' +
+    '<tr><td align="center">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:440px">' +
+
+    // White rounded card
+    '<tr><td class="ec" style="background:#ffffff;border-radius:28px;overflow:hidden">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+
+    // Warm gradient header
+    '<tr><td class="eh" bgcolor="#fff8f3" style="background:#fff8f3;padding:44px 40px 16px;text-align:center">' +
+    envelopeSVG +
+    '</td></tr>' +
+
+    // Content
+    '<tr><td class="eb" align="center" style="padding:8px 40px 44px;text-align:center">' +
+    (eyebrow ? '<p style="margin:0 0 12px;font-family:' + BRAND.fontBody + ';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#f97316">' + esc(eyebrow) + '</p>' : '') +
+    '<h1 style="margin:0 0 12px;font-family:' + BRAND.fontBody + ';font-size:26px;font-weight:800;color:#0a0908;letter-spacing:-0.02em;line-height:1.2">' + title + '</h1>' +
+    (subtitle ? '<p style="margin:0 0 4px;font-family:' + BRAND.fontBody + ';font-size:15px;color:#7d786e;line-height:1.65">' + subtitle + '</p>' : '') +
+    '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="height:16px;font-size:0">&nbsp;</td></tr></table>' +
+    bodyHTML +
+    ctaHTML +
+    '<p style="margin:14px 0 0;font-family:' + BRAND.fontBody + ';font-size:12px;color:#a39e94">' + noteText + '</p>' +
+    '</td></tr>' +
+
+    // Footer
+    '<tr><td align="center" style="border-top:1px solid rgba(0,0,0,0.06);padding:18px 40px 24px">' +
+    '<p style="margin:0 0 4px;font-family:' + BRAND.fontBody + ';font-size:13px;font-weight:700;color:#0a0908"><span style="color:#f97316">Ribyon</span> Studios</p>' +
+    '<p style="margin:0;font-family:' + BRAND.fontBody + ';font-size:11px;color:#a39e94;line-height:1.6">' + BRAND.tagline + '<br><a href="' + BRAND.siteUrl + '" style="color:#f97316;text-decoration:none">ribyonstudios.com</a></p>' +
+    '</td></tr>' +
+
+    '</table></td></tr>' +
+    '</table></td></tr></table>' +
+    '</body></html>';
+}
 
   const ctaHTML = cta
     ? '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 4px"><tr><td align="center">' +

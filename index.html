@@ -70,6 +70,10 @@
           <a href="blog.html">Read</a>
         </div>
         <button class="btn-nav" onclick="location.href='contact.html'">Start a project</button>
+        <button class="btn-subscribe" onclick="openModal('newsletterModal')" aria-label="Subscribe to newsletter">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="12" height="9" rx="2"/><path d="M2 7l6 4 6-4"/></svg>
+          Subscribe
+        </button>
       </div>
     </div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -698,6 +702,8 @@ function closeModal(id) {
 }
 /* Close on backdrop click */
 document.querySelectorAll('.modal-backdrop').forEach(function(m) {
+  /* Move to direct body child to escape any stacking context */
+  document.body.appendChild(m);
   m.addEventListener('click', function(e) {
     if (e.target === m) closeModal(m.id);
   });

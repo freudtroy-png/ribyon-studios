@@ -621,7 +621,90 @@ function docHD(data,type,label,rec){
       '<div class="pdf-hd-right"><span class="pdf-pill">'+label+'</span><strong>'+esc(rec.number||'')+'</strong>'+(rec.classification&&rec.classification!=='public'?'<span class="pdf-restricted">'+esc(rec.classification)+' · RESTRICTED</span>':'')+dates+'</div>'+
     '</div>'+
   '</div>';}
-function invDocHTML(i,data){var total=i.items?i.items.reduce(function(s,li){return s+((parseFloat(li.qty)||0)*(parseFloat(li.rate)||0));},0):parseFloat(i.amount)||0;var paid=(i.payments||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var bal=Math.max(0,total-paid);return '<div class="pdf-preview">'+docHD(data,'invoice','INVOICE',i)+'<div class="pdf-addr"><div><strong>Bill To</strong><p>'+esc(i.client)+'</p></div><div style="text-align:right"><strong>Status</strong><p><span class="status status-'+i.status+'">'+i.status+'</span></p></div></div><table class="pdf-table"><thead><tr><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr></thead><tbody>'+(i.items||[]).map(function(li){return '<tr><td>'+esc(li.desc)+'</td><td style="text-align:center">'+li.qty+'</td><td style="text-align:right">KSh '+(parseFloat(li.rate)||0).toLocaleString()+'</td><td style="text-align:right">KSh '+((parseFloat(li.qty)||0)*(parseFloat(li.rate)||0)).toLocaleString()+'</td></tr>';}).join('')+'</tbody></table><div class="pdf-total">Total: KSh '+total.toLocaleString()+'</div>'+(paid>0?'<p style="font-size:0.72rem;color:var(--green);margin-top:0.5rem">Paid: KSh '+paid.toLocaleString()+'</p>':'')+(bal>0?'<p style="font-size:0.72rem;color:var(--red);margin-top:0.15rem">Balance: KSh '+bal.toLocaleString()+'</p>':'')+(i.notes?'<p style="font-size:0.7rem;color:var(--stone);margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid var(--stone-line)">'+esc(i.notes)+'</p>':'')+'</div>';}
+function invDocHTML(i,data){
+  var S=data.settings||{};
+  var cur=i.currency||S.currency||'KSh';
+  var fmt$=function(n){return cur+'\u00a0'+(parseFloat(n)||0).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});};
+  var items=i.items||[];
+  var subtotal=items.reduce(function(s,li){return s+((parseFloat(li.qty)||0)*(parseFloat(li.rate)||0));},0)||parseFloat(i.amount)||0;
+  var discount=parseFloat(i.discount||0);
+  var taxRate=parseFloat(i.taxRate||0);
+  var taxAmt=parseFloat(i.taxAmount||(taxRate?(subtotal-discount)*taxRate:0));
+  var total=i.total!=null?parseFloat(i.total):(subtotal-discount+taxAmt);
+  var paid=(i.payments||[]).reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var bal=Math.max(0,total-paid);
+
+  // ── Bill-to / meta header ──────────────────────────────
+  var billTo='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.1rem 0 1rem;padding-bottom:0.85rem;border-bottom:1px solid var(--line)">'+
+    '<div><p style="font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);margin-bottom:.3rem">Bill To</p>'+
+    '<p style="font-weight:700;color:var(--ink);margin-bottom:.1rem">'+esc(i.client)+'</p>'+
+    (i.clientAddress?'<p style="font-size:.72rem;color:var(--stone);line-height:1.55">'+esc(i.clientAddress).replace(/\n/g,'<br>')+'</p>':'')+
+    '</div>'+
+    '<div style="text-align:right;line-height:1.85">'+
+    '<span style="display:flex;justify-content:flex-end;gap:.4rem"><span style="color:var(--stone);font-size:.72rem">Invoice #:</span><strong style="font-size:.72rem">'+esc(i.number||'')+'</strong></span>'+
+    '<span style="display:flex;justify-content:flex-end;gap:.4rem"><span style="color:var(--stone);font-size:.72rem">Date:</span><span style="font-size:.72rem">'+fmtDate(i.date)+'</span></span>'+
+    (i.dueDate?'<span style="display:flex;justify-content:flex-end;gap:.4rem"><span style="color:var(--stone);font-size:.72rem">Due Date:</span><span style="font-size:.72rem">'+fmtDate(i.dueDate)+'</span></span>':'')+
+    '<span style="display:flex;justify-content:flex-end;gap:.4rem;margin-top:.2rem"><span class="status status-'+i.status+'" style="font-size:.58rem">'+esc(i.status)+'</span></span>'+
+    '</div>'+
+  '</div>';
+
+  // ── Line items ─────────────────────────────────────────
+  var rows=(items.length?items:[{desc:i.desc||'Services rendered',qty:1,rate:total}]).map(function(li){
+    var qty=parseFloat(li.qty||1);var rate=parseFloat(li.rate||li.amount||0);var line=parseFloat(li.total!=null?li.total:qty*rate);
+    return '<tr>'+
+      '<td style="padding:.55rem .5rem;border-bottom:1px solid var(--ink-06);color:var(--ink)">'+esc(li.desc||'')+'</td>'+
+      '<td style="padding:.55rem .5rem;border-bottom:1px solid var(--ink-06);color:var(--ink);text-align:center">'+qty+'</td>'+
+      '<td style="padding:.55rem .5rem;border-bottom:1px solid var(--ink-06);color:var(--ink);text-align:right">'+fmt$(rate)+'</td>'+
+      '<td style="padding:.55rem .5rem;border-bottom:1px solid var(--ink-06);color:var(--ink);text-align:right">'+fmt$(line)+'</td>'+
+    '</tr>';
+  }).join('');
+
+  var table='<table class="pdf-table" style="margin-bottom:0">'+
+    '<thead><tr style="background:var(--surface-2)">'+
+    '<th style="width:46%">Item</th>'+
+    '<th style="text-align:center;width:10%">Qty</th>'+
+    '<th style="text-align:right;width:22%">Price</th>'+
+    '<th style="text-align:right;width:22%">Total</th>'+
+    '</tr></thead>'+
+    '<tbody>'+rows+'</tbody>'+
+  '</table>';
+
+  // ── Totals ─────────────────────────────────────────────
+  var showBreakdown=items.length>1||discount||taxAmt;
+  var totRows='';
+  if(showBreakdown){
+    totRows+='<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.72rem"><span style="color:var(--stone)">Subtotal:</span><span style="font-weight:700">'+fmt$(subtotal)+'</span></div>';
+  }
+  if(discount){
+    totRows+='<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.72rem"><span style="color:var(--stone)">Discount'+(i.discountLabel?' ('+esc(i.discountLabel)+')':'')+':</span><span style="color:var(--red)">&minus;'+fmt$(discount)+'</span></div>';
+    totRows+='<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.72rem"><span style="color:var(--stone)">Taxable Amount:</span><span>'+fmt$(subtotal-discount)+'</span></div>';
+  }
+  if(taxAmt){
+    var taxLabel=i.taxLabel||(taxRate?'VAT ('+Math.round(taxRate*100)+'%)':'Tax');
+    totRows+='<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.72rem"><span style="color:var(--stone)">'+esc(taxLabel)+':</span><span>'+fmt$(taxAmt)+'</span></div>';
+  }
+  if(paid>0){
+    totRows+='<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.72rem"><span style="color:var(--stone)">Paid:</span><span style="color:var(--green)">'+fmt$(paid)+'</span></div>';
+  }
+  var grandVal=paid>0?bal:total;
+  var totals='<div style="display:flex;justify-content:flex-end;margin-top:.2rem">'+
+    '<div style="width:55%;min-width:200px">'+
+    totRows+
+    '<div style="border-top:1.5px solid var(--ink);margin:.35rem 0"></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.2rem 0">'+
+    '<span style="font-size:.85rem;font-weight:700;color:var(--ink)">Total:</span>'+
+    '<span style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--ink)">'+fmt$(grandVal)+'</span>'+
+    '</div>'+
+    '</div></div>';
+
+  // ── Notes ──────────────────────────────────────────────
+  var notes=i.notes?'<div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--line)">'+
+    '<p style="font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);margin-bottom:.35rem">Notes</p>'+
+    '<p style="font-size:.72rem;color:var(--stone);line-height:1.65">'+esc(i.notes)+'</p>'+
+  '</div>':'';
+
+  return '<div class="pdf-preview">'+docHD(data,'invoice','INVOICE',i)+billTo+table+totals+notes+'</div>';
+}
 function quoDocHTML(q,data){var total=quoTotal(q);return '<div class="pdf-preview">'+docHD(data,'quote','QUOTATION',q)+'<div class="pdf-addr"><div><strong>Prepared for</strong><p>'+esc(q.client)+'</p></div><div style="text-align:right"><strong>Status</strong><p><span class="status '+opsStatusCls(q.status)+'">'+q.status+'</span></p></div></div><table class="pdf-table"><thead><tr><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr></thead><tbody>'+(q.items||[]).map(function(li){return '<tr><td>'+esc(li.desc)+'</td><td style="text-align:center">'+li.qty+'</td><td style="text-align:right">KSh '+(parseFloat(li.rate)||0).toLocaleString()+'</td><td style="text-align:right">KSh '+((parseFloat(li.qty)||0)*(parseFloat(li.rate)||0)).toLocaleString()+'</td></tr>';}).join('')+'</tbody></table><div class="pdf-total">Total: KSh '+total.toLocaleString()+'</div>'+(q.notes?'<p style="font-size:0.7rem;color:var(--stone);margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid var(--stone-line)">'+esc(q.notes)+'</p>':'')+'</div>';}
 function ctrDocHTML(c,data){
 var S=data.settings||{};var company=S.companyName||'Ribyon Studios';var email=S.companyEmail||'';var phone=S.companyPhone||'';var loc=S.address||'Nairobi, Kenya';

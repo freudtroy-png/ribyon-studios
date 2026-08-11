@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice — Ribyon Studios</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      background: #fff;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: #111;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── Page wrapper ───────────────────────────────────────── */
+    .page {
+      width: 680px;
+      min-height: 960px;
+      margin: 0 auto;
+      padding: 56px 56px 64px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Header: INVOICE + sender address ─────────────────── */
+    .header {
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #111;
+      line-height: 1;
+      margin-bottom: 10px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .sender {
+      font-size: 12.5px;
+      color: #444;
+      line-height: 1.65;
+    }
+
+    /* ── Bill-to / invoice meta row ────────────────────────── */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 36px;
+      gap: 2rem;
+    }
+
+    .bill-to-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 7px;
+    }
+
+    .bill-to-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 2px;
+    }
+
+    .bill-to-addr {
+      font-size: 12.5px;
+      color: #444;
+      line-height: 1.65;
+    }
+
+    .invoice-meta {
+      text-align: right;
+      font-size: 12.5px;
+      line-height: 1.85;
+      flex-shrink: 0;
+    }
+
+    .invoice-meta .meta-line {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+
+    .invoice-meta .meta-line .lbl {
+      color: #555;
+    }
+
+    .invoice-meta .meta-line .val {
+      font-weight: 600;
+      color: #111;
+    }
+
+    /* ── Divider ────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid #d0ccc6;
+      margin-bottom: 0;
+    }
+
+    /* ── Line-items table ──────────────────────────────────── */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .items-table thead tr {
+      background: #f5f3f0;
+    }
+
+    .items-table thead th {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #555;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #d0ccc6;
+    }
+
+    .items-table thead th.r { text-align: right; }
+    .items-table thead th.c { text-align: center; }
+
+    .items-table tbody tr {
+      border-bottom: 1px solid #ebe8e3;
+    }
+
+    .items-table tbody tr:last-child {
+      border-bottom: 1px solid #d0ccc6;
+    }
+
+    .items-table tbody td {
+      padding: 13px 14px;
+      font-size: 12.5px;
+      color: #222;
+      vertical-align: top;
+    }
+
+    .items-table tbody td.r { text-align: right; }
+    .items-table tbody td.c { text-align: center; }
+
+    .item-desc { font-weight: 500; }
+
+    /* ── Totals block ──────────────────────────────────────── */
+    .totals-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+
+    .totals {
+      width: 280px;
+      padding-top: 4px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 7px 14px;
+      font-size: 12.5px;
+    }
+
+    .totals-row .lbl { color: #555; }
+    .totals-row .val { color: #222; }
+
+    .totals-row.discount .val { color: #c0392b; }
+
+    .totals-divider {
+      border: none;
+      border-top: 1.5px solid #111;
+      margin: 4px 14px 0;
+    }
+
+    .totals-row.grand {
+      padding: 10px 14px 4px;
+    }
+
+    .totals-row.grand .lbl {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .totals-row.grand .val {
+      font-size: 18px;
+      font-weight: 800;
+      color: #111;
+    }
+
+    /* ── Notes ─────────────────────────────────────────────── */
+    .notes {
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid #ebe8e3;
+    }
+
+    .notes-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .notes-text {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.7;
+      max-width: 520px;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .footer {
+      margin-top: auto;
+      padding-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .footer .brand {
+      font-weight: 700;
+      color: #555;
+      font-size: 12px;
+    }
+
+    .footer .brand span {
+      color: #f97316;
+    }
+
+    /* ── Print rules ────────────────────────────────────────── */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        width: 210mm;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 18mm 18mm 22mm;
+      }
+
+      .no-print { display: none !important; }
+    }
+
+    /* ── Screen-only print bar ──────────────────────────────── */
+    .print-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      gap: 1rem;
+    }
+
+    .print-bar .bar-title {
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .print-bar-actions {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .print-bar button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 7px 18px;
+    }
+
+    .btn-print {
+      background: #f97316;
+      color: #fff;
+    }
+
+    .btn-print:hover { background: #ea580c; }
+
+    .btn-close {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    .btn-close:hover { background: rgba(255,255,255,0.2); }
+
+    @media print {
+      .print-bar { display: none; }
+      body { margin-top: 0; }
+    }
+
+    body.has-bar { margin-top: 48px; }
+  </style>
+</head>
+<body class="has-bar">
+
+  <!-- Screen-only toolbar -->
+  <div class="print-bar no-print">
+    <span class="bar-title" id="barTitle">Invoice</span>
+    <div class="print-bar-actions">
+      <button class="btn-print" onclick="window.print()">Download / Print PDF</button>
+      <button class="btn-close" onclick="window.close()">Close</button>
+    </div>
+  </div>
+
+  <!-- Invoice page -->
+  <div class="page" id="invoicePage">
+
+    <!-- ── Header ── -->
+    <div class="header">
+      <h1>INVOICE</h1>
+      <div class="sender" id="senderBlock">
+        Ribyon Studios<br>
+        Nairobi, Kenya<br>
+        hello@ribyonstudios.com
+      </div>
+    </div>
+
+    <!-- ── Bill-to + meta ── -->
+    <div class="meta-row">
+      <div class="bill-to">
+        <div class="bill-to-label">Bill To</div>
+        <div class="bill-to-name" id="clientName">—</div>
+        <div class="bill-to-addr" id="clientAddr"></div>
+      </div>
+
+      <div class="invoice-meta">
+        <div class="meta-line">
+          <span class="lbl">Invoice #:</span>
+          <span class="val" id="invNumber">—</span>
+        </div>
+        <div class="meta-line">
+          <span class="lbl">Date:</span>
+          <span class="val" id="invDate">—</span>
+        </div>
+        <div class="meta-line" id="dueDateRow">
+          <span class="lbl">Due Date:</span>
+          <span class="val" id="invDue">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Divider ── -->
+    <hr class="divider" />
+
+    <!-- ── Line items ── -->
+    <table class="items-table" id="itemsTable">
+      <thead>
+        <tr>
+          <th style="width:46%">Item</th>
+          <th class="c" style="width:10%">Qty</th>
+          <th class="r" style="width:22%">Price</th>
+          <th class="r" style="width:22%">Total</th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+
+    <!-- ── Totals ── -->
+    <div class="totals-wrap">
+      <div class="totals" id="totalsBlock">
+        <!-- rows injected by JS -->
+      </div>
+    </div>
+
+    <!-- ── Notes ── -->
+    <div class="notes" id="notesSection" style="display:none">
+      <div class="notes-label">Notes</div>
+      <div class="notes-text" id="notesText"></div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <div class="footer">
+      <div class="brand"><span>Ribyon</span> Studios</div>
+      <div id="footerRef"></div>
+    </div>
+
+  </div><!-- /page -->
+
+  <script>
+    /* ─────────────────────────────────────────────────────────
+       Invoice print renderer
+       Reads data from:
+         1. window.INVOICE_DATA  (set by opener via postMessage or direct prop)
+         2. URL search params    (fallback / direct link)
+    ───────────────────────────────────────────────────────── */
+
+    function fmt(d) {
+      if (!d) return '';
+      var x = new Date(d);
+      if (isNaN(x.getTime())) return String(d);
+      return x.toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function money(n, cur) {
+      var num = parseFloat(n) || 0;
+      var prefix = cur || 'KSh';
+      return prefix + '\u00a0' + num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function render(inv) {
+      if (!inv) return;
+
+      var cur = inv.currency || 'KSh';
+
+      /* title */
+      var num = inv.number || ('Invoice #' + (inv.id || ''));
+      document.title = num + ' — Ribyon Studios';
+      document.getElementById('barTitle').textContent = num;
+      document.getElementById('footerRef').textContent = num;
+
+      /* sender */
+      if (inv.senderName || inv.senderAddress) {
+        document.getElementById('senderBlock').innerHTML =
+          esc(inv.senderName || 'Ribyon Studios') + '<br>' +
+          (inv.senderAddress || '').split('\n').map(esc).join('<br>');
+      }
+
+      /* bill-to */
+      document.getElementById('clientName').textContent = inv.client || inv.clientName || '—';
+      var addr = inv.clientAddress || '';
+      if (addr) {
+        document.getElementById('clientAddr').innerHTML = addr.split('\n').map(esc).join('<br>');
+      }
+
+      /* invoice meta */
+      document.getElementById('invNumber').textContent = num;
+      document.getElementById('invDate').textContent = fmt(inv.date) || '—';
+
+      if (inv.dueDate) {
+        document.getElementById('invDue').textContent = fmt(inv.dueDate);
+      } else {
+        document.getElementById('dueDateRow').style.display = 'none';
+      }
+
+      /* line items */
+      var items = inv.items || [];
+      var tbody = document.getElementById('itemsBody');
+      tbody.innerHTML = '';
+
+      if (!items.length) {
+        /* No itemised rows — show a single summary row */
+        var total = parseFloat(inv.total || inv.amount || 0);
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="item-desc">' + esc(inv.description || 'Services rendered') + '</td>' +
+          '<td class="c">1</td>' +
+          '<td class="r">' + money(total, cur) + '</td>' +
+          '<td class="r">' + money(total, cur) + '</td>';
+        tbody.appendChild(tr);
+      } else {
+        items.forEach(function(li) {
+          var qty  = parseFloat(li.qty  || li.quantity || 1);
+          var rate = parseFloat(li.rate || li.price    || li.amount || 0);
+          var line = parseFloat(li.total != null ? li.total : qty * rate);
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td class="item-desc">' + esc(li.desc || li.name || li.description || '') + '</td>' +
+            '<td class="c">' + qty + '</td>' +
+            '<td class="r">' + money(rate, cur) + '</td>' +
+            '<td class="r">' + money(line, cur) + '</td>';
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* totals */
+      var subtotal = items.reduce(function(s, li) {
+        var qty  = parseFloat(li.qty  || li.quantity || 1);
+        var rate = parseFloat(li.rate || li.price    || li.amount || 0);
+        return s + (parseFloat(li.total != null ? li.total : qty * rate) || 0);
+      }, 0);
+
+      /* if no items array, subtotal = total */
+      if (!items.length) subtotal = parseFloat(inv.total || inv.amount || 0);
+
+      var discount = parseFloat(inv.discount || 0);
+      var taxRate  = parseFloat(inv.taxRate  || 0);   /* e.g. 0.16 for 16% */
+      var taxAmt   = parseFloat(inv.taxAmount || (taxRate ? (subtotal - discount) * taxRate : 0));
+      var grandTotal = parseFloat(inv.total != null ? inv.total : (inv.amount || (subtotal - discount + taxAmt)));
+
+      var paid    = (inv.payments || []).reduce(function(s,p){return s+(parseFloat(p.amount)||0);}, 0);
+      var balance = parseFloat(inv.balance != null ? inv.balance : grandTotal - paid);
+
+      var totalsHtml = '';
+
+      /* only show subtotal row when there are multiple items or a discount/tax */
+      var showBreakdown = items.length > 1 || discount || taxAmt;
+
+      if (showBreakdown) {
+        totalsHtml += '<div class="totals-row">' +
+          '<span class="lbl">Subtotal:</span>' +
+          '<span class="val"><strong>' + money(subtotal, cur) + '</strong></span></div>';
+      }
+
+      if (discount) {
+        totalsHtml += '<div class="totals-row discount">' +
+          '<span class="lbl">Discount' + (inv.discountLabel ? ' (' + esc(inv.discountLabel) + ')' : '') + ':</span>' +
+          '<span class="val">&minus;' + money(discount, cur) + '</span></div>';
+      }
+
+      if (discount || taxAmt) {
+        totalsHtml += '<div class="totals-row">' +
+          '<span class="lbl">Taxable Amount:</span>' +
+          '<span class="val">' + money(subtotal - discount, cur) + '</span></div>';
+      }
+
+      if (taxAmt) {
+        var taxLabel = inv.taxLabel || (taxRate ? 'VAT (' + Math.round(taxRate * 100) + '%)' : 'Tax');
+        totalsHtml += '<div class="totals-row">' +
+          '<span class="lbl">' + esc(taxLabel) + ':</span>' +
+          '<span class="val">' + money(taxAmt, cur) + '</span></div>';
+      }
+
+      if (paid > 0 && balance >= 0) {
+        totalsHtml += '<div class="totals-row">' +
+          '<span class="lbl">Paid:</span>' +
+          '<span class="val">' + money(paid, cur) + '</span></div>';
+      }
+
+      totalsHtml += '<hr class="totals-divider" />';
+      totalsHtml += '<div class="totals-row grand">' +
+        '<span class="lbl">Total:</span>' +
+        '<span class="val">' + money(paid > 0 && balance >= 0 ? balance : grandTotal, cur) + '</span></div>';
+
+      document.getElementById('totalsBlock').innerHTML = totalsHtml;
+
+      /* notes */
+      var notes = inv.notes || inv.note || '';
+      if (notes) {
+        document.getElementById('notesText').textContent = notes;
+        document.getElementById('notesSection').style.display = '';
+      }
+    }
+
+    /* ── Data ingestion ──────────────────────────────────── */
+
+    /* 1. Direct property set by opener */
+    if (window.INVOICE_DATA) {
+      render(window.INVOICE_DATA);
+    }
+
+    /* 2. postMessage from opener (portal sets it after window.open) */
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'RIBYON_INVOICE') {
+        render(e.data.invoice);
+        /* ACK so the opener stops polling */
+        try { e.source.postMessage({ type: 'RIBYON_INVOICE_ACK' }, e.origin); } catch(_) {}
+      }
+    });
+
+    /* 3. URL params fallback (simple share / test link) */
+    (function() {
+      var params = new URLSearchParams(location.search);
+      var raw = params.get('data');
+      if (raw) {
+        try { render(JSON.parse(decodeURIComponent(raw))); } catch(e) {}
+      }
+    })();
+  </script>
+</body>
+</html>

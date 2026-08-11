@@ -221,12 +221,44 @@ function viewInvoice(id){
 }
 function printInvoice(id){
   var i=(_data.invoices||[]).find(function(x){return x.id===id;});if(!i)return;
-  var rows=(i.items||[]).map(function(li){return '<tr><td>'+esc(li.desc)+'</td><td style="text-align:center">'+li.qty+'</td><td style="text-align:right">'+(li.rate||0).toLocaleString()+'</td><td style="text-align:right">'+((Number(li.qty)||0)*(Number(li.rate)||0)).toLocaleString()+'</td></tr>';}).join('');
-  var paid=(i.payments||[]).reduce(function(s,p){return s+(Number(p.amount)||0);},0);
-  var total=i.total!==undefined?i.total:(i.amount||0);
-  var w=window.open('','_blank');if(!w)return;
-  w.document.write('<!DOCTYPE html><html><head><title>'+esc(i.number)+'</title><style>body{font-family:Arial,Helvetica,sans-serif;padding:48px;color:#111}table{width:100%;border-collapse:collapse;margin-top:28px}th,td{border-bottom:1px solid #ddd;padding:9px 6px;font-size:13px}th{text-align:left;font-size:11px;text-transform:uppercase;color:#666}.tot{display:flex;justify-content:space-between;margin-top:10px;font-size:14px}h1{font-size:26px;letter-spacing:-.5px}.sub{color:#666;font-size:13px}.r{text-align:right}</style></head><body><h1>'+esc(i.number)+'</h1><div class="sub">Ribyon Studios · '+esc(i.client)+'</div><table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Total</th></tr></thead><tbody>'+rows+'</tbody></table><div class="tot"><strong>Total</strong><strong>'+(total||0).toLocaleString()+'</strong></div><div class="tot"><span>Paid</span><span>'+(paid||0).toLocaleString()+'</span></div><div class="tot"><span>Balance</span><span>'+Math.max(0,total-paid).toLocaleString()+'</span></div></body></html>');
-  w.document.close();setTimeout(function(){w.focus();w.print();},300);
+  // Build a clean invoice payload — client info comes from the portal data blob
+  var clientInfo=(_data.client)||{};
+  var inv={
+    id:       i.id,
+    number:   i.number||('Invoice #'+i.id),
+    date:     i.date,
+    dueDate:  i.dueDate,
+    client:   i.client||clientInfo.name||'',
+    currency: i.currency||'KSh',
+    items:    i.items||[],
+    total:    i.total!==undefined?i.total:(i.amount||0),
+    discount: i.discount||0,
+    discountLabel: i.discountLabel||'',
+    taxRate:  i.taxRate||0,
+    taxAmount:i.taxAmount||0,
+    taxLabel: i.taxLabel||'',
+    payments: i.payments||[],
+    balance:  i.balance,
+    notes:    i.notes||i.note||'',
+    senderName:    'Ribyon Studios',
+    senderAddress: 'Nairobi, Kenya\nhello@ribyonstudios.com',
+  };
+  var w=window.open('invoice-print.html','_blank');
+  if(!w){alert('Allow pop-ups to view the invoice PDF.');return;}
+  // postMessage once the page is ready; keep trying until it acks or times out
+  var attempts=0;var maxAttempts=40;
+  var timer=setInterval(function(){
+    attempts++;
+    try{w.postMessage({type:'RIBYON_INVOICE',invoice:inv},location.origin);}catch(e){}
+    if(attempts>=maxAttempts)clearInterval(timer);
+  },150);
+  // Stop polling once the child signals it received the data
+  window.addEventListener('message',function ack(e){
+    if(e.source===w&&e.data&&e.data.type==='RIBYON_INVOICE_ACK'){
+      clearInterval(timer);
+      window.removeEventListener('message',ack);
+    }
+  });
 }
 
 /* ─── Files ─── */

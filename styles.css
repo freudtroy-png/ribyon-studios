@@ -1401,7 +1401,7 @@ p:last-child { margin-bottom: 0; }
   transition: height .55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sva-row.open {
-  height: 22rem;
+  height: 26rem;
 }
 
 /* Inner layout — same max-width and padding as .container */
@@ -1415,9 +1415,18 @@ p:last-child { margin-bottom: 0; }
   margin: 0 auto;
   padding: 0 1.5rem;
   height: 5.5rem;
+  transition: height .55s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@media (min-width: 768px) {
-  .sva-row-inner { padding: 0 2rem; }
+.sva-row.open .sva-row-inner {
+  height: auto;
+  min-height: 5.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 769px) {
+  .sva-row-inner { padding-left: 2rem; padding-right: 2rem; }
 }
 
 /* Number — in flow, fixed width column before the title */
@@ -1465,7 +1474,7 @@ p:last-child { margin-bottom: 0; }
   transition: max-height .4s var(--ease-out), opacity .35s var(--ease), margin .35s var(--ease);
 }
 .sva-row.open .sva-conviction {
-  max-height: 2.5rem;
+  max-height: 6rem;
   opacity: 1;
   margin-top: 0.4rem;
 }
@@ -1482,7 +1491,7 @@ p:last-child { margin-bottom: 0; }
 }
 .sva-row.open .sva-tags {
   opacity: 1;
-  max-height: 2.5rem;
+  max-height: 4rem;
   margin: 0.75rem 0 0.1rem;
 }
 .sva-tags span {
@@ -5505,21 +5514,8 @@ body { top: 0 !important; }
   }
 }
 
-/* ── 18. SVA CONVICTION — fix transition on accordion ───────────── */
-/* Desktop: keep the original max-height animation unchanged */
-@media (min-width: 769px) {
-  .sva-conviction {
-    display: block;
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: max-height .45s var(--ease-out), opacity .35s var(--ease-out);
-  }
-  .sva-row.open .sva-conviction {
-    max-height: 3rem;
-    opacity: 1;
-  }
-}
+/* ── 18. SVA CONVICTION — desktop keeps the base open rule above ─── */
+/* Mobile override is handled in the @media (max-width: 768px) block */
 
 /* ── 19. CTA BUTTONS — ensure full-width stacking is smooth ─────── */
 @media (max-width: 480px) {

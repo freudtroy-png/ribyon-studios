@@ -490,27 +490,39 @@ p:last-child { margin-bottom: 0; }
 .section-dark .work-grid { background: rgba(255,255,255,0.04); }
 .section-light .work-grid { background: rgba(0,0,0,0.05); }
 
-/* Cards flex column so metric sticks to bottom */
+/* Cards flex column so metric sticks to bottom — all white */
 .work-grid .work-item {
   min-height: 280px;
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: var(--ink-card);
+  background: #fff;
 }
 
-/* Alternating: odd = dark, even = white */
+/* All cards white: override dark section background */
+.section-dark .work-grid .work-item,
+.section-dark .work-grid .work-item:nth-child(odd),
+.section-dark .work-grid .work-item:nth-child(even) {
+  background: #fff;
+}
+.section-dark .work-grid .work-item h3 { color: var(--ink); }
+.section-dark .work-grid .work-item p { color: var(--gray-dark); }
+
+/* Remove the old alternating rules */
 .work-grid .work-item:nth-child(even) { background: #fff; }
 .work-grid .work-item:nth-child(even) h3 { color: var(--ink); }
 .work-grid .work-item:nth-child(even) p { color: var(--gray-dark); }
 .work-grid .work-item:nth-child(even) .work-metric strong { color: var(--orange); }
 .work-grid .work-item:nth-child(even) .work-metric span { color: var(--gray-dim); }
 .work-grid .work-item:nth-child(even):hover { background: #f7f3ee; }
-.work-grid .work-item:hover { background: var(--ink-hover); }
-.section-light .work-grid .work-item { background: var(--paper-card); }
+.work-grid .work-item:hover { background: #f7f3ee; }
+.section-light .work-grid .work-item { background: #fff; }
 .section-light .work-grid .work-item:hover { background: #f4f0e6; }
-.work-grid .work-item h3 { font-size: 1rem; }
+.work-grid .work-item h3 { font-size: 1rem; color: var(--ink); }
+.work-grid .work-item p { color: var(--gray-dark); }
+.work-grid .work-metric strong { color: var(--orange); }
+.work-grid .work-metric span { color: var(--gray-dim); }
 @media (max-width: 900px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .work-grid { grid-template-columns: 1fr; } }
 

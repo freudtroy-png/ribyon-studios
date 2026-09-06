@@ -403,6 +403,11 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   /* ── Inject hidden Google Translate target ── */
+  /* Use a unique ID so nav.js is always the single source of truth */
+  /* Remove any hardcoded wrapper pages may have left in HTML */
+  var existingWrap = document.getElementById('google_translate_element_wrapper');
+  if (existingWrap) { existingWrap.parentNode.removeChild(existingWrap); }
+
   var gtWrap = document.createElement('div');
   gtWrap.id = 'google_translate_element_wrapper';
   gtWrap.style.cssText = 'position:absolute;opacity:0;pointer-events:none;height:0;overflow:hidden;';
@@ -432,6 +437,8 @@ document.addEventListener('DOMContentLoaded', function () {
       translateTo(l.code);
       document.querySelectorAll('.float-lang-opt').forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
+      /* Update the globe button to show the selected flag */
+      langBtnFlag.textContent = l.flag;
       panel.classList.remove('open');
     });
     panel.appendChild(btn);
@@ -442,7 +449,11 @@ document.addEventListener('DOMContentLoaded', function () {
   langBtn.className = 'float-btn float-btn--lang';
   langBtn.setAttribute('aria-label', 'Change language');
   langBtn.title = 'Language';
-  langBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  /* Globe icon + active flag display */
+  var langBtnFlag = document.createElement('span');
+  langBtnFlag.className = 'float-btn-flag';
+  langBtnFlag.textContent = '🌐';
+  langBtn.appendChild(langBtnFlag);
   langBtn.appendChild(panel);
 
   langBtn.addEventListener('click', function (e) {
@@ -499,17 +510,33 @@ document.addEventListener('DOMContentLoaded', function () {
     document.head.appendChild(gtScript);
   }
 
-  /* Switch language via the hidden Google combo */
+  /* Switch language via Google Translate cookie (most reliable cross-browser method) */
   function translateTo(langCode) {
+    if (langCode === 'en') {
+      /* Restore original — clear the GT cookie and reload */
+      var expires = new Date(0).toUTCString();
+      document.cookie = 'googtrans=; expires=' + expires + '; path=/';
+      document.cookie = 'googtrans=; expires=' + expires + '; domain=.' + location.hostname + '; path=/';
+      location.reload();
+      return;
+    }
+    /* Set the Google Translate cookie to the chosen language */
+    var val = '/en/' + langCode;
+    document.cookie = 'googtrans=' + val + '; path=/';
+    document.cookie = 'googtrans=' + val + '; domain=.' + location.hostname + '; path=/';
+    /* Also try the combo select as secondary trigger (no reload needed if it works) */
     var tryCount = 0;
     function attempt() {
       var combo = document.querySelector('.goog-te-combo');
       if (combo) {
         combo.value = langCode;
         combo.dispatchEvent(new Event('change'));
-      } else if (tryCount < 20) {
+      } else if (tryCount < 25) {
         tryCount++;
         setTimeout(attempt, 200);
+      } else {
+        /* Combo never appeared — fall back to reload which picks up the cookie */
+        location.reload();
       }
     }
     attempt();

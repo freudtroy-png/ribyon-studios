@@ -4542,11 +4542,13 @@ textarea:focus-visible {
 }
 body { top: 0px !important; }
 
+/* Google Translate widget is hidden — nav.js handles the custom language UI */
 #google_translate_element_wrapper {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 1.25rem;
-  z-index: 9997;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
 }
 #google_translate_element_wrapper .goog-te-gadget-simple {
   background: var(--ink-card) !important;
@@ -4941,6 +4943,13 @@ body { top: 0 !important; }
   position: relative;
 }
 .float-btn--lang:hover { border-color: var(--orange); }
+
+/* Flag/globe emoji shown on the language button */
+.float-btn-flag {
+  font-size: 1.1rem;
+  line-height: 1;
+  display: block;
+}
 
 /* Language dropdown panel — opens up from left */
 .float-lang-panel {

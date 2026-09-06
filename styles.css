@@ -2432,16 +2432,18 @@ p:last-child { margin-bottom: 0; }
   z-index: 1;
 }
 
-/* Body grid: full height, three rows — label bar / title / bottom bar */
+/* Body grid: full height — pushes all content to the bottom */
 .page-hero-body {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   width: 100%;
   padding-top: 6rem;
   padding-bottom: 3rem;
   min-height: 100vh;
+  gap: 0;
 }
 
 /* Top row: page label + studio name */
@@ -2461,11 +2463,11 @@ p:last-child { margin-bottom: 0; }
   color: var(--gray-dark);
 }
 
-/* Title: giant, fills the middle row */
+/* Title: sits just above the bottom bar */
 .page-hero-title-wrap {
   display: flex;
   align-items: flex-end;
-  padding: 2rem 0;
+  padding: 0 0 1.5rem;
   max-width: 55%;
 }
 .page-hero-title {
@@ -4398,7 +4400,7 @@ textarea:focus-visible {
   .manifesto { padding: 5rem 0; }
   .work-section { padding: 3rem 0 4rem; }
   .cta-section { padding: 5rem 0; }
-  .page-hero-body { padding-top: 5rem; padding-bottom: 1.5rem; }
+  .page-hero-body { padding-top: 5rem; padding-bottom: 1.5rem; justify-content: flex-end; }
   .page-hero { min-height: 85vh; }
   .page-hero-title-wrap { padding: 0.5rem 0; }
   .page-hero-bottom { padding-top: 1rem; }

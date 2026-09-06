@@ -5202,3 +5202,312 @@ body { top: 0 !important; }
 @media (max-width: 768px) {
   .btn-subscribe { display: none; }
 }
+
+/* ===================================================================
+   MOBILE OPTIMISATION — comprehensive pass (375px – 768px)
+   Addresses all components identified in the mobile audit.
+   Appended after all other rules so specificity is correct.
+   =================================================================== */
+
+/* ── 1. GLOBAL SECTION PADDING ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .section { padding: 3.5rem 0; }
+  .manifesto { padding: 4rem 0 !important; }
+  .cta-section { padding: 4rem 0 !important; }
+  .work-section { padding: 3rem 0 4rem !important; }
+  .svc-split-section { padding: 3.5rem 0 !important; }
+  .about-vm-section,
+  .about-values-section { padding: 4rem 0 !important; }
+  .svc-detail-section { padding: 3.5rem 0; }
+}
+
+/* ── 2. NAVIGATION — safe-area, drawer scroll ───────────────────── */
+@media (max-width: 768px) {
+  /* Drawer: allow scroll on very short viewports, add safe-area inset */
+  .nav-menu {
+    overflow-y: auto;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+
+  /* Active link pill: narrow pill centred inside full-width block */
+  .nav-links a.active {
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  /* Body lock: avoid scroll-jump on iOS using top offset approach */
+  body.menu-open {
+    overflow: hidden;
+  }
+}
+
+/* ── 3. HOME HERO ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Let hero grow with content instead of clipping at 100svh */
+  .hero-type {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .hero-type-inner {
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Wrap the two CTA buttons so they don't overflow at 375px */
+  .ht-actions {
+    flex-wrap: wrap;
+  }
+
+  /* Stack bottom row cleanly with tighter gap */
+  .ht-bottom {
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Full-width buttons in hero */
+  .ht-actions .btn,
+  .ht-actions a.btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── 4. PAGE HERO (services, about, blog, pricing, contact) ─────── */
+@media (max-width: 768px) {
+  .page-hero-body {
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+  }
+
+  .page-hero-title-wrap {
+    max-width: 100%;
+    padding: 0 0 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero-body {
+    padding-top: 4rem;
+  }
+
+  /* Slightly smaller hero title so 3-line titles don't overflow short phones */
+  .page-hero-title {
+    font-size: clamp(2.4rem, 11vw, 3.5rem);
+  }
+}
+
+/* ── 5. WORK PILE / RECENT WORK ─────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Section head: stack h2 and "All work" link */
+  .work-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Project detail: let description fill available width */
+  .wpd-desc {
+    max-width: 100%;
+  }
+}
+
+/* ── 6. TENETS / WHY US ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Stack into column layout */
+  .tenet-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem 0;
+  }
+
+  /* Hide the → arrow on mobile — wastes space */
+  .tenet-row-arrow {
+    display: none;
+  }
+
+  /* Number sits above title, not beside it */
+  .tenet-row-num {
+    width: auto;
+  }
+}
+
+/* Disable hover layout-shift on touch devices */
+@media (hover: none) {
+  .tenet-row:hover {
+    padding-left: 0;
+  }
+  .tenet-row:hover::before {
+    transform: scaleY(0);
+  }
+  .tenet-row:hover .tenet-row-arrow {
+    transform: none;
+    color: var(--gray-dark);
+  }
+}
+
+/* ── 7. SERVICES ACCORDION (sva) ────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Move CTA into document flow — remove absolute positioning */
+  .sva-cta {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    padding: 0.9rem 0 1rem 3.75rem;
+    opacity: 0;
+    transform: none;
+    transition: opacity .4s var(--ease-out) .12s;
+  }
+  .sva-row.open .sva-cta {
+    opacity: 1;
+  }
+
+  /* Taller max-height for conviction text so wrapping text isn't clipped */
+  .sva-conviction {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .45s var(--ease-out);
+  }
+  .sva-row.open .sva-conviction {
+    max-height: 6rem;
+  }
+}
+
+/* ── 8. SERVICES SPLIT (products page) ──────────────────────────── */
+@media (max-width: 640px) {
+  /* Reduce heavy indentation on open body */
+  .svc-split-body {
+    padding-left: 1rem;
+  }
+}
+
+/* ── 9. ABOUT: PHILOSOPHY IMAGE ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .philosophy-image {
+    min-height: 220px;
+  }
+}
+
+/* ── 10. ABOUT: VISION / MISSION CARDS ─────────────────────────── */
+@media (max-width: 480px) {
+  .about-vm-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* ── 11. ABOUT: VALUES GRID ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .value-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* ── 12. LOGO STRIP — fix nth-child separator hiding ───────────── */
+@media (max-width: 640px) {
+  /* Hide separators on ALL items that start a new row (odd children) */
+  .tb-logo:nth-child(2n+1)::before {
+    display: none;
+  }
+  /* Re-show the rule from the original that hid only 2nd and 4th */
+  .tb-logo:nth-child(2)::before,
+  .tb-logo:nth-child(4)::before {
+    display: none;
+  }
+}
+
+/* ── 13. MODAL — max-height for small viewports ─────────────────── */
+@media (max-width: 768px) {
+  .modal-card {
+    max-height: 90svh;
+    overflow-y: auto;
+    border-radius: 20px;
+  }
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── 14. FAQ — minimum 44px touch targets ───────────────────────── */
+.faq-q {
+  min-height: 44px;
+}
+
+/* ── 15. TIERS — tighter padding on small screens ───────────────── */
+@media (max-width: 480px) {
+  .tiers-col {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* ── 16. PROCESS STRIP — tighter step padding ───────────────────── */
+@media (max-width: 600px) {
+  .process-step {
+    padding: 1.5rem;
+  }
+}
+
+/* ── 17. WORK SECTION — reduce top margin on pile info ──────────── */
+@media (max-width: 860px) {
+  .work-section-head {
+    margin-bottom: 2rem;
+  }
+}
+
+/* ── 18. SVA CONVICTION — fix transition on accordion ───────────── */
+/* Desktop: keep the original max-height animation unchanged */
+@media (min-width: 769px) {
+  .sva-conviction {
+    display: block;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .45s var(--ease-out), opacity .35s var(--ease-out);
+  }
+  .sva-row.open .sva-conviction {
+    max-height: 3rem;
+    opacity: 1;
+  }
+}
+
+/* ── 19. CTA BUTTONS — ensure full-width stacking is smooth ─────── */
+@media (max-width: 480px) {
+  .cta-inner .btn,
+  .cta-inner .btn-ghost-dark,
+  .cta-inner .btn-ghost {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
+    margin-top: 0.5rem;
+  }
+  .cta-inner .btn:first-of-type {
+    margin-top: 0;
+  }
+}
+
+/* ── 20. GENERAL OVERFLOW SAFETY ────────────────────────────────── */
+/* Prevent any section-level SVG ribbons from creating horizontal scroll */
+.hero-type,
+.manifesto,
+.tiers-section,
+.cta-section,
+.svc-split-section,
+.about-vm-section,
+.about-values-section,
+.svc-detail-section,
+.page-hero,
+.work-section {
+  overflow-x: hidden;
+}

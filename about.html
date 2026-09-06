@@ -128,8 +128,42 @@
           <p>We built something different. A brand identity agency that works the way great creative studios in New York or London work. Strategy first, craft second, results always. But priced, scoped, and built for founders and businesses here and across the continent.</p>
           <p>We're small by design. Every project is led by a senior strategist and designer, not handed to a junior team. We take fewer clients to give more to each one. We measure success not by how the work looks in our portfolio, but by what it unlocks for yours.</p>
         </div>
-        <div class="about-story-img reveal reveal-d2">
-          <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=900&q=80&fit=crop" loading="lazy" alt="Ribyon Studios studio">
+        <div class="about-slideshow reveal reveal-d2" id="aboutSlideshow">
+          <!-- Slide 1: studio / creative work session -->
+          <div class="about-slide active">
+            <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=900&q=80&fit=crop" loading="lazy" alt="Ribyon Studios creative studio">
+          </div>
+          <!-- Slide 2: brand strategy / whiteboard session -->
+          <div class="about-slide">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80&fit=crop" loading="lazy" alt="Brand strategy session">
+          </div>
+          <!-- Slide 3: design work / Nairobi creative -->
+          <div class="about-slide">
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80&fit=crop" loading="lazy" alt="Creative team at work">
+          </div>
+          <!-- Slide 4: identity / logo design -->
+          <div class="about-slide">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop" loading="lazy" alt="Brand identity design process">
+          </div>
+          <!-- Slide 5: client presentation -->
+          <div class="about-slide">
+            <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&q=80&fit=crop" loading="lazy" alt="Brand presentation">
+          </div>
+          <!-- Arrows -->
+          <button class="about-slide-prev" aria-label="Previous image">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 4L6 8l4 4"/></svg>
+          </button>
+          <button class="about-slide-next" aria-label="Next image">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+          </button>
+          <!-- Dots -->
+          <div class="about-slide-dots" role="tablist">
+            <button class="about-slide-dot active" data-idx="0" aria-label="Image 1"></button>
+            <button class="about-slide-dot" data-idx="1" aria-label="Image 2"></button>
+            <button class="about-slide-dot" data-idx="2" aria-label="Image 3"></button>
+            <button class="about-slide-dot" data-idx="3" aria-label="Image 4"></button>
+            <button class="about-slide-dot" data-idx="4" aria-label="Image 5"></button>
+          </div>
         </div>
       </div>
     </div>
@@ -188,7 +222,7 @@
         <div class="value-card value-card--orange reveal reveal-d4">
           <span class="val-num">04</span>
           <h3>Results over portfolio</h3>
-          <p>A beautiful brand that doesn't perform isn't a success. We measure what we do by what it unlocks for our clients — not how it looks in our portfolio.</p>
+          <p>A beautiful brand that doesn't perform isn't a success. We measure what we do by what it unlocks for our clients, not how it looks in our portfolio.</p>
         </div>
       </div>
     </div>
@@ -298,5 +332,43 @@
 <button id="go-to-top" aria-label="Scroll to top">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
+<script>
+/* About page image slideshow */
+(function () {
+  var ss = document.getElementById('aboutSlideshow');
+  if (!ss) return;
+  var slides = Array.from(ss.querySelectorAll('.about-slide'));
+  var dots   = Array.from(ss.querySelectorAll('.about-slide-dot'));
+  var prev   = ss.querySelector('.about-slide-prev');
+  var next   = ss.querySelector('.about-slide-next');
+  var current = 0;
+  var timer;
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = ((idx % slides.length) + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function start() {
+    timer = setInterval(function () { goTo(current + 1); }, 4000);
+  }
+
+  function reset() {
+    clearInterval(timer);
+    start();
+  }
+
+  if (prev) prev.addEventListener('click', function () { goTo(current - 1); reset(); });
+  if (next) next.addEventListener('click', function () { goTo(current + 1); reset(); });
+  dots.forEach(function (dot) {
+    dot.addEventListener('click', function () { goTo(parseInt(dot.dataset.idx, 10)); reset(); });
+  });
+
+  start();
+}());
+</script>
 </body>
 </html>

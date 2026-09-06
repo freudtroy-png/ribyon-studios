@@ -167,23 +167,38 @@
               </div>
             </div>
             <div class="cfn-group">
-              <label for="company">Company or project name</label>
-              <input type="text" id="company" name="company" placeholder="Acme Ltd.">
+              <label for="company">Company or project</label>
+              <input type="text" id="company" name="company" placeholder="e.g. Acme Ltd.">
+            </div>
+            <div class="cfn-row">
+              <div class="cfn-group">
+                <label for="service">Service needed</label>
+                <select id="service" name="service">
+                  <option value="">Select a service</option>
+                  <option>Brand Identity</option>
+                  <option>Brand Strategy</option>
+                  <option>Website Design</option>
+                  <option>Software Design</option>
+                  <option>Social Media &amp; Content Systems</option>
+                  <option>Full Brand Package</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+              <div class="cfn-group">
+                <label for="budget">Budget range</label>
+                <select id="budget" name="budget">
+                  <option value="">Select a range</option>
+                  <option>Under KSh 50,000</option>
+                  <option>KSh 50,000 – 100,000</option>
+                  <option>KSh 100,000 – 250,000</option>
+                  <option>KSh 250,000+</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
             </div>
             <div class="cfn-group">
-              <label for="budget">Budget range</label>
-              <select id="budget" name="budget">
-                <option value="">Select a range</option>
-                <option>Under KSh 50,000</option>
-                <option>KSh 50,000 – KSh 100,000</option>
-                <option>KSh 100,000 – KSh 250,000</option>
-                <option>KSh 250,000+</option>
-                <option>Not sure yet</option>
-              </select>
-            </div>
-            <div class="cfn-group">
-              <label for="message">Tell us about your brand</label>
-              <textarea id="message" name="message" rows="5" placeholder="Your market, your audience, where you are now, and what you're trying to build. The more context, the better." required></textarea>
+              <label for="message">About your brand</label>
+              <textarea id="message" name="message" rows="4" placeholder="Your market, goals, and what you're trying to build." required></textarea>
             </div>
             <button type="submit" class="cfn-submit">
               Send message
@@ -264,6 +279,7 @@
       name: document.getElementById('name')?.value || '',
       email: document.getElementById('email')?.value || '',
       company: document.getElementById('company')?.value || '',
+      service: document.getElementById('service')?.value || '',
       budget: document.getElementById('budget')?.value || '',
       message: document.getElementById('message')?.value || ''
     };
@@ -272,7 +288,7 @@
     var d;
     try { d = raw ? JSON.parse(raw) : {}; } catch(e) { d = {}; }
     if (!d.inquiries) d.inquiries = [];
-    d.inquiries.push({ id: Date.now(), name: data.name, email: data.email, phone: '', company: data.company, budget: data.budget, message: data.message, date: new Date().toISOString().split('T')[0], status: 'new' });
+    d.inquiries.push({ id: Date.now(), name: data.name, email: data.email, phone: '', company: data.company, service: data.service, budget: data.budget, message: data.message, date: new Date().toISOString().split('T')[0], status: 'new' });
     localStorage.setItem('rs_data', JSON.stringify(d));
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('formSuccess').style.display = 'block';

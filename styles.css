@@ -5302,28 +5302,30 @@ body { top: 0 !important; }
 @media (max-width: 768px) {
   .page-hero-body {
     padding-top: 5rem;
-    padding-bottom: 2rem;
-    /* Lift title up from the absolute bottom — use space-between so
-       an invisible spacer pushes content to roughly the lower-third */
+    /* Reduced bottom padding moves title up from the bottom edge */
+    padding-bottom: clamp(1.5rem, 5vh, 3rem);
     justify-content: flex-end;
-    padding-bottom: clamp(3rem, 12vh, 6rem);
   }
 
   .page-hero-title-wrap {
     max-width: 100%;
-    padding: 0 0 1.25rem;
+    padding: 0 0 1rem;
+  }
+
+  /* Bigger title on mobile landing pages */
+  .page-hero-title {
+    font-size: clamp(3.2rem, 13vw, 5.5rem);
   }
 }
 
 @media (max-width: 480px) {
   .page-hero-body {
     padding-top: 4rem;
-    padding-bottom: clamp(2.5rem, 10vh, 4.5rem);
+    padding-bottom: clamp(1.25rem, 4vh, 2.5rem);
   }
 
-  /* Slightly smaller hero title so 3-line titles don't overflow short phones */
   .page-hero-title {
-    font-size: clamp(2.4rem, 11vw, 3.5rem);
+    font-size: clamp(2.8rem, 12vw, 4.5rem);
   }
 }
 

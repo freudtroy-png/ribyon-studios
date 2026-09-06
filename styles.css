@@ -5302,9 +5302,8 @@ body { top: 0 !important; }
 @media (max-width: 768px) {
   .page-hero-body {
     padding-top: 5rem;
-    /* Reduced bottom padding moves title up from the bottom edge */
-    padding-bottom: clamp(1.5rem, 5vh, 3rem);
-    justify-content: flex-end;
+    padding-bottom: 2rem;
+    justify-content: center;
   }
 
   .page-hero-title-wrap {
@@ -5321,7 +5320,8 @@ body { top: 0 !important; }
 @media (max-width: 480px) {
   .page-hero-body {
     padding-top: 4rem;
-    padding-bottom: clamp(1.25rem, 4vh, 2.5rem);
+    padding-bottom: 2rem;
+    justify-content: center;
   }
 
   .page-hero-title {

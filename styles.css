@@ -2624,7 +2624,7 @@ p:last-child { margin-bottom: 0; }
 }
 .page-hero-sub {
   font-size: 0.95rem;
-  color: var(--gray-dim);
+  color: rgba(255,255,255,0.85);
   line-height: 1.6;
   margin: 0;
   max-width: 320px;
@@ -6332,4 +6332,115 @@ input, textarea, select,
   }
   .footer p, .footer a { color: #555 !important; font-size: 9pt !important; }
   .footer-socials { display: none !important; }
+}
+
+/* ===================================================================
+   FINAL FIX: page-hero subtitle always white on hero images
+   =================================================================== */
+.page-hero .page-hero-sub,
+.page-hero-body .page-hero-sub {
+  color: rgba(255,255,255,0.85) !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+@media (max-width: 768px) {
+  .page-hero .page-hero-sub {
+    color: rgba(255,255,255,0.85) !important;
+    font-size: 0.85rem !important;
+    display: block !important;
+    max-width: 100% !important;
+    margin-bottom: 0.75rem !important;
+  }
+  /* Give page-hero-bottom enough breathing room */
+  .page-hero-bottom {
+    padding-top: 1rem !important;
+    gap: 0.75rem !important;
+    border-top: 1px solid rgba(255,255,255,0.12) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero .page-hero-sub {
+    color: rgba(255,255,255,0.85) !important;
+    font-size: 0.78rem !important;
+    display: block !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ===================================================================
+   FINAL FIX: Mobile nav — active pill alignment
+   =================================================================== */
+@media (max-width: 768px) {
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  /* All links same height and border */
+  .nav-links a {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    padding: 0 1rem !important;
+    text-align: center;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--ink-line);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Active pill: orange, same row height, border-bottom stays for alignment */
+  .nav-links a.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: var(--orange) !important;
+    color: var(--ink) !important;
+    font-weight: 700 !important;
+    border-radius: 999px !important;
+    /* Keep the same height as other items */
+    height: 56px;
+    /* Shrink to content width but centre in the full-width row */
+    width: fit-content !important;
+    min-width: 120px;
+    margin: 0 auto !important;
+    padding: 0 1.5rem !important;
+    border-bottom: 1px solid transparent !important;
+    position: relative;
+  }
+
+  /* Restore the visual divider line below active item using pseudo */
+  .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--ink-line);
+    transform: none !important;
+    display: block !important;
+  }
+}
+
+/* ===================================================================
+   STRONGER COPY PROTECTION
+   =================================================================== */
+* {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+input, textarea, select,
+[contenteditable="true"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  user-select: text !important;
 }

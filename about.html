@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <link rel="preload" href="images/site/about-hero.jpg" as="image">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Ribyon Studio | Brand Identity Agency, Nairobi Kenya</title>
   <meta name="description" content="Ribyon Studio is a brand identity and strategy agency founded in Nairobi, Kenya. We work with founders and growing businesses across Africa to build brands that compete globally.">
@@ -62,11 +65,11 @@
       <div class="nav-menu" id="navMenu">
         <div class="nav-links">
           <a href="/">Home</a>
-          <a href="products.html">Services</a>
-          <a class="active" href="about.html">About</a>
-          <a href="pricing.html">Pricing</a>
-          <a href="contact.html">Contact</a>
-          <a href="blog.html">Read</a>
+          <a href="/services">Services</a>
+          <a class="active" href="/about">About</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/contact">Contact</a>
+          <a href="/blog">Read</a>
         </div>
         <button class="btn-nav" onclick="location.href='contact.html'">Start a project</button>
       </div>
@@ -78,7 +81,7 @@
   <!-- HERO -->
   <section class="page-hero">
     <div class="page-hero-img">
-      <img src="images/site/about-hero.jpg" loading="lazy" alt="">
+      <img src="images/site/about-hero.jpg" loading="eager" alt="">
     </div>
     <div class="container page-hero-body">
       <div class="page-hero-title-wrap">
@@ -86,7 +89,7 @@
       </div>
       <div class="page-hero-bottom">
         <p class="page-hero-sub">Small, intentional, built around<br>craft rather than process.</p>
-        <a href="contact.html" class="btn btn-orange">Work with us</a>
+        <a href="/contact" class="btn btn-orange">Work with us</a>
       </div>
     </div>
   </section>
@@ -252,9 +255,9 @@
         <span class="label">Work with us</span>
         <h2>Think we might be a fit?</h2>
         <p>Tell us about your brand. We'll tell you what we'd do and what it costs. No pitch. No pressure.</p>
-        <a href="contact.html" class="btn btn-orange">
+        <a href="/contact" class="btn btn-orange">
           Start a conversation
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
         </a>
       </div>
     </div>
@@ -282,18 +285,18 @@
         <div class="footer-col">
           <h4>Company</h4>
           <ul>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="blog.html">Read</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/blog">Read</a></li>
+            <li><a href="/pricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Services</h4>
           <ul>
-            <li><a href="products.html">Brand Identity</a></li>
-            <li><a href="products.html">Web Design</a></li>
-            <li><a href="products.html">Brand Strategy</a></li>
+            <li><a href="/services">Brand Identity</a></li>
+            <li><a href="/services">Web Design</a></li>
+            <li><a href="/services">Brand Strategy</a></li>
           </ul>
         </div>
         <div class="footer-col">

@@ -414,10 +414,6 @@ p:last-child { margin-bottom: 0; }
 }
 .stage-row .stage-btn:hover { background: var(--orange); color: var(--ink); gap: 0.6rem; }
 .stage-row.featured { position: relative; }
-.stage-row.featured::before {
-  content: ''; position: absolute; top: 0; left: 2.5rem; right: 2.5rem;
-  height: 2px; background: var(--orange);
-}
 .stage-row.featured .stage-tag::after { content: ' — Popular'; color: var(--gold); font-weight: 800; }
 @media (max-width: 800px) {
   .stage-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem 2rem; }
@@ -4632,7 +4628,7 @@ textarea:focus-visible {
 #go-to-top:active {
   transform: translateY(0) scale(0.95);
 }
-#go-to-top svg { display: block; stroke: #fff; }
+#go-to-top svg { display: block; stroke: #fff; display: flex; align-items: center; justify-content: center; }
 @media (max-width: 640px) {
   #go-to-top { bottom: 1.25rem; right: 1.25rem; width: 38px; height: 38px; }
 }
@@ -5986,3 +5982,94 @@ body { top: 0 !important; }
   .wk-track  { gap: 1rem; }
 }
 
+
+/* ===================================================================
+   SPEED & SMOOTHNESS IMPROVEMENTS
+   =================================================================== */
+
+/* Reduce jitter: contain paint for heavy sections */
+.work-showcase,
+.svc-accordion,
+.hero-type,
+.page-hero,
+.cs-hero,
+.manifesto,
+.tiers-section {
+  contain: layout style;
+}
+
+/* Limit will-change to only animated elements */
+.wk-track,
+.ws-track,
+.work-pile-card,
+.about-slide,
+.sva-row {
+  will-change: transform;
+}
+
+/* Prevent accidental transforms triggering GPU layers on static elements */
+.footer,
+.navbar,
+.newsletter-section {
+  will-change: auto;
+  transform: translateZ(0); /* promote to own layer for smooth scroll */
+}
+
+/* Smooth scroll only when user hasn't requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Remove scroll-behavior from html if already set globally */
+/* (prevents jitter on hash navigation) */
+html { scroll-behavior: smooth; }
+
+/* Fix go-up button: perfectly centred icon on all screens */
+#go-to-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+#go-to-top svg {
+  display: block;
+  flex-shrink: 0;
+  stroke: #fff;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  #go-to-top {
+    bottom: 1.25rem;
+    right: 1.25rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #go-to-top svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Stage-row: remove featured orange top line */
+.stage-row.featured::before { display: none; }
+
+/* Tenet row arrow: use › instead of → */
+.tenet-row-arrow {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Smooth image loading: no layout shift */
+img {
+  height: auto;
+}
+
+/* Prevent FOUT on font load */
+body {
+  font-display: swap;
+}

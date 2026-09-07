@@ -4582,7 +4582,7 @@ textarea:focus-visible {
   .page-hero { min-height: 70vh; }
   .page-hero-body { padding-top: 3.5rem; padding-bottom: 0.5rem; }
   .page-hero-title { font-size: clamp(2rem, 12vw, 3rem); }
-  .page-hero-sub { font-size: 0.78rem; display: block; max-width: 100%; }
+  .page-hero-sub { font-size: 0.78rem; display: block !important; max-width: 100%; }
   .page-hero-bottom .btn { font-size: 0.82rem; padding: 0.55rem 1.1rem; }
   .cs-hero-title { font-size: clamp(2rem, 12vw, 3rem); }
   .post-back { font-size: 0.7rem; padding: 0.5rem 1rem; }
@@ -5418,29 +5418,45 @@ body { top: 0 !important; }
   .page-hero-body {
     padding-top: 5rem;
     padding-bottom: 2rem;
-    justify-content: center;
+    justify-content: flex-end;
   }
 
   .page-hero-title-wrap {
     max-width: 100%;
-    padding: 0 0 1rem;
+    padding: 0 0 0.75rem;
   }
 
   /* Bigger title on mobile landing pages */
   .page-hero-title {
-    font-size: clamp(3.2rem, 13vw, 5.5rem);
+    font-size: clamp(2.8rem, 11vw, 4.5rem);
+  }
+
+  /* Always show subtitle on mobile */
+  .page-hero-sub {
+    display: block !important;
+    font-size: 0.85rem;
+    max-width: 100%;
+    color: rgba(255,255,255,0.75);
   }
 }
 
 @media (max-width: 480px) {
   .page-hero-body {
     padding-top: 4rem;
-    padding-bottom: 2rem;
-    justify-content: center;
+    padding-bottom: 1.75rem;
+    justify-content: flex-end;
   }
 
   .page-hero-title {
-    font-size: clamp(2.8rem, 12vw, 4.5rem);
+    font-size: clamp(2.4rem, 10vw, 3.8rem);
+  }
+
+  /* Always show subtitle */
+  .page-hero-sub {
+    display: block !important;
+    font-size: 0.78rem;
+    max-width: 100%;
+    color: rgba(255,255,255,0.75);
   }
 }
 

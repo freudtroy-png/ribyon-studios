@@ -6099,3 +6099,16 @@ a.wk-card .wk-desc  { color: var(--gray-dark); }
 a.wk-card--accent .wk-title { color: #fff; }
 a.wk-card--accent .wk-desc  { color: rgba(255,255,255,0.85); }
 a.wk-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.18); transform: translateY(-4px); }
+
+/* div-based clickable cards via onclick */
+div.wk-card[onclick] {
+  cursor: pointer;
+}
+div.wk-card[onclick]:hover {
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  transform: translateY(-4px);
+}
+div.wk-card[onclick]:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}

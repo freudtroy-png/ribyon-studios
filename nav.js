@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+/* ── Content protection ── */
+(function() {
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+  document.addEventListener('copy',    function(e) { e.preventDefault(); });
+  document.addEventListener('cut',     function(e) { e.preventDefault(); });
+  document.addEventListener('dragstart',function(e) { e.preventDefault(); });
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && ['u','U','s','S','a','A','c','C','p','P','j','J'].includes(e.key)) {
+      e.preventDefault();
+    }
+    if (e.key === 'F12') e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(function(img) {
+    img.setAttribute('draggable', 'false');
+  });
+}());
+
   /* Navbar scroll state — hide on scroll down, show on scroll up */
   const navbar = document.querySelector('.navbar');
   let lastScroll = 0;

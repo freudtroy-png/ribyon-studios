@@ -6128,3 +6128,208 @@ div.wk-card[onclick]:focus-visible {
   outline: 2px solid var(--orange);
   outline-offset: 3px;
 }
+
+/* ===================================================================
+   FIX: page-hero subtitle always visible on mobile
+   =================================================================== */
+
+/* Ensure page-hero-bottom never collapses or clips */
+.page-hero-bottom {
+  flex-shrink: 0;
+}
+
+/* Force subtitle visible at all sizes with proper contrast */
+.page-hero-sub {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+  .page-hero-sub {
+    display: block !important;
+    font-size: 0.85rem;
+    max-width: 100%;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.75rem;
+  }
+  /* More bottom padding so subtitle+button aren't clipped */
+  .page-hero-body {
+    padding-bottom: 3rem;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero-sub {
+    display: block !important;
+    font-size: 0.78rem;
+    max-width: 100%;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.6rem;
+  }
+  .page-hero-body {
+    padding-bottom: 2.5rem;
+    justify-content: flex-end;
+  }
+}
+
+/* ===================================================================
+   FIX: Mobile hamburger — active nav link pill shape
+   =================================================================== */
+@media (max-width: 768px) {
+  /* Override the 1rem 0 padding on mobile links for active pill only */
+  .nav-links a.active {
+    display: inline-block;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 0.4rem 1.25rem !important;
+    background: var(--orange);
+    color: var(--ink) !important;
+    border-radius: 999px;
+    border-bottom: none !important;
+    font-weight: 700;
+    text-align: center;
+  }
+  /* Keep non-active links full-width with border */
+  .nav-links a:not(.active) {
+    width: 100%;
+    display: block;
+    text-align: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--ink-line);
+  }
+  /* Remove bottom border from last link before the button */
+  .nav-links a:last-child {
+    border-bottom: 1px solid var(--ink-line);
+  }
+}
+
+/* ===================================================================
+   CONTENT PROTECTION — prevent copy/clone
+   =================================================================== */
+
+/* Disable text selection on the main content */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow selection inside forms and inputs */
+input, textarea, select,
+.contact-form-new,
+.newsletter-form,
+.cfn-group input,
+.cfn-group textarea,
+.cfn-group select {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  user-select: text !important;
+}
+
+/* ===================================================================
+   PRINT STYLES — clean branded print view
+   =================================================================== */
+@media print {
+  /* Hide non-essential elements */
+  .navbar,
+  .mobile-toggle,
+  .mobile-overlay,
+  .scroll-progress,
+  .float-bar,
+  .float-bar--lang,
+  #go-to-top,
+  #cookie-banner,
+  .newsletter-section,
+  .cta-ribbon,
+  .hero-type-ribbon,
+  .manifesto-ribbon,
+  .tiers-geo,
+  .svc-split-ribbon,
+  .process-ribbon,
+  .about-vm-ribbon,
+  .about-values-ribbon,
+  .post-hero-ribbon,
+  .post-footer-ribbon,
+  .post-body-ribbon,
+  .btn-subscribe,
+  .wk-controls,
+  .wk-dots,
+  .wk-btn,
+  .work-view-all {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+
+  html, body {
+    font-size: 11pt;
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Force white backgrounds */
+  section, .section, .bg-black, .bg-white, .bg-grey,
+  .hero-type, .manifesto, .work-section {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 { color: #111 !important; page-break-after: avoid; }
+  p { color: #333 !important; }
+  a { color: #f97316 !important; text-decoration: underline; }
+
+  /* Orange stays orange on print */
+  .orange, [class*="orange"] { color: #f97316 !important; }
+
+  /* Navbar: show as simple header */
+  .navbar {
+    display: block !important;
+    position: static !important;
+    border-bottom: 2pt solid #f97316;
+    padding: 6mm 0;
+    margin-bottom: 8mm;
+  }
+  .nav-links, .btn-nav, .btn-subscribe { display: none !important; }
+  .logo img { height: 28pt; }
+
+  /* Containers */
+  .container { max-width: 100% !important; padding: 0 !important; }
+
+  /* Hero sections */
+  .page-hero {
+    min-height: auto !important;
+    padding: 10mm 0 6mm !important;
+    break-after: avoid;
+  }
+  .page-hero-img { display: none !important; }
+  .page-hero-body { padding: 0 !important; min-height: auto !important; }
+  .page-hero-title { font-size: 28pt !important; color: #111 !important; }
+  .page-hero-sub { color: #555 !important; font-size: 11pt !important; display: block !important; }
+
+  /* Cards and grids */
+  .wk-card, .work-item, .cs-deliverable, .value-card,
+  .tiers-col, .stage-row, .process-step {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1pt solid #ddd !important;
+    background: #fff !important;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1pt solid #ddd !important;
+    padding: 6mm 0 !important;
+  }
+  .footer p, .footer a { color: #555 !important; font-size: 9pt !important; }
+  .footer-socials { display: none !important; }
+}

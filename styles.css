@@ -5782,28 +5782,36 @@ body { top: 0 !important; }
 
 /* Section already has .work-section padding */
 
-/* Slider: clips the scrolling track, full width */
+/* Slider outer: full width, dark background */
 .wk-slider {
   width: 100%;
-  overflow: hidden;
-  padding: 0 0 2rem;
+  padding-bottom: 2rem;
 }
 
-/* Track: 6 cards, showing 4 at a time on desktop */
-/* Each card = 25% of the slider = 100%/4 */
-/* Full track width = 6 cards * 25% = 150% */
+/* Clip wrapper: contains and clips the sliding track */
+.wk-clip {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Track: stretches to exactly the clip inner width */
 .wk-track {
   display: flex;
   gap: 1.25rem;
-  /* Outer padding gives side margins identical to .container */
-  padding: 0 calc((100% - 1240px) / 2 + 1.5rem);
-  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  /* Make track exactly the clip inner width so card % math is correct */
+  width: 100%;
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
   will-change: transform;
 }
 
-/* Card: white, rounded, shadow */
+/* Card: exactly 1/3 of clip inner width minus 2 gaps shared across 3 cards */
 .wk-card {
-  flex: 0 0 calc((1240px - 3 * 1.25rem) / 4);
+  flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
+  min-width: 0;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
@@ -5957,11 +5965,13 @@ body { top: 0 !important; }
 .wk-dot:hover:not(.active) { background: rgba(255,255,255,0.5); }
 
 /* Responsive */
-@media (max-width: 1100px) {
-  .wk-track { padding: 0 2rem; }
-  .wk-card  { flex: 0 0 calc(50% - 0.625rem); }
+/* Responsive — card sizing only, track/clip padding stays constant */
+@media (max-width: 1280px) {
+  /* clip is max 1240px; below that it becomes 100vw - 4rem */
+  .wk-card { flex: 0 0 calc((100vw - 4rem - 2 * 1.25rem) / 3); }
 }
-@media (max-width: 640px) {
-  .wk-track { padding: 0 1.25rem; gap: 1rem; }
-  .wk-card  { flex: 0 0 calc(85vw); }
+@media (max-width: 768px) {
+  .wk-clip { padding: 0 1.25rem; }
+  .wk-card { flex: 0 0 calc(80vw); }
 }
+

@@ -218,36 +218,42 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }());
 
-/* Work section — 2-card sliding showcase */
+/* Work section — 3-card sliding showcase, auto-advances */
 (function () {
-  var showcase = document.getElementById('workShowcase');
-  if (!showcase) return;
+  var slider  = document.getElementById('wkSlider');
+  if (!slider) return;
 
-  var track   = document.getElementById('wsTrack');
-  var cards   = Array.from(track.querySelectorAll('.ws-card'));
-  var dots    = Array.from(document.querySelectorAll('.ws-dot'));
-  var btnPrev = document.getElementById('wsPrev');
-  var btnNext = document.getElementById('wsNext');
-  var total   = cards.length;        /* 6 cards */
-  var current = 0;
+  var track   = document.getElementById('wkTrack');
+  var cards   = Array.from(track.querySelectorAll('.wk-card'));
+  var dots    = Array.from(document.querySelectorAll('.wk-dot'));
+  var btnPrev = document.getElementById('wkPrev');
+  var btnNext = document.getElementById('wkNext');
+  var total   = cards.length;   /* 6 */
+  var perView = 3;              /* always show 3 */
+  var current = 0;              /* index of first visible card */
   var autoTimer;
 
-  function perView() { return window.innerWidth <= 640 ? 1 : 2; }
-  function maxPos()  { return total - perView(); }
+  function maxPos() {
+    return total - (window.innerWidth <= 768 ? 1 : perView);
+  }
 
   function goTo(idx) {
     var max = maxPos();
     current = Math.max(0, Math.min(idx, max));
-    /* Each card is 1/total of the track width */
-    track.style.transform = 'translateX(-' + (current * (100 / total)) + '%)';
-    /* Dots active state */
+    /* Measure actual card width + gap from DOM for pixel-perfect slide */
+    var card     = cards[0];
+    var gap      = parseFloat(getComputedStyle(track).gap) || 20;
+    var cardW    = card.getBoundingClientRect().width;
+    var offset   = current * (cardW + gap);
+    track.style.transform = 'translateX(-' + offset + 'px)';
+    /* Update dots */
     dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
   }
 
-  function next() { goTo(current < maxPos() ? current + 1 : 0); }
-  function prev() { goTo(current > 0        ? current - 1 : maxPos()); }
+  function next() { goTo(current >= maxPos() ? 0 : current + 1); }
+  function prev() { goTo(current <= 0 ? maxPos() : current - 1); }
 
-  function startAuto() { stopAuto(); autoTimer = setInterval(next, 4000); }
+  function startAuto() { stopAuto(); autoTimer = setInterval(next, 4500); }
   function stopAuto()  { clearInterval(autoTimer); }
 
   if (btnPrev) btnPrev.addEventListener('click', function () { prev(); startAuto(); });
@@ -260,26 +266,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* Pause on hover */
-  showcase.addEventListener('mouseenter', stopAuto);
-  showcase.addEventListener('mouseleave', startAuto);
+  /* Pause auto on hover */
+  slider.addEventListener('mouseenter', stopAuto);
+  slider.addEventListener('mouseleave', startAuto);
 
   /* Touch swipe */
   var touchX = 0;
-  showcase.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
-  showcase.addEventListener('touchend', function (e) {
+  slider.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+  slider.addEventListener('touchend',   function (e) {
     var diff = touchX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); startAuto(); }
   }, { passive: true });
 
   /* Keyboard */
-  showcase.setAttribute('tabindex', '0');
-  showcase.addEventListener('keydown', function (e) {
+  slider.setAttribute('tabindex', '0');
+  slider.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight') { e.preventDefault(); next(); startAuto(); }
     if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); startAuto(); }
   });
 
-  /* Recalculate on resize */
+  /* Recalculate on resize (card widths change at breakpoints) */
   window.addEventListener('resize', function () { goTo(Math.min(current, maxPos())); });
 
   goTo(0);

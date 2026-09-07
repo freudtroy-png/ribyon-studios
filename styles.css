@@ -4582,7 +4582,7 @@ textarea:focus-visible {
   .page-hero { min-height: 70vh; }
   .page-hero-body { padding-top: 3.5rem; padding-bottom: 0.5rem; }
   .page-hero-title { font-size: clamp(2rem, 12vw, 3rem); }
-  .page-hero-sub { display: none; }
+  .page-hero-sub { font-size: 0.78rem; display: block; max-width: 100%; }
   .page-hero-bottom .btn { font-size: 0.82rem; padding: 0.55rem 1.1rem; }
   .cs-hero-title { font-size: clamp(2rem, 12vw, 3rem); }
   .post-back { font-size: 0.7rem; padding: 0.5rem 1rem; }
@@ -4628,7 +4628,7 @@ textarea:focus-visible {
 #go-to-top:active {
   transform: translateY(0) scale(0.95);
 }
-#go-to-top svg { display: block; stroke: #fff; display: flex; align-items: center; justify-content: center; }
+#go-to-top svg { display: block; stroke: #fff; }
 @media (max-width: 640px) {
   #go-to-top { bottom: 1.25rem; right: 1.25rem; width: 38px; height: 38px; }
 }
@@ -6072,4 +6072,17 @@ img {
 /* Prevent FOUT on font load */
 body {
   font-display: swap;
+}
+
+/* ── Go-to-top: always orange, always white icon ── */
+#go-to-top,
+#go-to-top:link,
+#go-to-top:visited {
+  background: var(--orange) !important;
+  border: none !important;
+  color: #fff !important;
+}
+#go-to-top svg,
+#go-to-top svg * {
+  stroke: #fff !important;
 }

@@ -218,80 +218,47 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }());
 
-/* Work section — stacked image pile */
+/* Work section — editorial showcase */
 (function () {
-  var pile    = document.getElementById('workPile');
-  var navEl   = document.getElementById('wpdNav');
-  var btnPrev = document.getElementById('workPrev');
-  var btnNext = document.getElementById('workNext');
-  var countEl = document.getElementById('wpcCount');
-  if (!pile) return;
+  var showcase = document.getElementById('workShowcase');
+  if (!showcase) return;
 
-  var cards   = Array.from(pile.querySelectorAll('.work-pile-card'));
-  var details = Array.from(document.querySelectorAll('.work-pile-detail'));
-  var dots    = navEl ? Array.from(navEl.querySelectorAll('.wpd-dot')) : [];
-  var total   = cards.length;
+  var slides  = Array.from(showcase.querySelectorAll('.ws-slide'));
+  var dots    = Array.from(showcase.querySelectorAll('.ws-dot'));
+  var btnPrev = document.getElementById('wsPrev');
+  var btnNext = document.getElementById('wsNext');
+  var total   = slides.length;
   var current = 0;
 
-  /* Resting transform/opacity/z for each stack position (0 = top) */
-  var restT = [
-    'rotate(0deg) translate(0px, 0px)',
-    'rotate(-2.5deg) translate(-8px, 6px)',
-    'rotate(1.8deg) translate(6px, 10px)',
-    'rotate(-1.2deg) translate(-4px, 16px)',
-    'rotate(2.4deg) translate(10px, 22px)',
-    'rotate(-1.8deg) translate(-6px, 28px)'
-  ];
-  var restO = [1, 0.85, 0.70, 0.50, 0.35, 0.20];
-  var restZ = [6, 5, 4, 3, 2, 1];
-
-  function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
   function goTo(idx) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
     current = ((idx % total) + total) % total;
-
-    /* Restack cards */
-    cards.forEach(function (card) {
-      var pos = ((parseInt(card.dataset.idx, 10) - current) + total) % total;
-      card.style.transform = restT[pos];
-      card.style.opacity   = restO[pos];
-      card.style.zIndex    = restZ[pos];
-    });
-
-    /* Swap detail panel */
-    details.forEach(function (d) {
-      d.classList.toggle('active', parseInt(d.dataset.idx, 10) === current);
-    });
-
-    /* Dots */
-    dots.forEach(function (d) {
-      d.classList.toggle('active', parseInt(d.dataset.idx, 10) === current);
-    });
-
-    /* Counter */
-    if (countEl) countEl.textContent = pad(current + 1) + ' / ' + pad(total);
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
   }
 
-  /* Prev / Next */
   if (btnPrev) btnPrev.addEventListener('click', function () { goTo(current - 1); });
   if (btnNext) btnNext.addEventListener('click', function () { goTo(current + 1); });
 
-  /* Dot clicks */
   dots.forEach(function (dot) {
     dot.addEventListener('click', function () { goTo(parseInt(dot.dataset.idx, 10)); });
   });
 
-  /* Pile click → next (still works as shortcut) */
-  pile.addEventListener('click', function () { goTo(current + 1); });
-
-  /* Keyboard */
-  pile.setAttribute('tabindex', '0');
-  pile.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); goTo(current - 1); }
+  /* Keyboard navigation */
+  showcase.setAttribute('tabindex', '0');
+  showcase.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
   });
 
-  goTo(0);
+  /* Touch swipe */
+  var touchStartX = 0;
+  showcase.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  showcase.addEventListener('touchend', function (e) {
+    var diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { goTo(diff > 0 ? current + 1 : current - 1); }
+  }, { passive: true });
 }());
 
 /* Services split accordion — products.html */

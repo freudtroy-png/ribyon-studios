@@ -362,137 +362,161 @@
       </a>
     </div>
 
-    <div class="container work-pile-wrap">
+    <!-- New editorial showcase -->
+    <div class="work-showcase" id="workShowcase">
 
-      <!-- Left: stacked image pile + nav buttons -->
-      <div class="work-pile-left">
-        <div class="work-pile" id="workPile">
-          <div class="work-pile-card" data-idx="0">
-            <!-- Tronavo: overhead painted warehouse floor markings — bold geometry, industrial orange echoes brand -->
-            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Tronavo">
-          </div>
-          <div class="work-pile-card" data-idx="1">
-            <!-- Galactic Core: dark room, multiple glowing screens, data-rich -->
-            <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Galactic Core">
-          </div>
-          <div class="work-pile-card" data-idx="2">
-            <!-- Safari Yetu: elephant silhouette at golden dusk — cinematic, not postcard -->
-            <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Safari Yetu">
-          </div>
-          <div class="work-pile-card" data-idx="3">
-            <!-- Pixelplus: camera lens close-up with dramatic light refraction -->
-            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Pixelplus">
-          </div>
-          <div class="work-pile-card" data-idx="4">
-            <!-- Tybrite POS: Nairobi market stalls, vivid colour, East African street commerce -->
-            <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Tybrite POS">
-          </div>
-          <div class="work-pile-card" data-idx="5">
-            <!-- Pollant Travels: aerial Kenyan landscape — abstract topography, brand direction -->
-            <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=900&q=85&fit=crop&crop=center" loading="lazy" alt="Pollant Travels">
-          </div>
+      <!-- Slide 0: Tronavo -->
+      <div class="ws-slide active" data-idx="0">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Tronavo">
+          <div class="ws-img-overlay"></div>
         </div>
-
-        <!-- Prev / Next buttons — always visible below the pile -->
-        <div class="work-pile-controls">
-          <button class="wpc-btn" id="workPrev" aria-label="Previous project">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4L6 8l4 4"/></svg>
-            Prev
-          </button>
-          <span class="wpc-count" id="wpcCount">01 / 06</span>
-          <button class="wpc-btn wpc-btn--next" id="workNext" aria-label="Next project">
-            Next
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-          </button>
+        <div class="ws-info">
+          <span class="ws-num">01 / 06</span>
+          <h3 class="ws-name">Tronavo</h3>
+          <div class="ws-tags">
+            <span>Brand Identity</span>
+            <span>Visual Language</span>
+          </div>
+          <p class="ws-desc">Built the full brand identity for a Nairobi-based tech startup working in automation, web, and AI. Logo, colour system, typography, and brand guidelines from zero.</p>
+          <div class="ws-stat">3 enterprise clients in month one</div>
+          <a href="case-studies/tronavo.html" class="ws-cta">
+            View case study
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
+          </a>
         </div>
       </div>
 
-      <!-- Right: project details -->
-      <div class="work-pile-info">
-
-        <div class="work-pile-detail active" data-idx="0">
-          <span class="wpd-num">01 / 06</span>
-          <h3 class="wpd-name">Tronavo</h3>
-          <p class="wpd-type">Brand Identity · Visual Language</p>
-          <p class="wpd-desc">Built the full brand identity for a Nairobi-based tech startup working in automation, web, and AI. Logo, colour system, typography, and brand guidelines from zero.</p>
-          <span class="wpd-stat">3 enterprise clients in month one</span>
-          <a href="case-studies/tronavo.html" class="wpd-cta">
+      <!-- Slide 1: Galactic Core -->
+      <div class="ws-slide" data-idx="1">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Galactic Core">
+          <div class="ws-img-overlay"></div>
+        </div>
+        <div class="ws-info">
+          <span class="ws-num">02 / 06</span>
+          <h3 class="ws-name">Galactic Core</h3>
+          <div class="ws-tags">
+            <span>Brand Identity</span>
+            <span>Visual Language</span>
+          </div>
+          <p class="ws-desc">Brand identity and visual system for Tybrite Labs' production commerce engine. Built to communicate precision and scale at an enterprise level.</p>
+          <div class="ws-stat">Identity for a platform serving live stores</div>
+          <a href="case-studies/galactic-core.html" class="ws-cta">
             View case study
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
           </a>
         </div>
-
-        <div class="work-pile-detail" data-idx="1">
-          <span class="wpd-num">02 / 06</span>
-          <h3 class="wpd-name">Galactic Core</h3>
-          <p class="wpd-type">Brand Identity · Visual Language</p>
-          <p class="wpd-desc">Brand identity and visual system for Tybrite Labs' production commerce engine, Galactic Core. Built to communicate precision and scale at an enterprise level.</p>
-          <span class="wpd-stat">Identity built for a platform serving live stores</span>
-          <a href="case-studies/galactic-core.html" class="wpd-cta">
-            View case study
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
-          </a>
-        </div>
-
-        <div class="work-pile-detail" data-idx="2">
-          <span class="wpd-num">03 / 06</span>
-          <h3 class="wpd-name">Safari Yetu</h3>
-          <p class="wpd-type">Website · CMS · Client Portal · Social Media</p>
-          <p class="wpd-desc">Full digital rebuild for Kenya's leading tailor-made safari operator. New website, CMS, newsletter pipeline, client portal, and a complete social media design system.</p>
-          <span class="wpd-stat">62% growth in profile reach</span>
-          <a href="case-studies/safari-yetu.html" class="wpd-cta">
-            View case study
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
-          </a>
-        </div>
-
-        <div class="work-pile-detail" data-idx="3">
-          <span class="wpd-num">04 / 06</span>
-          <h3 class="wpd-name">Pixelplus</h3>
-          <p class="wpd-type">Identity · Videography</p>
-          <p class="wpd-desc">Cinematic visual system for a videography studio. Built to compete at the highest level.</p>
-          <span class="wpd-stat">Launching 2026</span>
-          <a href="case-studies/pixelplus.html" class="wpd-cta">
-            View case study
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
-          </a>
-        </div>
-
-        <div class="work-pile-detail" data-idx="4">
-          <span class="wpd-num">05 / 06</span>
-          <h3 class="wpd-name">Tybrite POS</h3>
-          <p class="wpd-type">Product · Retail</p>
-          <p class="wpd-desc">Point of sale system for East African retail. Built for speed in high-volume environments.</p>
-          <span class="wpd-stat">↑ 65% transaction speed</span>
-          <a href="case-studies/tybrite-pos.html" class="wpd-cta">
-            View case study
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
-          </a>
-        </div>
-
-        <div class="work-pile-detail" data-idx="5">
-          <span class="wpd-num">06 / 06</span>
-          <h3 class="wpd-name">Pollant Travels</h3>
-          <p class="wpd-type">Brand Strategy</p>
-          <p class="wpd-desc">Brand direction for a travel company connecting East Africa to the world.</p>
-          <span class="wpd-stat">Direction complete</span>
-          <a href="case-studies/pollant-travels.html" class="wpd-cta">
-            View case study
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
-          </a>
-        </div>
-
-        <!-- Dot nav -->
-        <div class="wpd-nav" id="wpdNav">
-          <button class="wpd-dot active" data-idx="0" aria-label="Tronavo"></button>
-          <button class="wpd-dot" data-idx="1" aria-label="Galactic Core"></button>
-          <button class="wpd-dot" data-idx="2" aria-label="Safari Yetu"></button>
-          <button class="wpd-dot" data-idx="3" aria-label="Pixelplus"></button>
-          <button class="wpd-dot" data-idx="4" aria-label="Tybrite POS"></button>
-          <button class="wpd-dot" data-idx="5" aria-label="Pollant Travels"></button>
-        </div>
-
       </div>
+
+      <!-- Slide 2: Safari Yetu -->
+      <div class="ws-slide" data-idx="2">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Safari Yetu">
+          <div class="ws-img-overlay"></div>
+        </div>
+        <div class="ws-info">
+          <span class="ws-num">03 / 06</span>
+          <h3 class="ws-name">Safari Yetu</h3>
+          <div class="ws-tags">
+            <span>Website</span>
+            <span>CMS</span>
+            <span>Client Portal</span>
+            <span>Social Media</span>
+          </div>
+          <p class="ws-desc">Full digital rebuild for Kenya's leading tailor-made safari operator. Website, CMS, newsletter pipeline, client portal, and a complete social media design system.</p>
+          <div class="ws-stat">62% growth in profile reach</div>
+          <a href="case-studies/safari-yetu.html" class="ws-cta">
+            View case study
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Slide 3: Pixelplus -->
+      <div class="ws-slide" data-idx="3">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Pixelplus">
+          <div class="ws-img-overlay"></div>
+        </div>
+        <div class="ws-info">
+          <span class="ws-num">04 / 06</span>
+          <h3 class="ws-name">Pixelplus</h3>
+          <div class="ws-tags">
+            <span>Brand Identity</span>
+            <span>Videography</span>
+          </div>
+          <p class="ws-desc">Cinematic visual identity for a Nairobi videography studio competing with international names. Precise, premium, built to stand on its own.</p>
+          <div class="ws-stat">Launching 2026</div>
+          <a href="case-studies/pixelplus.html" class="ws-cta">
+            View case study
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Slide 4: Tybrite POS -->
+      <div class="ws-slide" data-idx="4">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Tybrite POS">
+          <div class="ws-img-overlay"></div>
+        </div>
+        <div class="ws-info">
+          <span class="ws-num">05 / 06</span>
+          <h3 class="ws-name">Tybrite POS</h3>
+          <div class="ws-tags">
+            <span>Product Design</span>
+            <span>Retail</span>
+          </div>
+          <p class="ws-desc">Point of sale system designed for East African retail environments. Built for high transaction volumes, speed, and operators who cannot afford downtime.</p>
+          <div class="ws-stat">65% faster transaction speed</div>
+          <a href="case-studies/tybrite-pos.html" class="ws-cta">
+            View case study
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Slide 5: Pollant Travels -->
+      <div class="ws-slide" data-idx="5">
+        <div class="ws-img">
+          <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1200&q=85&fit=crop&crop=center" loading="lazy" alt="Pollant Travels">
+          <div class="ws-img-overlay"></div>
+        </div>
+        <div class="ws-info">
+          <span class="ws-num">06 / 06</span>
+          <h3 class="ws-name">Pollant Travels</h3>
+          <div class="ws-tags">
+            <span>Brand Strategy</span>
+            <span>Positioning</span>
+          </div>
+          <p class="ws-desc">Brand strategy and positioning for a travel company connecting East Africa to the world. From competing on price to competing on experience.</p>
+          <div class="ws-stat">Repositioning complete</div>
+          <a href="case-studies/pollant-travels.html" class="ws-cta">
+            View case study
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5l4.5 4.5-4.5 4.5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="ws-controls">
+        <button class="ws-btn ws-prev" id="wsPrev" aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 4L6 8l4 4"/></svg>
+        </button>
+        <div class="ws-dots" id="wsDots">
+          <button class="ws-dot active" data-idx="0" aria-label="Tronavo"></button>
+          <button class="ws-dot" data-idx="1" aria-label="Galactic Core"></button>
+          <button class="ws-dot" data-idx="2" aria-label="Safari Yetu"></button>
+          <button class="ws-dot" data-idx="3" aria-label="Pixelplus"></button>
+          <button class="ws-dot" data-idx="4" aria-label="Tybrite POS"></button>
+          <button class="ws-dot" data-idx="5" aria-label="Pollant Travels"></button>
+        </div>
+        <button class="ws-btn ws-next" id="wsNext" aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+
     </div>
   </section>
 

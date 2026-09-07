@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }());
 
-/* Work section — 3-card sliding showcase, auto-advances */
+/* Work section — 3-card sliding showcase (1 card on mobile), auto-advances */
 (function () {
   var slider  = document.getElementById('wkSlider');
   if (!slider) return;
@@ -229,24 +229,22 @@ document.addEventListener('DOMContentLoaded', function () {
   var btnPrev = document.getElementById('wkPrev');
   var btnNext = document.getElementById('wkNext');
   var total   = cards.length;   /* 6 */
-  var perView = 3;              /* always show 3 */
-  var current = 0;              /* index of first visible card */
+  var current = 0;
   var autoTimer;
 
-  function maxPos() {
-    return total - (window.innerWidth <= 768 ? 1 : perView);
-  }
+  function perView() { return window.innerWidth <= 768 ? 1 : 3; }
+  function maxPos()  { return total - perView(); }
 
   function goTo(idx) {
     var max = maxPos();
     current = Math.max(0, Math.min(idx, max));
-    /* Measure actual card width + gap from DOM for pixel-perfect slide */
-    var card     = cards[0];
-    var gap      = parseFloat(getComputedStyle(track).gap) || 20;
-    var cardW    = card.getBoundingClientRect().width;
-    var offset   = current * (cardW + gap);
-    track.style.transform = 'translateX(-' + offset + 'px)';
-    /* Update dots */
+
+    /* Pixel-perfect offset: card width + gap, measured live */
+    var cardW = cards[0].getBoundingClientRect().width;
+    var gap   = parseFloat(getComputedStyle(track).gap) || 20;
+    track.style.transform = 'translateX(-' + (current * (cardW + gap)) + 'px)';
+
+    /* Sync dots — 4 dots for desktop (pos 0-3), 6 dots for mobile (pos 0-5) */
     dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
   }
 
@@ -266,11 +264,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* Pause auto on hover */
   slider.addEventListener('mouseenter', stopAuto);
   slider.addEventListener('mouseleave', startAuto);
 
-  /* Touch swipe */
   var touchX = 0;
   slider.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
   slider.addEventListener('touchend',   function (e) {
@@ -278,15 +274,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); startAuto(); }
   }, { passive: true });
 
-  /* Keyboard */
   slider.setAttribute('tabindex', '0');
   slider.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight') { e.preventDefault(); next(); startAuto(); }
     if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); startAuto(); }
   });
 
-  /* Recalculate on resize (card widths change at breakpoints) */
-  window.addEventListener('resize', function () { goTo(Math.min(current, maxPos())); });
+  window.addEventListener('resize', function () {
+    current = Math.min(current, maxPos());
+    goTo(current);
+  });
 
   goTo(0);
   startAuto();

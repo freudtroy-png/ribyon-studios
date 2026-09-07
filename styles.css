@@ -5782,35 +5782,38 @@ body { top: 0 !important; }
 
 /* Section already has .work-section padding */
 
-/* Slider outer: full width, dark background */
+/* Slider outer: full width dark bg */
 .wk-slider {
   width: 100%;
   padding-bottom: 2rem;
 }
 
-/* Clip wrapper: contains and clips the sliding track */
-.wk-clip {
-  width: 100%;
+/* Margin wrapper: provides side spacing without clipping */
+.wk-margin {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 2rem;
-  overflow: hidden;
-  box-sizing: border-box;
 }
 
-/* Track: stretches to exactly the clip inner width */
+/* Clip: sits inside margin wrapper, clips overflowing cards */
+.wk-clip {
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Track: flex row of 6 cards, translated by JS */
 .wk-track {
   display: flex;
   gap: 1.25rem;
-  /* Make track exactly the clip inner width so card % math is correct */
-  width: 100%;
   transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
   will-change: transform;
 }
 
-/* Card: exactly 1/3 of clip inner width minus 2 gaps shared across 3 cards */
+/* Card: 1/3 of the visible area.
+   wk-margin inner = min(100vw, 1240px) - 4rem padding
+   Below 1240+4rem = 1272px viewport, use vw math */
 .wk-card {
-  flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
+  flex: 0 0 calc((min(100vw, 1240px) - 4rem - 2 * 1.25rem) / 3);
   min-width: 0;
   background: #fff;
   border-radius: 16px;
@@ -5965,13 +5968,16 @@ body { top: 0 !important; }
 .wk-dot:hover:not(.active) { background: rgba(255,255,255,0.5); }
 
 /* Responsive */
-/* Responsive — card sizing only, track/clip padding stays constant */
+/* Responsive */
+/* Below 1280px viewport, wk-margin is 100vw - 4rem */
 @media (max-width: 1280px) {
-  /* clip is max 1240px; below that it becomes 100vw - 4rem */
   .wk-card { flex: 0 0 calc((100vw - 4rem - 2 * 1.25rem) / 3); }
 }
+
+/* Mobile: 1 card at a time, full width minus margins */
 @media (max-width: 768px) {
-  .wk-clip { padding: 0 1.25rem; }
-  .wk-card { flex: 0 0 calc(80vw); }
+  .wk-margin { padding: 0 1.25rem; }
+  .wk-card   { flex: 0 0 calc(100vw - 2.5rem); }
+  .wk-track  { gap: 1rem; }
 }
 

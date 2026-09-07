@@ -6086,3 +6086,16 @@ body {
 #go-to-top svg * {
   stroke: #fff !important;
 }
+
+/* ── Work cards: fully clickable ── */
+a.wk-card {
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+a.wk-card .wk-title { color: var(--ink); }
+a.wk-card .wk-desc  { color: var(--gray-dark); }
+a.wk-card--accent .wk-title { color: #fff; }
+a.wk-card--accent .wk-desc  { color: rgba(255,255,255,0.85); }
+a.wk-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.18); transform: translateY(-4px); }

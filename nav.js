@@ -218,47 +218,72 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }());
 
-/* Work section — editorial showcase */
+/* Work section — 2-card sliding showcase */
 (function () {
   var showcase = document.getElementById('workShowcase');
   if (!showcase) return;
 
-  var slides  = Array.from(showcase.querySelectorAll('.ws-slide'));
-  var dots    = Array.from(showcase.querySelectorAll('.ws-dot'));
+  var track   = document.getElementById('wsTrack');
+  var cards   = Array.from(track.querySelectorAll('.ws-card'));
+  var dots    = Array.from(document.querySelectorAll('.ws-dot'));
   var btnPrev = document.getElementById('wsPrev');
   var btnNext = document.getElementById('wsNext');
-  var total   = slides.length;
+  var total   = cards.length;        /* 6 cards */
   var current = 0;
+  var autoTimer;
+
+  function perView() { return window.innerWidth <= 640 ? 1 : 2; }
+  function maxPos()  { return total - perView(); }
 
   function goTo(idx) {
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = ((idx % total) + total) % total;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
+    var max = maxPos();
+    current = Math.max(0, Math.min(idx, max));
+    /* Each card is 1/total of the track width */
+    track.style.transform = 'translateX(-' + (current * (100 / total)) + '%)';
+    /* Dots active state */
+    dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
   }
 
-  if (btnPrev) btnPrev.addEventListener('click', function () { goTo(current - 1); });
-  if (btnNext) btnNext.addEventListener('click', function () { goTo(current + 1); });
+  function next() { goTo(current < maxPos() ? current + 1 : 0); }
+  function prev() { goTo(current > 0        ? current - 1 : maxPos()); }
+
+  function startAuto() { stopAuto(); autoTimer = setInterval(next, 4000); }
+  function stopAuto()  { clearInterval(autoTimer); }
+
+  if (btnPrev) btnPrev.addEventListener('click', function () { prev(); startAuto(); });
+  if (btnNext) btnNext.addEventListener('click', function () { next(); startAuto(); });
 
   dots.forEach(function (dot) {
-    dot.addEventListener('click', function () { goTo(parseInt(dot.dataset.idx, 10)); });
+    dot.addEventListener('click', function () {
+      goTo(parseInt(dot.dataset.idx, 10));
+      startAuto();
+    });
   });
 
-  /* Keyboard navigation */
-  showcase.setAttribute('tabindex', '0');
-  showcase.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
-  });
+  /* Pause on hover */
+  showcase.addEventListener('mouseenter', stopAuto);
+  showcase.addEventListener('mouseleave', startAuto);
 
   /* Touch swipe */
-  var touchStartX = 0;
-  showcase.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  var touchX = 0;
+  showcase.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
   showcase.addEventListener('touchend', function (e) {
-    var diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) { goTo(diff > 0 ? current + 1 : current - 1); }
+    var diff = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); startAuto(); }
   }, { passive: true });
+
+  /* Keyboard */
+  showcase.setAttribute('tabindex', '0');
+  showcase.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); startAuto(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); startAuto(); }
+  });
+
+  /* Recalculate on resize */
+  window.addEventListener('resize', function () { goTo(Math.min(current, maxPos())); });
+
+  goTo(0);
+  startAuto();
 }());
 
 /* Services split accordion — products.html */
